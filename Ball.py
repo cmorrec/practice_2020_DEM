@@ -1,6 +1,4 @@
 from math import *
-
-
 class Ball:
     def __init__(self, x, y, canvas, color, radius, alpha, velocity):
         self.alphaRadian = alpha * pi / 180
@@ -14,8 +12,8 @@ class Ball:
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
         self.canvas_height = self.canvas.winfo_height()
         self.canvas_width = self.canvas.winfo_width()
-        self.starts = False
-        self.started = False
+        #self.starts = False
+        #self.started = False
         self.canvas.bind_all('<KeyPress-s>', self.start)                # s - начало движения
         self.canvas.bind_all('<KeyPress-e>', self.exit)                 # e - конец движения
 

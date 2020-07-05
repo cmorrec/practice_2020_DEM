@@ -1,6 +1,10 @@
 from tkinter import *
+from typing import List, Any
+
 from Ball import *
 import time
+
+from practice_2020_DEM.Ball import Ball
 
 mWidth = 500
 mHeight = 500
@@ -9,7 +13,7 @@ x = 70
 print("Координата х шара в начальный момент времени: ", x)
 y = 50
 print("Координата y шара в начальный момент времени: ", y)
-velocity = 10
+velocity = 2
 print("Скорость шара равна: ", velocity)
 radius = 20
 print("Радиус шара равен: ", radius)
@@ -23,11 +27,16 @@ tk.wm_attributes('-topmost', 1)
 canvas = Canvas(tk, width=mWidth, height=mHeight, highlightthickness=0)
 canvas.pack()
 tk.update()
+ball=[]
+for i in range(5):
+    ball.append(Ball(x+50*i, y+50*i, canvas, 'red', radius, alpha, velocity))
+    i+= 1
 
-ball = Ball(x, y, canvas, 'red', radius, alpha, velocity)
-while not ball.starts:
-    if ball.started:
-        ball.draw()
+#while not ball[0].starts:
+    #if ball[0].started:
+while 1:
+    for i in range(5):
+        ball[i].draw()
     tk.update_idletasks()
     tk.update()
-    time.sleep(0.1)
+    time.sleep(0.01)
