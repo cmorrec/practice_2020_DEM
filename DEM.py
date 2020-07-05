@@ -1,10 +1,7 @@
 from tkinter import *
-from typing import List, Any
-
 from Ball import *
 import time
 
-from practice_2020_DEM.Ball import Ball
 
 mWidth = 500
 mHeight = 500
