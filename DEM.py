@@ -33,10 +33,10 @@ tk.update()
 # При желании посмотреть на другие фигуры раскомментируйте(и закомментируйте) соотвествующие участки кода
 
 # Ромб
-coordinate1 = Coordinate(mWidth / 2, 0)
-coordinate2 = Coordinate(mWidth, mHeight / 2)
-coordinate3 = Coordinate(mWidth / 2, mHeight)
-coordinate4 = Coordinate(0, mHeight / 2)
+# coordinate1 = Coordinate(mWidth / 2, 0)
+# coordinate2 = Coordinate(mWidth, mHeight / 2)
+# coordinate3 = Coordinate(mWidth / 2, mHeight)
+# coordinate4 = Coordinate(0, mHeight / 2)
 
 # Прямоугольник
 # coordinate1 = Coordinate(0, 0)
@@ -45,10 +45,10 @@ coordinate4 = Coordinate(0, mHeight / 2)
 # coordinate4 = Coordinate(0, mHeight)
 
 # Трапеция
-# coordinate1 = Coordinate(mWidth / 4, 0)
-# coordinate2 = Coordinate(3 * mWidth / 4, 0)
-# coordinate3 = Coordinate(mWidth, mHeight)
-# coordinate4 = Coordinate(0, mHeight)
+coordinate1 = Coordinate(mWidth / 4, 0)
+coordinate2 = Coordinate(3 * mWidth / 4, 0)
+coordinate3 = Coordinate(mWidth, mHeight)
+coordinate4 = Coordinate(0, mHeight)
 
 coordinates = np.array([coordinate1, coordinate2, coordinate3, coordinate3])
 
@@ -60,11 +60,11 @@ lines = np.array([line1, line2, line3, line4])
 
 wall = Wall(coordinates, lines, canvas, 'black')
 
-ball = Ball(x, y, canvas, 'red', radius, alpha, velocity)
+ball = Ball(x, y, canvas, 'red', radius, alpha, velocity, wall)
 
 while not ball.starts:
     if ball.started:
-        ball.drawPolygon(wall)
+        ball.drawPolygon()
     tk.update_idletasks()
     tk.update()
     time.sleep(0.1)
