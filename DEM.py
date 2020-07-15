@@ -9,15 +9,15 @@ import time
 mWidth = 500
 mHeight = 500
 
-x = 260
+x = 250
 print("Координата х шара в начальный момент времени: ", x)
-y = 240
+y = 250
 print("Координата y шара в начальный момент времени: ", y)
 velocity = 15
 print("Скорость шара равна: ", velocity)
 radius = 20
 print("Радиус шара равен: ", radius)
-alpha = -30
+alpha = -35
 print("Поворот вектора скорости относительно горизонтали: ", alpha)
 
 tk = Tk()
@@ -39,16 +39,16 @@ tk.update()
 # coordinate4 = Coordinate(0, mHeight / 2)
 
 # Прямоугольник
-# coordinate1 = Coordinate(0, 0)
-# coordinate2 = Coordinate(mWidth, 0)
-# coordinate3 = Coordinate(mWidth, mHeight)
-# coordinate4 = Coordinate(0, mHeight)
-
-# Трапеция
-coordinate1 = Coordinate(mWidth / 4, 0)
-coordinate2 = Coordinate(3 * mWidth / 4, 0)
+coordinate1 = Coordinate(0, 0)
+coordinate2 = Coordinate(mWidth, 0)
 coordinate3 = Coordinate(mWidth, mHeight)
 coordinate4 = Coordinate(0, mHeight)
+
+# Трапеция
+# coordinate1 = Coordinate(mWidth / 4, 0)
+# coordinate2 = Coordinate(3 * mWidth / 4, 0)
+# coordinate3 = Coordinate(mWidth, mHeight - 50)
+# coordinate4 = Coordinate(0, mHeight - 50)
 
 coordinates = np.array([coordinate1, coordinate2, coordinate3, coordinate3])
 
