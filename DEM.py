@@ -6,7 +6,6 @@ from Wall import *
 from Elements import *
 import numpy as np
 import time
-
 mWidth = 500
 mHeight = 500
 
@@ -20,7 +19,7 @@ velocity = 5
 print("Скорость шара равна: ", velocity)
 radius = 30
 print("Радиус шара равен: ", radius)
-alpha = 30
+alpha = 40
 print("Поворот вектора скорости относительно горизонтали: ", alpha)
 
 tk = Tk()
@@ -65,13 +64,11 @@ wall = Wall(coordinates, lines, canvas, 'black')
 ball1 = Ball(x, y, canvas, 'red', radius, alpha, velocity, wall)
 ball2 = Ball(x+80, y, canvas, 'green', radius, -alpha, velocity, wall)
 ball3 = Ball(x-80, y, canvas, 'blue', radius, -alpha, velocity, wall)
-balls = np.array([ball1, ball2, ball3, 0])
-elements = Elements(balls, canvas, n)
+balls = np.array([ball1, ball2, ball3])
+elements = Elements(balls, canvas)
 while not elements.starts:
     if elements.started:
-        for i in range(n):
-            elements.draw(balls, n)
-            elements.reset(balls, n)
+        elements.draw(balls)
     tk.update_idletasks()
     tk.update()
-    time.sleep(0.08)
+    time.sleep(0.05)
