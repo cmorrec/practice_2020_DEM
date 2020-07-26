@@ -9,40 +9,83 @@ class Elements:
         self.canvas = canvas
         self.canvas.bind_all('<KeyPress-s>', self.start)  # s - начало движения
         self.canvas.bind_all('<KeyPress-e>', self.exit)  # e - конец движения
-        self.flac = 0
+        self.summ = 0
+        self.velocityXSignPlus = True
+        self.velocityYSignPlus = True
+        self.distance = 0
 
-    def method(self, balls, i, j):# приведение к задаче о столкновении шаров(линия столкновения становится горизонтальной)
+    def method(self, i, j):# приведение к задаче о столкновении шаров(линия столкновения становится горизонтальной)
         # угол между линией удара и горизонталью
-        gamma = atan(abs((balls[i].y - balls[j].y)) / abs((balls[i].x - balls[j].x)))
-        alphaRadian_2_tmp = balls[j].alphaRadian
-        alphaRadian_1_tmp = balls[i].alphaRadian
-        Velocity1X_old = balls[i].velocityAbsolute * cos(alphaRadian_1_tmp)
-        Velocity1Y = balls[i].velocityAbsolute * sin(alphaRadian_1_tmp)
-        Velocity2X_old = balls[j].velocityAbsolute * cos(alphaRadian_2_tmp)
-        Velocity2Y = balls[j].velocityAbsolute * sin(alphaRadian_2_tmp)
+        # gamma = atan(abs((self.balls[i].y - self.balls[j].y)) / abs((self.balls[i].x - self.balls[j].x)))
+        # alphaRadian_2_tmp = self.balls[j].alphaRadian
+        # alphaRadian_1_tmp = self.balls[i].alphaRadian
+        # Velocity1X_old = self.balls[i].velocityAbsolute * cos(alphaRadian_1_tmp)
+        # Velocity1Y = self.balls[i].velocityAbsolute * sin(alphaRadian_1_tmp)
+        # Velocity2X_old = self.balls[j].velocityAbsolute * cos(alphaRadian_2_tmp)
+        # Velocity2Y = self.balls[j].velocityAbsolute * sin(alphaRadian_2_tmp)
+        #
+        #
+        # Velocity1X_new = ((self.balls[i].mass - self.balls[j].mass) * Velocity1X_old + 2 * self.balls[j].mass *Velocity2X_old) / (self.balls[i].mass + self.balls[j].mass)
+        # Velocity2X_new = (2 * self.balls[i].mass * Velocity1X_old + (self.balls[j].mass - self.balls[i].mass) * Velocity2X_old) / (self.balls[i].mass + self.balls[j].mass)
+        # self.balls[i].alphaRadian = atan(Velocity1Y / Velocity1X_new) + gamma
+        # self.balls[j].alphaRadian = atan(Velocity2Y / Velocity2X_new) + gamma
+        self.balls[i].newAlpha = -1
+        self.balls[j].newAlpha =  1
+        self.balls[i].newVelocityAbsolute = 5
+        self.balls[j].newVelocityAbsolute = 5
+        self.balls[i].changeAlpha()
+        self.balls[j].changeAlpha()
+
+    def move(self): # проверяем столкнулись ли шары
+         for i in range(len(self.balls)):
+             for j in range(i+1,len(self.balls)):
+                 if self.request(i, j):
+                     self.method(i, j)
 
 
-        Velocity1X_new = ((balls[i].m - balls[j].m) * Velocity1X_old + 2 * balls[j].m *Velocity2X_old) / (balls[i].m + balls[j].m)
-        Velocity2X_new = (2 * balls[i].m * Velocity1X_old + (balls[j].m - balls[i].m) * Velocity2X_old) / (balls[i].m + balls[j].m)
-        balls[i].alphaRadian = atan(Velocity1Y / Velocity1X_new) + gamma
-        balls[j].alphaRadian = atan(Velocity2Y / Velocity2X_new) + gamma
-        self.flac +=1
 
-    def move(self, balls): # проверяем столкнулись ли шары
-         for i in range(len(balls)):
-             for j in range(len(balls)-1, -1, -1):
-                 if self.request(balls, i, j):
-                     self.method(balls, i, j)
-
-
-
-    def request(self, balls, i, j):
-            if sqrt((balls[i].x - balls[j].x) ** 2 + (balls[i].y - balls[j].y) ** 2) - (balls[i].radius + balls[j].radius) < eps and not i == j and self.flac == 0:
-                self.flac = i
+    def request(self, i, j):
+            if sqrt((self.balls[i].x - self.balls[j].x) ** 2 + (self.balls[i].y - self.balls[j].y) ** 2) < (self.balls[i].radius + self.balls[j].radius):
+                self.distance = sqrt((self.balls[i].x - self.balls[j].x) ** 2 + (self.balls[i].y - self.balls[j].y) ** 2)
+                if self.balls[i].velocityX > 0:# проверяем какой знак имеют скорости первого шара. От этого зависит условие сближения/удаления шаров
+                    self.velocityXSignPlus = True
+                self.velocityXSignPlus = False
+                if self.balls[i].velocityY > 0:
+                    self.velocityYSignPlus = True
+                self.velocityYSignPlus = False
+                # Возвращаем True если шары летят навстречу друг другу, в обратном случае False.
+                if self.velocityXSignPlus:
+                    if self.distance < self.distance - (self.balls[i].velocityX - self.balls[j].velocityX)*0.05:
+                        print('7')
+                        if self.velocityYSignPlus:
+                            if self.distance < self.distance - (self.balls[i].velocityY - self.balls[j].velocityY)*0.05:
+                                print('1')
+                                return False
+                            print('2')
+                            return True
+                        if self.distance < self.distance + (self.balls[i].velocityY - self.balls[j].velocityY) * 0.05:
+                            print("3")
+                            return False
+                        print('4')
+                        return True
+                    print('5')
+                    return True
+                # Если же знак скорости Х отрицательный проделываем остальные проверки заново.
+                if self.distance < self.distance + (self.balls[i].velocityX - self.balls[j].velocityX) * 0.05:
+                    print('6')
+                    if self.velocityYSignPlus:
+                        if self.distance < self.distance - (self.balls[i].velocityY - self.balls[j].velocityY) * 0.05:
+                            print('8')
+                            return False
+                        print("9")
+                        return True
+                    if self.distance < self.distance + (self.balls[i].velocityY - self.balls[j].velocityY) * 0.05:
+                        print('10')
+                        return False
+                    print('11')
+                    return True
+                print('12')
                 return True
-            self.flac+=1
-            if self.flac == 3:
-                self.flac = 0
             return False
     def start(self, event):
         self.started = True
@@ -50,7 +93,7 @@ class Elements:
     def exit(self, event):
         self.started = False
 
-    def draw(self, balls):
-        self.move(balls)
-        for i in range(len(balls)):
-            balls[i].drawPolygon()
+    def draw(self):
+        self.move()
+        for i in range(len(self.balls)):
+            self.balls[i].drawPolygon()

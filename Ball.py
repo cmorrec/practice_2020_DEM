@@ -1,6 +1,8 @@
 from math import *
 
 eps = 1e-5  # eps необходимо поместить в одно место(второе в Line.py),
+
+
 # возможно создать отдельный файл для хранения констант, если таковые будут(шаг по времени, ускорение и пр.)
 
 # Для синтаксического сахара необходимо в конструкторе проверять на принадлежность стенке
@@ -11,7 +13,9 @@ class Ball:
     def __init__(self, x, y, canvas, color, radius, alpha, velocity, wall):
         self.x = x
         self.y = y
-        self.m = pi*radius**2
+        self.mass = pi * radius ** 2
+        self.newAlpha = 0
+        self.newVelocityAbsolute = 0
         self.radius = radius
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180
@@ -20,16 +24,6 @@ class Ball:
         self.wall = wall
         self.canvas = canvas
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
-        self.starts = False
-        self.started = True
-        self.canvas.bind_all('<KeyPress-s>', self.start)  # s - начало движения
-        self.canvas.bind_all('<KeyPress-e>', self.exit)  # e - конец движения
-
-    def start(self, event):
-        self.started = True
-
-    def exit(self, event):
-        self.started = False
 
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
@@ -126,5 +120,7 @@ class Ball:
             if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
                 self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
                 return
-    def changeAlpha(newAlpha):
-        return
+
+    def changeAlpha(self):
+        self.alphaRadian = self.newAlpha
+        self.velocityAbsolute = self.newVelocityAbsolute

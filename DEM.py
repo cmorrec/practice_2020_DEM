@@ -68,7 +68,7 @@ balls = np.array([ball1, ball2, ball3])
 elements = Elements(balls, canvas)
 while not elements.starts:
     if elements.started:
-        elements.draw(balls)
+        elements.draw()
     tk.update_idletasks()
     tk.update()
     time.sleep(0.05)
