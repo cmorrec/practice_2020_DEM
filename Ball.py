@@ -121,6 +121,6 @@ class Ball:
                 self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
                 return
 
-    def changeAlpha(self):
-        self.alphaRadian = self.newAlpha
-        self.velocityAbsolute = self.newVelocityAbsolute
+    def changeAlpha(self, newAlpha, newVelocityAbsolute):
+        self.alphaRadian = newAlpha
+        self.velocityAbsolute = newVelocityAbsolute
