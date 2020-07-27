@@ -11,15 +11,15 @@ mHeight = 500
 
 n = 3
 print("Количество шаров: ", n)
-x = 250
+x = 200
 print("Координата х шара в начальный момент времени: ", x)
-y = 250
+y = 200
 print("Координата y шара в начальный момент времени: ", y)
 velocity = 5
 print("Скорость шара равна: ", velocity)
-radius = 30
+radius = 70
 print("Радиус шара равен: ", radius)
-alpha = 40
+alpha = 70
 print("Поворот вектора скорости относительно горизонтали: ", alpha)
 
 tk = Tk()
@@ -62,9 +62,9 @@ lines = np.array([line1, line2, line3, line4])
 
 wall = Wall(coordinates, lines, canvas, 'black')
 ball1 = Ball(x, y, canvas, 'red', radius, alpha, velocity, wall)
-ball2 = Ball(x+80, y, canvas, 'green', radius, -alpha, velocity, wall)
-ball3 = Ball(x-80, y, canvas, 'blue', radius, -alpha, velocity, wall)
-balls = np.array([ball1, ball2, ball3])
+ball2 = Ball(x+180, y+180, canvas, 'green', radius, -120, velocity, wall)
+#ball3 = Ball(x-200, y-20, canvas, 'blue', radius, 20, velocity, wall)
+balls = np.array([ball1, ball2])
 elements = Elements(balls, canvas)
 while not elements.starts:
     if elements.started:

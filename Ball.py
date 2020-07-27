@@ -14,8 +14,6 @@ class Ball:
         self.x = x
         self.y = y
         self.mass = pi * radius ** 2
-        self.newAlpha = 0
-        self.newVelocityAbsolute = 0
         self.radius = radius
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180

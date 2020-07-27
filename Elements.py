@@ -20,24 +20,26 @@ class Elements:
     def method(self, i, j):
         # приведение к задаче о столкновении шаров(линия столкновения становится горизонтальной)
         # угол между линией удара и горизонталью
-        # gamma = atan(abs((self.balls[i].y - self.balls[j].y)) / abs((self.balls[i].x - self.balls[j].x)))
-        # alphaRadian_2_tmp = self.balls[j].alphaRadian
-        # alphaRadian_1_tmp = self.balls[i].alphaRadian
-        # Velocity1X_old = self.balls[i].velocityAbsolute * cos(alphaRadian_1_tmp)
-        # Velocity1Y = self.balls[i].velocityAbsolute * sin(alphaRadian_1_tmp)
-        # Velocity2X_old = self.balls[j].velocityAbsolute * cos(alphaRadian_2_tmp)
-        # Velocity2Y = self.balls[j].velocityAbsolute * sin(alphaRadian_2_tmp)
-        #
-        #
-        # Velocity1X_new = ((self.balls[i].mass - self.balls[j].mass) * Velocity1X_old + 2 * self.balls[j].mass *Velocity2X_old) / (self.balls[i].mass + self.balls[j].mass)
-        # Velocity2X_new = (2 * self.balls[i].mass * Velocity1X_old + (self.balls[j].mass - self.balls[i].mass) * Velocity2X_old) / (self.balls[i].mass + self.balls[j].mass)
-        # self.balls[i].alphaRadian = atan(Velocity1Y / Velocity1X_new) + gamma
-        # self.balls[j].alphaRadian = atan(Velocity2Y / Velocity2X_new) + gamma
-        newAlphaI = -1
-        newAlphaJ = 1
-        newVelocityAbsolute = 5
-        self.balls[i].changeAlpha(newAlphaI, newVelocityAbsolute)
-        self.balls[j].changeAlpha(newAlphaJ, newVelocityAbsolute)
+        if not self.balls[i].x == self.balls[j].x:
+             gamma = atan((self.balls[i].y - self.balls[j].y) / (self.balls[i].x - self.balls[j].x))
+        else:
+             gamma = pi/2
+        alphaRadian_1_tmp = self.balls[i].alphaRadian
+        alphaRadian_2_tmp = self.balls[j].alphaRadian
+        velocity1X_old = self.balls[i].velocityAbsolute * cos(alphaRadian_1_tmp)
+        velocity1Y = self.balls[i].velocityAbsolute * sin(alphaRadian_1_tmp)
+        velocity2X_old = self.balls[j].velocityAbsolute * cos(alphaRadian_2_tmp)
+        velocity2Y = self.balls[j].velocityAbsolute * sin(alphaRadian_2_tmp)
+        velocity1Y_new = velocity1Y
+        velocity2Y_new = velocity2Y
+        velocity1X_new = ((self.balls[i].mass - self.balls[j].mass) * velocity1X_old + 2 * self.balls[j].mass *velocity2X_old) / (self.balls[i].mass + self.balls[j].mass)
+        velocity2X_new = - (2 * self.balls[i].mass * velocity1X_old + (self.balls[j].mass - self.balls[i].mass) * velocity2X_old) / (self.balls[i].mass + self.balls[j].mass)
+        newAlphaI = pi - atan(velocity1Y_new / velocity1X_new) - gamma
+        newAlphaJ = atan(velocity2Y_new / velocity2X_new) - gamma
+        newVelocityAbsoluteI = sqrt(velocity1X_new**2 + velocity1Y**2)
+        newVelocityAbsoluteJ = sqrt(velocity2X_new**2 + velocity2Y**2)
+        self.balls[i].changeAlpha(newAlphaI, newVelocityAbsoluteI)
+        self.balls[j].changeAlpha(newAlphaJ, newVelocityAbsoluteJ)
 
     def move(self):  # проверяем столкнулись ли шары
         for i in range(len(self.balls)):
@@ -88,7 +90,7 @@ class Elements:
             #     print('11')
             #     return True
             # print('12')
-            if self.distanceNow(i, j) > self.distanceNext(i, j):
+            if self.distanceNow(i, j) >= self.distanceNext(i, j):
                 print(i, j, self.distanceNow(i, j), self.distanceNext(i, j), True)
                 return True
             print(i, j, self.distanceNow(i, j), self.distanceNext(i, j), False)
