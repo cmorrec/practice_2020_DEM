@@ -18,9 +18,17 @@ class Elements:
 
     def start(self, event):
         self.started = True
+        print("Изначальное количество энергии", self.energy(), "\n")
 
     def exit(self, event):
         self.started = False
+        print("Конечное количество энергии", self.energy(), "\n\n")
+
+    def energy(self):
+        energyCount = 0
+        for ball in self.balls:
+            energyCount += ball.mass * (ball.velocityAbsolute ** 2)
+        return energyCount
 
     def draw(self):
         self.move()
