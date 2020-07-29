@@ -1,26 +1,24 @@
-from tkinter import *
 from Ball import *
 from Coordinate import *
 from Line import *
 from Wall import *
 from Elements import *
-import numpy as np
-import time
+
 mWidth = 500
 mHeight = 500
 
 n = 3
 print("Количество шаров: ", n)
-x = 200
-print("Координата х шара в начальный момент времени: ", x)
-y = 200
-print("Координата y шара в начальный момент времени: ", y)
+x = 250
+print("Дефолтная координата х шара в начальный момент времени: ", x)
+y = 250
+print("Дефолтная координата y шара в начальный момент времени: ", y)
 velocity = 5
-print("Скорость шара равна: ", velocity)
-radius = 70
-print("Радиус шара равен: ", radius)
-alpha = 70
-print("Поворот вектора скорости относительно горизонтали: ", alpha)
+print("Дефолтная скорость шара равна: ", velocity)
+radius = 25
+print("Дефолтный радиус шара равен: ", radius)
+alpha = 30
+print("Дефолтный поворот вектора скорости относительно горизонтали: ", alpha)
 
 tk = Tk()
 tk.title('DEM')
@@ -35,16 +33,16 @@ tk.update()
 # При желании посмотреть на другие фигуры раскомментируйте(и закомментируйте) соотвествующие участки кода
 
 # Ромб
-# coordinate1 = Coordinate(mWidth / 2, 0)
-# coordinate2 = Coordinate(mWidth, mHeight / 2)
-# coordinate3 = Coordinate(mWidth / 2, mHeight)
-# coordinate4 = Coordinate(0, mHeight / 2)
+coordinate1 = Coordinate(mWidth / 2, 0)
+coordinate2 = Coordinate(mWidth, mHeight / 2)
+coordinate3 = Coordinate(mWidth / 2, mHeight)
+coordinate4 = Coordinate(0, mHeight / 2)
 
 # Прямоугольник
-coordinate1 = Coordinate(0, 0)
-coordinate2 = Coordinate(mWidth, 0)
-coordinate3 = Coordinate(mWidth, mHeight)
-coordinate4 = Coordinate(0, mHeight)
+# coordinate1 = Coordinate(0, 0)
+# coordinate2 = Coordinate(mWidth, 0)
+# coordinate3 = Coordinate(mWidth, mHeight)
+# coordinate4 = Coordinate(0, mHeight)
 
 # Трапеция
 # coordinate1 = Coordinate(mWidth / 4, 0)
@@ -61,10 +59,10 @@ line4 = Line(coordinate4.x, coordinate4.y, coordinate1.x, coordinate1.y)
 lines = np.array([line1, line2, line3, line4])
 
 wall = Wall(coordinates, lines, canvas, 'black')
-ball1 = Ball(x, y, canvas, 'red', radius, alpha, velocity, wall)
-ball2 = Ball(x+180, y+180, canvas, 'green', radius, -120, velocity, wall)
-#ball3 = Ball(x-200, y-20, canvas, 'blue', radius, 20, velocity, wall)
-balls = np.array([ball1, ball2])
+ball1 = Ball(x, y, canvas, 'red', radius + 10, alpha, velocity + 3, wall)
+ball2 = Ball(x + 80, y, canvas, 'green', radius, 2 * alpha, velocity - 3, wall)
+ball3 = Ball(x - 80, y, canvas, 'blue', radius - 10, -alpha, velocity, wall)
+balls = np.array([ball1, ball2, ball3])
 elements = Elements(balls, canvas)
 while not elements.starts:
     if elements.started:

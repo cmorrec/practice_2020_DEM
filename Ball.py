@@ -1,12 +1,7 @@
-from math import *
+from GlobalUtils import *
 
-eps = 1e-5  # eps необходимо поместить в одно место(второе в Line.py),
-
-
-# возможно создать отдельный файл для хранения констант, если таковые будут(шаг по времени, ускорение и пр.)
 
 # Для синтаксического сахара необходимо в конструкторе проверять на принадлежность стенке
-# В последующем классе Elements также нужно реализовать эту проверку и проверку о ненакладывании мячей
 
 
 class Ball:
@@ -14,6 +9,8 @@ class Ball:
         self.x = x
         self.y = y
         self.mass = pi * radius ** 2
+        self.newAlpha = 0
+        self.newVelocityAbsolute = 0
         self.radius = radius
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180
@@ -119,6 +116,9 @@ class Ball:
                 self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
                 return
 
-    def changeAlpha(self, newAlpha, newVelocityAbsolute):
+    def changeVelocity(self, newAlpha, newVelocityAbsolute):
+        # Изменение вектора скорости
         self.alphaRadian = newAlpha
         self.velocityAbsolute = newVelocityAbsolute
+        self.velocityX = newVelocityAbsolute * cos(newAlpha)
+        self.velocityY = newVelocityAbsolute * sin(newAlpha)
