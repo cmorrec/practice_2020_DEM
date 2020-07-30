@@ -1,5 +1,5 @@
-from GlobalUtils import *
-
+from Line import *
+from Coordinate import *
 
 # Класс Wall по-хорошему надо сделать Singleton`ом, но я не знаю как это реализуется в Python,
 # поэтому пока запихнул в конструктор Ball
@@ -17,7 +17,14 @@ from GlobalUtils import *
 
 
 class Wall:
-    def __init__(self, coordinates, lines, canvas, color):
+    def __init__(self, canvas, color, coordinates=None, lines=None):
+        if coordinates is None:
+            coordinates = [Coordinate(), Coordinate()]
+        if lines is None:
+            lines = []
+            for i in range(len(coordinates)):
+                lines.append(Line(coordinates[i % len(coordinates)], coordinates[(i + 1) % len(coordinates)]))
+
         self.coordinates = coordinates
         self.lines = lines
         for line in self.lines:

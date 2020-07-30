@@ -1,6 +1,5 @@
 from Ball import *
 from Coordinate import *
-from Line import *
 from Wall import *
 from Elements import *
 
@@ -19,6 +18,28 @@ radius = 25
 print("Дефолтный радиус шара равен: ", radius)
 alpha = 30
 print("Дефолтный поворот вектора скорости относительно горизонтали: ", alpha)
+
+coordinatesFile = open('wall_coordinates.txt', 'r')
+ballStartFile = open('balls_start.txt', 'r')
+ballEndFile = open('balls_end.txt', 'w')
+
+coordinatesFromFile = []
+linesFromFile = []
+i = 0
+
+for line in coordinatesFile:
+    words = line.split()
+    data = []
+    for word in words:
+        if i == 0:
+            mWidth = int(word)
+        elif i == 1:
+            mHeight = int(word)
+        else:
+            data.append(int(word))
+        i += 1
+    if len(data) > 0:
+        coordinatesFromFile.append(Coordinate(data[0], data[1]))
 
 tk = Tk()
 tk.title('DEM')
@@ -52,13 +73,13 @@ coordinate4 = Coordinate(0, mHeight / 2)
 
 coordinates = np.array([coordinate1, coordinate2, coordinate3, coordinate3])
 
-line1 = Line(coordinate1.x, coordinate1.y, coordinate2.x, coordinate2.y)
-line2 = Line(coordinate2.x, coordinate2.y, coordinate3.x, coordinate3.y)
-line3 = Line(coordinate3.x, coordinate3.y, coordinate4.x, coordinate4.y)
-line4 = Line(coordinate4.x, coordinate4.y, coordinate1.x, coordinate1.y)
+line1 = Line(coordinate1, coordinate2)
+line2 = Line(coordinate2, coordinate3)
+line3 = Line(coordinate3, coordinate4)
+line4 = Line(coordinate4, coordinate1)
 lines = np.array([line1, line2, line3, line4])
 
-wall = Wall(coordinates, lines, canvas, 'black')
+wall = Wall(canvas, 'black', coordinatesFromFile)
 ball1 = Ball(x, y, canvas, 'red', radius + 10, alpha, velocity + 3, wall)
 ball2 = Ball(x + 80, y, canvas, 'green', radius, 2 * alpha, velocity - 3, wall)
 ball3 = Ball(x - 80, y, canvas, 'blue', radius - 10, -alpha, velocity, wall)

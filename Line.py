@@ -1,15 +1,12 @@
 from GlobalUtils import *
 
 
-# Для синтаксического сахара необходим конструктор, принимающий на вход два объекта класса Coordinate
-
-
 class Line:
-    def __init__(self, x1, y1, x2, y2):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+    def __init__(self, coordinate1, coordinate2):
+        self.x1 = coordinate1.x
+        self.y1 = coordinate1.y
+        self.x2 = coordinate2.x
+        self.y2 = coordinate2.y
         self.abs = sqrt((self.x2 - self.x1) ** 2 + (self.y2 - self.y1) ** 2)
         # Следующие три строки исключают возможность деления на ноль
         distY = abs(self.y2 - self.y1)
