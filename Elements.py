@@ -63,6 +63,7 @@ class Elements:
         # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
         # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
         # переход в локальную систему координат)
+        # Также учет диссипации при каждом столкновении шаров
 
         # Угол между линией удара и горизонталью
         gamma = atan2((self.balls[i].y - self.balls[j].y), (self.balls[i].x - self.balls[j].x))
@@ -74,6 +75,9 @@ class Elements:
         velocity1YLocal = self.balls[i].velocityAbsolute * sin(alphaRadian_1_tmp)
         velocity2XLocal = self.balls[j].velocityAbsolute * cos(alphaRadian_2_tmp)
         velocity2YLocal = self.balls[j].velocityAbsolute * sin(alphaRadian_2_tmp)
+        # Относительная скорость и демпфирование
+        dampeningNormal = (abs(velocity1XLocal - velocity2XLocal))*сn
+        #dampeningTangent = (abs(velocity1YLocal - velocity2YLocal))*cs
 
         # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
         velocity1XLocalNew = ((self.balls[i].mass - self.balls[j].mass) * velocity1XLocal + 2 * self.balls[
@@ -85,9 +89,13 @@ class Elements:
         # Возвращение к глобальной системе координат
         newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
         newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
-        newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
-        newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
-
+        newVelocityAbsoluteI = sqrt((abs(velocity1XLocalNew) - dampeningNormal) ** 2 + velocity1YLocal ** 2)
+        newVelocityAbsoluteJ = sqrt((abs(velocity2XLocalNew) - dampeningNormal) ** 2 + velocity2YLocal ** 2)
+        # Остановка шаров при крайне малых скоростях
+        if newVelocityAbsoluteI <= 0.1:
+            newVelocityAbsoluteI = 0
+        if newVelocityAbsoluteJ <= 0.1:
+            newVelocityAbsoluteJ = 0
         # Задание нового вектора скорости
         self.balls[i].changeVelocity(newAlphaI, newVelocityAbsoluteI)
         self.balls[j].changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
