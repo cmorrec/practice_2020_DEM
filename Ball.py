@@ -5,7 +5,7 @@ from GlobalUtils import *
 
 
 class Ball:
-    def __init__(self, x, y, canvas, color, radius, alpha, velocity, wall):
+    def __init__(self, x, y, radius, alpha, velocity, color, canvas, wall):
         self.x = x
         self.y = y
         self.mass = pi * radius ** 2
