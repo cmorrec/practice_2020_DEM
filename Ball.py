@@ -40,7 +40,9 @@ class Ball:
             self.comeBack()
         # Обновление направлений скоростей
         self.velocityX = self.velocityAbsolute * cos(self.alphaRadian)
-        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian)
+        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) 
+        # self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.wall.accelerationX * deltaTime
+        # self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.wall.accelerationY * deltaTime
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией
@@ -58,6 +60,17 @@ class Ball:
                 # (во втором случае менять направление не нужно)
                 if self.resetForLine(line):
                     self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
+                    alphaRadianLocal = self.alphaRadian - line.alphaNorm
+                    velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
+                    velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
+                    dampeningNormal = velocityXLocal * self.cn
+                    #dampeningTangent = velocityYLocal * self.cs
+                    if abs(velocityXLocal) - dampeningNormal > 0:
+                        velocityXLocalNew = (abs(velocityXLocal) - dampeningNormal) * velocityXLocal / abs(
+                            velocityXLocal)
+                    else:
+                        velocityXLocalNew = 0
+                    self.velocityAbsolute = sqrt(velocityXLocalNew**2 + velocityYLocal**2)
                     return
 
     def resetForLine(self, line):

@@ -24,7 +24,8 @@ class Wall:
             lines = []
             for i in range(len(coordinates)):
                 lines.append(Line(coordinates[i % len(coordinates)], coordinates[(i + 1) % len(coordinates)]))
-
+        self.accelerationX = 0
+        self.accelerationY = 9.8
         self.coordinates = coordinates
         self.lines = lines
         for line in self.lines:
