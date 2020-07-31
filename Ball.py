@@ -124,3 +124,9 @@ class Ball:
         self.velocityAbsolute = newVelocityAbsolute
         self.velocityX = newVelocityAbsolute * cos(newAlpha)
         self.velocityY = newVelocityAbsolute * sin(newAlpha)
+
+    def getAlpha(self):
+        return self.alphaRadian * 180 / pi
+
+    def getAcceleration(self):
+        return self.velocityAbsolute / deltaTime

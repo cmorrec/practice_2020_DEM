@@ -2,6 +2,7 @@ from Ball import *
 from Wall import *
 from Elements import *
 
+
 n = 3
 print("Количество шаров: ", n)
 x = 250
@@ -16,9 +17,6 @@ alpha = 30
 print("Дефолтный поворот вектора скорости относительно горизонтали: ", alpha)
 
 coordinatesFile = open('wall_coordinates.txt', 'r')
-ballStartFile = open('balls_start.txt', 'r')
-ballEndFile = open('balls_end.txt', 'w')
-
 coordinatesFromFile = []
 
 for line in coordinatesFile:
@@ -28,6 +26,8 @@ for line in coordinatesFile:
         data.append(float(word))
     if len(data) > 0:
         coordinatesFromFile.append(Coordinate(data[0], data[1]))
+
+coordinatesFile.close()
 
 xCoordinates = []
 yCoordinates = []
@@ -47,9 +47,10 @@ tk.update()
 
 wall = Wall(canvas, 'black', coordinatesFromFile)
 
+ballsStartFile = open('balls_start.txt', 'r')
 ballsFromFile = []
 
-for line in ballStartFile:
+for line in ballsStartFile:
     words = line.split()
     data = []
     j = 0
@@ -63,10 +64,14 @@ for line in ballStartFile:
     if len(data) > 0:
         ballsFromFile.append(Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], color, canvas, wall))
 
+ballsStartFile.close()
+
 elements = Elements(ballsFromFile, canvas)
 while not elements.starts:
     if elements.started:
         elements.draw()
     tk.update_idletasks()
     tk.update()
-    time.sleep(0.05)
+    time.sleep(deltaTime)
+
+saveResults(elements)

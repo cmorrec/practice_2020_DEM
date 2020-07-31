@@ -16,13 +16,19 @@ class Elements:
         self.canvas.bind_all('<KeyPress-s>', self.start)  # s - начало движения
         self.canvas.bind_all('<KeyPress-e>', self.exit)  # e - конец движения
 
+    def energyMonitoring(self):
+        print("Количество энергии", self.energy(), "\n")
+        if self.energy() < eps:
+            self.starts = True
+
     def start(self, event):
         self.started = True
-        print("Изначальное количество энергии", self.energy(), "\n")
+        self.energyMonitoring()
 
     def exit(self, event):
         self.started = False
-        print("Конечное количество энергии", self.energy(), "\n\n")
+        saveResults(self)
+        self.energyMonitoring()
 
     def energy(self):
         energyCount = 0
