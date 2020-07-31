@@ -1,5 +1,4 @@
 from Ball import *
-from Coordinate import *
 from Wall import *
 from Elements import *
 
@@ -29,12 +28,12 @@ for line in coordinatesFile:
         data.append(float(word))
     if len(data) > 0:
         coordinatesFromFile.append(Coordinate(data[0], data[1]))
+
 xCoordinates = []
 yCoordinates = []
 for coordinate in coordinatesFromFile:
     xCoordinates.append(coordinate.x)
     yCoordinates.append(coordinate.y)
-
 mWidth = max(xCoordinates) - min(xCoordinates)
 mHeight = max(yCoordinates) - min(yCoordinates)
 
@@ -62,7 +61,7 @@ for line in ballStartFile:
             color = word
         j += 1
     if len(data) > 0:
-        ballsFromFile.append(Ball(data[0], data[1], data[2], data[3], data[4], color, canvas, wall))
+        ballsFromFile.append(Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], color, canvas, wall))
 
 elements = Elements(ballsFromFile, canvas)
 while not elements.starts:

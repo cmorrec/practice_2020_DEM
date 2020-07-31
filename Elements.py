@@ -68,16 +68,16 @@ class Elements:
         # Угол между линией удара и горизонталью
         gamma = atan2((self.balls[i].y - self.balls[j].y), (self.balls[i].x - self.balls[j].x))
         # Углы направления шаров в локальной системе координат
-        alphaRadian_1_tmp = self.balls[i].alphaRadian - gamma
-        alphaRadian_2_tmp = self.balls[j].alphaRadian - gamma
+        alphaRadian1Local = self.balls[i].alphaRadian - gamma
+        alphaRadian2Local = self.balls[j].alphaRadian - gamma
         # Скорости шаров в локальной системе координат
-        velocity1XLocal = self.balls[i].velocityAbsolute * cos(alphaRadian_1_tmp)
-        velocity1YLocal = self.balls[i].velocityAbsolute * sin(alphaRadian_1_tmp)
-        velocity2XLocal = self.balls[j].velocityAbsolute * cos(alphaRadian_2_tmp)
-        velocity2YLocal = self.balls[j].velocityAbsolute * sin(alphaRadian_2_tmp)
+        velocity1XLocal = self.balls[i].velocityAbsolute * cos(alphaRadian1Local)
+        velocity1YLocal = self.balls[i].velocityAbsolute * sin(alphaRadian1Local)
+        velocity2XLocal = self.balls[j].velocityAbsolute * cos(alphaRadian2Local)
+        velocity2YLocal = self.balls[j].velocityAbsolute * sin(alphaRadian2Local)
         # Относительная скорость и демпфирование
-        dampeningNormal = (abs(velocity1XLocal - velocity2XLocal))*сn
-        #dampeningTangent = (abs(velocity1YLocal - velocity2YLocal))*cs
+        dampeningNormal = (abs(velocity1XLocal - velocity2XLocal)) * self.balls[i].cn
+        dampeningTangent = (abs(velocity1YLocal - velocity2YLocal)) * self.balls[i].cs
 
         # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
         velocity1XLocalNew = ((self.balls[i].mass - self.balls[j].mass) * velocity1XLocal + 2 * self.balls[
@@ -86,11 +86,23 @@ class Elements:
                 self.balls[j].mass - self.balls[i].mass) * velocity2XLocal) / (
                                      self.balls[i].mass + self.balls[j].mass)
 
+        # Учет демпфирования
+        if abs(velocity1XLocalNew) - dampeningNormal > 0:
+            velocity1XLocalNew = (abs(velocity1XLocalNew) - dampeningNormal) * velocity1XLocalNew / abs(
+                velocity1XLocalNew)
+        else:
+            velocity1XLocalNew = 0
+        if abs(velocity2XLocalNew) - dampeningNormal > 0:
+            velocity2XLocalNew = (abs(velocity2XLocalNew) - dampeningNormal) * velocity2XLocalNew / abs(
+                velocity2XLocalNew)
+        else:
+            velocity2XLocalNew = 0
+
         # Возвращение к глобальной системе координат
         newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
         newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
-        newVelocityAbsoluteI = sqrt((abs(velocity1XLocalNew) - dampeningNormal) ** 2 + velocity1YLocal ** 2)
-        newVelocityAbsoluteJ = sqrt((abs(velocity2XLocalNew) - dampeningNormal) ** 2 + velocity2YLocal ** 2)
+        newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
+        newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
         # Остановка шаров при крайне малых скоростях
         if newVelocityAbsoluteI <= 0.1:
             newVelocityAbsoluteI = 0

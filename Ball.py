@@ -5,10 +5,14 @@ from GlobalUtils import *
 
 
 class Ball:
-    def __init__(self, x, y, radius, alpha, velocity, color, canvas, wall):
+    def __init__(self, x, y, radius, alpha, velocity, cn, cs, color, canvas, wall):
         self.x = x
         self.y = y
         self.mass = pi * radius ** 2
+        # Коэффициент контактного демпфирования в нормальном направлении
+        self.cn = cn
+        # Коэффициент контактного демпфирования в тангенциальном направлении
+        self.cs = cs
         self.radius = radius
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180
