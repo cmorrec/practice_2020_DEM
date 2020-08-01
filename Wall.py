@@ -17,15 +17,15 @@ from Coordinate import *
 
 
 class Wall:
-    def __init__(self, canvas, color, coordinates=None, lines=None):
+    def __init__(self, canvas, color, coordinates=None, accelerationX=0, accelerationY=0, lines=None):
         if coordinates is None:
             coordinates = [Coordinate(), Coordinate()]
         if lines is None:
             lines = []
             for i in range(len(coordinates)):
                 lines.append(Line(coordinates[i % len(coordinates)], coordinates[(i + 1) % len(coordinates)]))
-        self.accelerationX = 0
-        self.accelerationY = 9.8
+        self.accelerationX = accelerationX
+        self.accelerationY = accelerationY
         self.coordinates = coordinates
         self.lines = lines
         for line in self.lines:

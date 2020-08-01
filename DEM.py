@@ -2,7 +2,6 @@ from Ball import *
 from Wall import *
 from Elements import *
 
-
 n = 3
 print("Количество шаров: ", n)
 x = 250
@@ -45,7 +44,7 @@ canvas = Canvas(tk, width=mWidth, height=mHeight, highlightthickness=0)
 canvas.pack()
 tk.update()
 
-wall = Wall(canvas, 'black', coordinatesFromFile)
+wall = Wall(canvas, 'black', coordinatesFromFile, accelerationX, accelerationY)
 
 ballsStartFile = open('balls_start.txt', 'r')
 ballsFromFile = []

@@ -50,10 +50,8 @@ class Elements:
 
     def isCross(self, i, j):
         # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
-        if sqrt((self.balls[i].x - self.balls[j].x) ** 2 + (self.balls[i].y - self.balls[j].y) ** 2) < (
-                self.balls[i].radius + self.balls[j].radius):
-            if self.distanceNow(i, j) > self.distanceNext(i, j):
-                return True
+        if self.distanceNext(i, j) < self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
+            return True
         return False
 
     def distanceNow(self, i, j):
@@ -109,11 +107,6 @@ class Elements:
         newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
         newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
         newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
-        # Остановка шаров при крайне малых скоростях
-        if newVelocityAbsoluteI <= 0.1:
-            newVelocityAbsoluteI = 0
-        if newVelocityAbsoluteJ <= 0.1:
-            newVelocityAbsoluteJ = 0
         # Задание нового вектора скорости
         self.balls[i].changeVelocity(newAlphaI, newVelocityAbsoluteI)
         self.balls[j].changeVelocity(newAlphaJ, newVelocityAbsoluteJ)

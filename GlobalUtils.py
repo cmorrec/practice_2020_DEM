@@ -8,14 +8,17 @@ from tkinter import *
 eps = 1e-5
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
-deltaTime = 1e-2
+deltaTime = 0.1
 # Шаг по времени
+
+accelerationX = 0
+accelerationY = 0.1
 
 
 def saveResults(elements):
     # Запись результатов в файл
     ballsEndFile = open('balls_end.txt', 'w')
-    linesEndFile = []
+    linesEndFile = ['x\t\t\t\t\t\t\ty\t\tradius\t\talpha\t\t\tvelocity\t\tacceleration']
     for ball in elements.balls:
         linesEndFile.append(
             str(ball.x) + ' ' + str(ball.y) + ' ' + str(ball.radius) + ' ' + str(ball.getAlpha()) + ' ' + str(

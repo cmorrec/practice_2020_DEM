@@ -39,10 +39,12 @@ class Ball:
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
-        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian)
-        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) 
-        # self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.wall.accelerationX * deltaTime
-        # self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.wall.accelerationY * deltaTime
+        # self.velocityX = self.velocityAbsolute * cos(self.alphaRadian)
+        # self.velocityY = self.velocityAbsolute * sin(self.alphaRadian)
+        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.wall.accelerationX
+        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.wall.accelerationY
+        self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
+                            sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией
@@ -64,14 +66,14 @@ class Ball:
                     velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
                     velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
                     dampeningNormal = velocityXLocal * self.cn
-                    #dampeningTangent = velocityYLocal * self.cs
+                    # dampeningTangent = velocityYLocal * self.cs
                     if abs(velocityXLocal) - dampeningNormal > 0:
                         velocityXLocalNew = (abs(velocityXLocal) - dampeningNormal) * velocityXLocal / abs(
                             velocityXLocal)
                     else:
                         velocityXLocalNew = 0
-                    self.velocityAbsolute = sqrt(velocityXLocalNew**2 + velocityYLocal**2)
-                    return
+                    self.changeVelocity(atan2(velocityYLocal, velocityXLocalNew + eps) + line.alphaNorm,
+                                        sqrt(velocityXLocalNew ** 2 + velocityYLocal ** 2))
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
