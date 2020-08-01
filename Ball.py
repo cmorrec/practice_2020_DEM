@@ -8,6 +8,7 @@ class Ball:
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, color, canvas, wall):
         self.x = x
         self.y = y
+        self.theta = 0
         self.mass = pi * radius ** 2
         # Коэффициент контактного демпфирования в нормальном направлении
         self.cn = cn
@@ -18,6 +19,7 @@ class Ball:
         self.alphaRadian = alpha * pi / 180
         self.velocityX = velocity * cos(self.alphaRadian)
         self.velocityY = velocity * sin(self.alphaRadian)
+        self.velocityTheta = 0
         self.wall = wall
         self.canvas = canvas
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
@@ -65,8 +67,9 @@ class Ball:
                     alphaRadianLocal = self.alphaRadian - line.alphaNorm
                     velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
                     velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
-                    dampeningNormal = velocityXLocal * self.cn
-                    # dampeningTangent = velocityYLocal * self.cs
+                    dampeningNormal = velocityXLocal * cn_wall
+                    dampeningTangent = (velocityYLocal - self.velocityTheta * self.radius) * cs_wall
+                    self.velocityTheta = velocityYLocal - self.velocityTheta * self.radius - dampeningTangent
                     if abs(velocityXLocal) - dampeningNormal > 0:
                         velocityXLocalNew = (abs(velocityXLocal) - dampeningNormal) * velocityXLocal / abs(
                             velocityXLocal)

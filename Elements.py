@@ -81,15 +81,16 @@ class Elements:
         velocity2YLocal = self.balls[j].velocityAbsolute * sin(alphaRadian2Local)
         # Относительная скорость и демпфирование
         dampeningNormal = (abs(velocity1XLocal - velocity2XLocal)) * self.balls[i].cn
-        dampeningTangent = (abs(velocity1YLocal - velocity2YLocal)) * self.balls[i].cs
+        dampeningTangent = (abs(velocity1YLocal - velocity2YLocal) - (self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[j].radius)) * self.balls[i].cs
 
-        # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
+        # Непосредственно решение задачи о нецентральном упругом ударе двух дисков, задание новой угловой скорости дисков
         velocity1XLocalNew = ((self.balls[i].mass - self.balls[j].mass) * velocity1XLocal + 2 * self.balls[
             j].mass * velocity2XLocal) / (self.balls[i].mass + self.balls[j].mass)
         velocity2XLocalNew = (2 * self.balls[i].mass * velocity1XLocal + (
                 self.balls[j].mass - self.balls[i].mass) * velocity2XLocal) / (
                                      self.balls[i].mass + self.balls[j].mass)
-
+        self.balls[i].velocityTheta = abs(velocity1YLocal - velocity2YLocal) - (self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[j].radius) - dampeningTangent
+        self.balls[j].velocityTheta = abs(velocity1YLocal - velocity2YLocal) - (self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[j].radius) - dampeningTangent
         # Учет демпфирования
         if abs(velocity1XLocalNew) - dampeningNormal > 0:
             velocity1XLocalNew = (abs(velocity1XLocalNew) - dampeningNormal) * velocity1XLocalNew / abs(
@@ -101,7 +102,6 @@ class Elements:
                 velocity2XLocalNew)
         else:
             velocity2XLocalNew = 0
-
         # Возвращение к глобальной системе координат
         newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
         newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
