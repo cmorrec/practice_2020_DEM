@@ -15,8 +15,8 @@ cs_wall = 0
 # коэффициенты демпфирования для стенок
 accelerationX = 0
 accelerationY = 0.1
-
-
+# Плотность
+density = 1
 def saveResults(elements):
     # Запись результатов в файл
     ballsEndFile = open('balls_end.txt', 'w')

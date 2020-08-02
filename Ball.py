@@ -9,7 +9,7 @@ class Ball:
         self.x = x
         self.y = y
         self.theta = 0
-        self.mass = pi * radius ** 2
+        self.mass = density * pi * radius ** 2
         # Коэффициент контактного демпфирования в нормальном направлении
         self.cn = cn
         # Коэффициент контактного демпфирования в тангенциальном направлении
@@ -23,14 +23,18 @@ class Ball:
         self.wall = wall
         self.canvas = canvas
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
-        self.id2 = canvas.create_line(x, y, x + radius*cos(self.theta), y + radius*sin(self.theta), width=2, fill="black")
+        self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,fill="black")
 
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
         self.canvas.move(self.id, self.velocityX, self.velocityY)  # прорисовка движения
+
     def rotationIndicator(self):
-        self.theta +=self.velocityTheta*deltaTime
+        self.theta += self.velocityTheta * deltaTime
+        self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
+                           self.y + self.radius * sin(self.theta))
         self.canvas.move(self.id2, self.velocityX, self.velocityY)
+
     def movePolygon(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
         self.x = (pos[0] + pos[2]) / 2  # можно найти координаты центра
@@ -71,8 +75,8 @@ class Ball:
                     velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
                     velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
                     dampeningNormal = velocityXLocal * cn_wall
-                    dampeningTangent = (velocityYLocal - self.velocityTheta * self.radius) * cs_wall
-                    self.velocityTheta = velocityYLocal - self.velocityTheta * self.radius - dampeningTangent
+                    self.velocityTheta = 1 / self.radius * (1 - cs_wall) * (
+                            abs(velocityYLocal) - (self.velocityTheta * self.radius))
                     if abs(velocityXLocal) - dampeningNormal > 0:
                         velocityXLocalNew = (abs(velocityXLocal) - dampeningNormal) * velocityXLocal / abs(
                             velocityXLocal)
