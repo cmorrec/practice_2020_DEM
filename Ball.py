@@ -23,11 +23,14 @@ class Ball:
         self.wall = wall
         self.canvas = canvas
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
+        self.id2 = canvas.create_line(x, y, x + radius*cos(self.theta), y + radius*sin(self.theta), width=2, fill="black")
 
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
         self.canvas.move(self.id, self.velocityX, self.velocityY)  # прорисовка движения
-
+    def rotationIndicator(self):
+        self.theta +=self.velocityTheta*deltaTime
+        self.canvas.move(self.id2, self.velocityX, self.velocityY)
     def movePolygon(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
         self.x = (pos[0] + pos[2]) / 2  # можно найти координаты центра
