@@ -11,7 +11,7 @@ eps = 1e-5
 deltaTime = 0.1
 # Шаг по времени
 cn_wall = 0.1
-cs_wall = 0
+cs_wall = 0.2
 # коэффициенты демпфирования для стенок
 accelerationX = 0
 accelerationY = 0.1
