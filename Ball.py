@@ -31,7 +31,10 @@ class Ball:
         self.canvas.move(self.id, self.velocityX, self.velocityY)  # прорисовка движения
 
     def rotationIndicator(self):
-        self.theta += self.velocityTheta * deltaTime
+        if self.theta <= 3140 or self.theta >= -3140:
+            self.theta += self.velocityTheta * deltaTime
+        else:
+            self.theta = 0
         self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
                            self.y + self.radius * sin(self.theta))
         self.canvas.move(self.id2, self.velocityX, self.velocityY)
@@ -76,8 +79,8 @@ class Ball:
                     velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
                     velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
                     dampeningNormal = velocityXLocal * cn_wall
-                    self.velocityTheta = 1 / self.radius * (1 - cs_wall) * (
-                            abs(velocityYLocal) - (self.velocityTheta * self.radius))
+                    self.velocityTheta -= 1 / self.radius * (1 - cs_wall) * (
+                            velocityYLocal - (self.velocityTheta * self.radius))
                     if abs(velocityXLocal) - dampeningNormal > 0:
                         velocityXLocalNew = (abs(velocityXLocal) - dampeningNormal) * velocityXLocal / abs(
                             velocityXLocal)

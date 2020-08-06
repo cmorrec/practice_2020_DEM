@@ -63,9 +63,16 @@ class Elements:
         # Расстояние между двумя шарами в следующий момент времени
         return sqrt(((self.balls[i].x + self.balls[i].velocityX) - (self.balls[j].x + self.balls[j].velocityX)) ** 2 + (
                 (self.balls[i].y + self.balls[i].velocityY) - (self.balls[j].y + self.balls[j].velocityY)) ** 2)
+
     def rotation(self, i, j, velocity1YLocal, velocity2YLocal):
-        self.balls[i].velocityTheta = (self.balls[i].mass / (self.balls[j].mass * self.balls[i].radius)) * (1 - self.balls[i].cs)*(abs(velocity1YLocal - velocity2YLocal) - (self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[j].radius))
-        self.balls[j].velocityTheta = (self.balls[j].mass / (self.balls[i].mass * self.balls[j].radius)) * (1 - self.balls[j].cs)*(abs(velocity1YLocal - velocity2YLocal) - (self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[j].radius))
+        self.balls[i].velocityTheta -= (self.balls[j].mass / (self.balls[i].mass * self.balls[i].radius)) * (
+                    1 - self.balls[i].cs) * (velocity1YLocal - velocity2YLocal - (
+                    self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+                j].radius))
+        self.balls[j].velocityTheta -= (self.balls[i].mass / (self.balls[j].mass * self.balls[j].radius)) * (
+                    1 - self.balls[j].cs) * (velocity1YLocal - velocity2YLocal - (
+                    self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+                j].radius))
 
     def method(self, i, j):
         # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
@@ -85,6 +92,9 @@ class Elements:
         velocity2YLocal = self.balls[j].velocityAbsolute * sin(alphaRadian2Local)
         # Относительная скорость и демпфирование
         dampeningNormal = (abs(velocity1XLocal - velocity2XLocal)) * self.balls[i].cn
+        dampeningTangent = (abs(velocity1YLocal - velocity2YLocal) - (
+                    self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+                j].radius)) * self.balls[i].cs
 
         # Непосредственно решение задачи о нецентральном упругом ударе двух дисков, задание новой угловой скорости дисков
         velocity1XLocalNew = ((self.balls[i].mass - self.balls[j].mass) * velocity1XLocal + 2 * self.balls[
@@ -112,6 +122,3 @@ class Elements:
         # Задание нового вектора скорости
         self.balls[i].changeVelocity(newAlphaI, newVelocityAbsoluteI)
         self.balls[j].changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
-
-
-
