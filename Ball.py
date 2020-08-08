@@ -15,6 +15,8 @@ class Ball:
         # Коэффициент контактного демпфирования в тангенциальном направлении
         self.cs = cs
         self.radius = radius
+        self.accelerationX = accelerationX
+        self.accelerationY = accelerationY
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180
         self.velocityX = velocity * cos(self.alphaRadian)
@@ -35,8 +37,8 @@ class Ball:
             self.theta += self.velocityTheta * deltaTime
         else:
             self.theta = 0
-        self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
-                           self.y + self.radius * sin(self.theta))
+        # self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
+        #                    self.y + self.radius * sin(self.theta))
         self.canvas.move(self.id2, self.velocityX, self.velocityY)
 
     def movePolygon(self):
@@ -54,8 +56,8 @@ class Ball:
         # Обновление направлений скоростей
         # self.velocityX = self.velocityAbsolute * cos(self.alphaRadian)
         # self.velocityY = self.velocityAbsolute * sin(self.alphaRadian)
-        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.wall.accelerationX
-        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.wall.accelerationY
+        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.accelerationX
+        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.accelerationY
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
                             sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
 
@@ -63,7 +65,9 @@ class Ball:
         # Проверяет пересечение как минимум с одной линией
         for line in self.wall.lines:
             if line.crossLine(self.x, self.y, self.radius):
+                self.accelerationY = 0
                 return True
+        self.accelerationY = accelerationY
         return False
 
     def resetPolygon(self):
@@ -123,7 +127,7 @@ class Ball:
         # Возвращаем мяч в стенки в случае его выброса:
         # Находим линию к которой мячу будет логичнее всего стремиться
         # (меньше всего расстояние и перпендекуляр попадает в линию(в отрезок линии))
-        # и меняем направление в соответсвие с этой линией
+        # и меняем направление в соответсвии с этой линией
         distances = []
         for line in self.wall.lines:
             distances.append(line.distanceToLine(self.x, self.y))

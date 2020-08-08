@@ -8,13 +8,13 @@ from tkinter import *
 eps = 1e-5
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
-deltaTime = 0.1
+deltaTime = 0.0001
 # Шаг по времени
 cn_wall = 0.1
 cs_wall = 0.2
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 0
+accelerationY = 0.1
 # Плотность
 density = 1
 def saveResults(elements):

@@ -51,9 +51,15 @@ class Elements:
 
     def isCross(self, i, j):
         # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
-        if self.distanceNext(i, j) < self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
-            return True
+        if self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
+            self.balls[i].accelerationY = 0
+            self.balls[j].accelerationY = 0
+            if self.distanceNext(i, j) < self.distanceNow(i, j):
+                return True
+        self.balls[i].accelerationY = accelerationY
+        self.balls[j].accelerationY = accelerationY
         return False
+
 
     def distanceNow(self, i, j):
         # Расстояние между двумя шарами в данный момент времени
