@@ -27,6 +27,7 @@ class Ball:
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
         self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,
                                       fill="black")
+        self.isCrossAnything = False
 
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
@@ -54,8 +55,6 @@ class Ball:
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
-        # self.velocityX = self.velocityAbsolute * cos(self.alphaRadian)
-        # self.velocityY = self.velocityAbsolute * sin(self.alphaRadian)
         self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.accelerationX
         self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.accelerationY
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
@@ -65,9 +64,7 @@ class Ball:
         # Проверяет пересечение как минимум с одной линией
         for line in self.wall.lines:
             if line.crossLine(self.x, self.y, self.radius):
-                self.accelerationY = 0
                 return True
-        self.accelerationY = accelerationY
         return False
 
     def resetPolygon(self):
@@ -163,3 +160,17 @@ class Ball:
 
     def getAcceleration(self):
         return self.velocityAbsolute / deltaTime
+
+    def setAcceleration(self):
+        if self.isCrossAnything:
+            self.removeAcceleration()
+        else:
+            self.addAcceleration()
+
+    def removeAcceleration(self):
+        self.accelerationX = 0
+        self.accelerationY = 0
+
+    def addAcceleration(self):
+        self.accelerationX = self.wall.accelerationX
+        self.accelerationY = self.wall.accelerationY

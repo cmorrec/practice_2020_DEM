@@ -1,4 +1,4 @@
-from GlobalUtils import *
+from Ball import *
 
 
 # Класс Elements содержит в себе массив шаров и координирует их движение между собой,
@@ -10,6 +10,9 @@ from GlobalUtils import *
 class Elements:
     def __init__(self, balls, canvas):
         self.balls = balls
+        self.ballsCrossing = []
+        for i in range(len(balls)):
+            self.ballsCrossing.append(False)
         self.starts = False
         self.started = False
         self.canvas = canvas
@@ -44,22 +47,31 @@ class Elements:
 
     def move(self):
         # В случае столкновения шаров друг с другом решается задача о нецентральном упругом ударе
+        self.setAcceleration()
+
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
                 if self.isCross(i, j):
                     self.method(i, j)
 
+    def setAcceleration(self):
+        for ball in self.balls:
+            ball.isCrossAnything = ball.crossPolygon()
+
+        for i in range(len(self.balls)):
+            for j in range(i + 1, len(self.balls)):
+                if self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
+                    self.balls[i].isCrossAnything = True
+                    self.balls[j].isCrossAnything = True
+
+        for ball in self.balls:
+            ball.setAcceleration()
+
     def isCross(self, i, j):
         # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
-        if self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
-            self.balls[i].accelerationY = 0
-            self.balls[j].accelerationY = 0
-            if self.distanceNext(i, j) < self.distanceNow(i, j):
-                return True
-        self.balls[i].accelerationY = accelerationY
-        self.balls[j].accelerationY = accelerationY
+        if self.distanceNext(i, j) < self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
+            return True
         return False
-
 
     def distanceNow(self, i, j):
         # Расстояние между двумя шарами в данный момент времени
@@ -72,13 +84,13 @@ class Elements:
 
     def rotation(self, i, j, velocity1YLocal, velocity2YLocal):
         self.balls[i].velocityTheta -= (self.balls[j].mass / (self.balls[i].mass * self.balls[i].radius)) * (
-                    1 - self.balls[i].cs) * (velocity1YLocal - velocity2YLocal - (
-                    self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-                j].radius))
+                1 - self.balls[i].cs) * (velocity1YLocal - velocity2YLocal - (
+                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+            j].radius))
         self.balls[j].velocityTheta -= (self.balls[i].mass / (self.balls[j].mass * self.balls[j].radius)) * (
-                    1 - self.balls[j].cs) * (velocity1YLocal - velocity2YLocal - (
-                    self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-                j].radius))
+                1 - self.balls[j].cs) * (velocity1YLocal - velocity2YLocal - (
+                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+            j].radius))
 
     def method(self, i, j):
         # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
@@ -99,8 +111,8 @@ class Elements:
         # Относительная скорость и демпфирование
         dampeningNormal = (abs(velocity1XLocal - velocity2XLocal)) * self.balls[i].cn
         dampeningTangent = (abs(velocity1YLocal - velocity2YLocal) - (
-                    self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-                j].radius)) * self.balls[i].cs
+                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+            j].radius)) * self.balls[i].cs
 
         # Непосредственно решение задачи о нецентральном упругом ударе двух дисков, задание новой угловой скорости дисков
         velocity1XLocalNew = ((self.balls[i].mass - self.balls[j].mass) * velocity1XLocal + 2 * self.balls[
