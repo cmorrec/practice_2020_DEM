@@ -18,16 +18,6 @@ accelerationY = 0.1
 # Плотность
 density = 1
 
-wall = None
-
-
-def getWall():
-    return wall
-
-
-def setWall(mWall):
-    wall = mWall
-
 
 def saveResults(elements):
     # Запись результатов в файл
@@ -40,6 +30,5 @@ def saveResults(elements):
     for line in linesEndFile:
         ballsEndFile.write(line + '\n')
     ballsEndFile.close()
-
 
 # Возможно стоит хранить шаг по времени, ускорение и пр.

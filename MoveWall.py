@@ -22,18 +22,12 @@ class MoveWall(Wall):
             self.canvas.move(line.id, self.velocityX, self.velocityY)  # прорисовка движения стенки
             line.setCoordinates(Coordinate(line.currentX1 + self.velocityX, line.currentY1 + self.velocityY),
                                 Coordinate(line.currentX2 + self.velocityX, line.currentY2 + self.velocityY))
-        for line in self.lines:
-            print(line.startX1, line.currentX1)
-            print(line.startY1, line.currentY1)
-            print('\n')
-        print('\n')
 
     def changeVelocityX(self):
         self.velocityX *= -1
 
     def changeVelocityY(self):
         self.velocityY *= -1
-
 
     @staticmethod
     def getInstance():

@@ -31,7 +31,8 @@ class Line:
         # Координаты точки на прямой этой линии до которой от центра шарика расстояние h
         xH = x0 + h * cos(pi - self.alphaNorm)
         yH = y0 - h * sin(pi - self.alphaNorm)
-        if (h < radius) and (self.isLine(xH, yH) or abs(self.currentX1 - self.currentX2) < eps or abs(self.currentY1 - self.currentY2) < eps):
+        if (h < radius) and (self.isLine(xH, yH) or abs(self.currentX1 - self.currentX2) < eps or abs(
+                self.currentY1 - self.currentY2) < eps):
             return True
         else:
             return False

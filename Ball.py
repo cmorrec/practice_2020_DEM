@@ -1,5 +1,6 @@
 from MoveWall import *
 
+
 # Для синтаксического сахара необходимо в конструкторе проверять на принадлежность стенке
 
 
@@ -21,7 +22,7 @@ class Ball:
         self.velocityX = velocity * cos(self.alphaRadian)
         self.velocityY = velocity * sin(self.alphaRadian)
         self.velocityTheta = 0
-        #self.wall = wall
+        # self.wall = wall
         self.canvas = canvas
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
         self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,
