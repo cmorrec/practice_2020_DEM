@@ -41,6 +41,7 @@ class Elements:
 
     def draw(self):
         self.move()
+        MoveWall.getInstance().move()
         for ball in self.balls:
             ball.drawPolygon()
             ball.rotationIndicator()
@@ -83,14 +84,15 @@ class Elements:
                 (self.balls[i].y + self.balls[i].velocityY) - (self.balls[j].y + self.balls[j].velocityY)) ** 2)
 
     def rotation(self, i, j, velocity1YLocal, velocity2YLocal):
-        self.balls[i].velocityTheta -= (self.balls[j].mass / (self.balls[i].mass * self.balls[i].radius)) * (
+        velocityThetaI = self.balls[i].velocityTheta
+        velocityThetaJ = self.balls[j].velocityTheta
+
+        self.balls[i].velocityTheta += (self.balls[j].mass / (self.balls[i].mass * self.balls[i].radius)) * (
                 1 - self.balls[i].cs) * (velocity1YLocal - velocity2YLocal - (
-                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-            j].radius))
-        self.balls[j].velocityTheta -= (self.balls[i].mass / (self.balls[j].mass * self.balls[j].radius)) * (
+                velocityThetaI * self.balls[i].radius + velocityThetaJ * self.balls[j].radius))
+        self.balls[j].velocityTheta += (self.balls[i].mass / (self.balls[j].mass * self.balls[j].radius)) * (
                 1 - self.balls[j].cs) * (velocity1YLocal - velocity2YLocal - (
-                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-            j].radius))
+                velocityThetaI * self.balls[i].radius + velocityThetaJ * self.balls[j].radius))
 
     def method(self, i, j):
         # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о

@@ -1,6 +1,7 @@
 from Line import *
 from Coordinate import *
 
+
 # Класс Wall по-хорошему надо сделать Singleton`ом, но я не знаю как это реализуется в Python,
 # поэтому пока запихнул в конструктор Ball
 #
@@ -17,6 +18,8 @@ from Coordinate import *
 
 
 class Wall:
+    __instance = None
+
     def __init__(self, canvas, color, coordinates=None, accelerationX=0, accelerationY=0, lines=None):
         if coordinates is None:
             coordinates = [Coordinate(), Coordinate()]
@@ -28,5 +31,16 @@ class Wall:
         self.accelerationY = accelerationY
         self.coordinates = coordinates
         self.lines = lines
+        self.canvas = canvas
         for line in self.lines:
-            canvas.create_line(line.x1, line.y1, line.x2, line.y2, fill=color)
+            line.setID(canvas.create_line(line.startX1, line.startY1, line.startX2, line.startY2, fill=color))
+        Wall.__instance = self
+
+        def __new__(cls):
+            if not hasattr(cls, 'instance'):
+                cls.instance = super(Wall, cls).__new__(cls)
+            return cls.instance
+
+        @staticmethod
+        def getInstance():
+            return Wall.__instance

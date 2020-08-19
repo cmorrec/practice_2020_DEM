@@ -1,5 +1,4 @@
-from Ball import *
-from Wall import *
+from MoveWall import *
 from Elements import *
 
 n = 3
@@ -18,11 +17,25 @@ print("Дефолтный поворот вектора скорости отн�
 coordinatesFile = open('wall_coordinates.txt', 'r')
 coordinatesFromFile = []
 
+isFirstLine = True
+
+velocityXWall = float(0)
+velocityYWall = float(0)
+absXWall = float(0)
+absYWall = float(0)
+
 for line in coordinatesFile:
     words = line.split()
     data = []
-    for word in words:
-        data.append(float(word))
+    if isFirstLine:
+        velocityXWall = float(words[0])
+        velocityYWall = float(words[1])
+        absXWall = float(words[2])
+        absYWall = float(words[3])
+        isFirstLine = False
+    else:
+        for word in words:
+            data.append(float(word))
     if len(data) > 0:
         coordinatesFromFile.append(Coordinate(data[0], data[1]))
 
@@ -33,8 +46,8 @@ yCoordinates = []
 for coordinate in coordinatesFromFile:
     xCoordinates.append(coordinate.x)
     yCoordinates.append(coordinate.y)
-mWidth = max(xCoordinates) - min(xCoordinates)
-mHeight = max(yCoordinates) - min(yCoordinates)
+mWidth = max(xCoordinates) - min(xCoordinates) + absXWall
+mHeight = max(yCoordinates) - min(yCoordinates) + absYWall
 
 tk = Tk()
 tk.title('DEM')
@@ -44,7 +57,8 @@ canvas = Canvas(tk, width=mWidth, height=mHeight, highlightthickness=0)
 canvas.pack()
 tk.update()
 
-wall = Wall(canvas, 'black', coordinatesFromFile, accelerationX, accelerationY)
+wall = MoveWall(canvas, 'black', coordinatesFromFile, accelerationX, accelerationY, None, velocityXWall, velocityYWall,
+                absXWall, absYWall)
 
 ballsStartFile = open('balls_start.txt', 'r')
 ballsFromFile = []
@@ -61,7 +75,7 @@ for line in ballsStartFile:
             color = word
         j += 1
     if len(data) > 0:
-        ballsFromFile.append(Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], color, canvas, wall))
+        ballsFromFile.append(Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], color, canvas))
 
 ballsStartFile.close()
 

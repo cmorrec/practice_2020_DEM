@@ -1,11 +1,10 @@
-from GlobalUtils import *
-
+from MoveWall import *
 
 # Для синтаксического сахара необходимо в конструкторе проверять на принадлежность стенке
 
 
 class Ball:
-    def __init__(self, x, y, radius, alpha, velocity, cn, cs, color, canvas, wall):
+    def __init__(self, x, y, radius, alpha, velocity, cn, cs, color, canvas):
         self.x = x
         self.y = y
         self.theta = 0
@@ -22,7 +21,7 @@ class Ball:
         self.velocityX = velocity * cos(self.alphaRadian)
         self.velocityY = velocity * sin(self.alphaRadian)
         self.velocityTheta = 0
-        self.wall = wall
+        #self.wall = wall
         self.canvas = canvas
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
         self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,
@@ -62,7 +61,7 @@ class Ball:
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией
-        for line in self.wall.lines:
+        for line in MoveWall.getInstance().lines:
             if line.crossLine(self.x, self.y, self.radius):
                 return True
         return False
@@ -70,7 +69,7 @@ class Ball:
     def resetPolygon(self):
         # Находим линию, которую пересекает шарик и изменяем угол шарика по известной формуле:
         # alpha = 2 * beta - alpha
-        for line in self.wall.lines:
+        for line in MoveWall.getInstance().lines:
             if line.crossLine(self.x, self.y, self.radius):
                 # Проверка на то двигается ли мячик к линии или от нее
                 # (во втором случае менять направление не нужно)
@@ -112,7 +111,7 @@ class Ball:
         # Направляем луч из центра шарика вертикально вверх и считаем количество пересечений с линиями стенки
         # Если количество пересечений кратно двум, значит мяч вышел за границу стенки
         summary = 0
-        for line in self.wall.lines:
+        for line in MoveWall.getInstance().lines:
             if line.crossVerticalUp(self.x, self.y):
                 summary += 1
         if summary % 2 == 1:
@@ -126,13 +125,13 @@ class Ball:
         # (меньше всего расстояние и перпендекуляр попадает в линию(в отрезок линии))
         # и меняем направление в соответсвии с этой линией
         distances = []
-        for line in self.wall.lines:
+        for line in MoveWall.getInstance().lines:
             distances.append(line.distanceToLine(self.x, self.y))
         minDistance = min(distances)
         key = True
 
         while key:
-            for line in self.wall.lines:
+            for line in MoveWall.getInstance().lines:
                 if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
                     h = line.distanceToLine(self.x, self.y)
                     xH = self.x + h * cos(pi - line.alphaNorm)
@@ -143,7 +142,7 @@ class Ball:
                         distances.remove(minDistance)
                         minDistance = min(distances)
 
-        for line in self.wall.lines:
+        for line in MoveWall.getInstance().lines:
             if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
                 self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
                 return
@@ -172,5 +171,5 @@ class Ball:
         self.accelerationY = 0
 
     def addAcceleration(self):
-        self.accelerationX = self.wall.accelerationX
-        self.accelerationY = self.wall.accelerationY
+        self.accelerationX = MoveWall.getInstance().accelerationX
+        self.accelerationY = MoveWall.getInstance().accelerationY

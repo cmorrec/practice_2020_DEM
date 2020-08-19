@@ -8,7 +8,7 @@ from tkinter import *
 eps = 1e-5
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
-deltaTime = 0.0001
+deltaTime = 0.01
 # Шаг по времени
 cn_wall = 0.1
 cs_wall = 0.2
@@ -17,6 +17,16 @@ accelerationX = 0
 accelerationY = 0.1
 # Плотность
 density = 1
+
+wall = None
+
+
+def getWall():
+    return wall
+
+
+def setWall(mWall):
+    wall = mWall
 
 
 def saveResults(elements):
@@ -30,5 +40,6 @@ def saveResults(elements):
     for line in linesEndFile:
         ballsEndFile.write(line + '\n')
     ballsEndFile.close()
+
 
 # Возможно стоит хранить шаг по времени, ускорение и пр.
