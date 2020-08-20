@@ -9,9 +9,15 @@ class MoveWall(Wall):
         Wall.__init__(self, canvas, color, coordinates, accelerationX, accelerationY, lines)
         self.velocityX = velocityX
         self.velocityY = velocityY
+        self.velocityAbsolute = sqrt((velocityX ** 2) + (velocityY ** 2))
+        self.velocityAlpha = atan2(velocityY, velocityX + eps)
         self.absX = absX
         self.absY = absY
         MoveWall.__instance = self
+
+    @staticmethod
+    def getInstance():
+        return MoveWall.__instance
 
     def move(self):
         if abs(self.lines[0].x1 - self.lines[0].startX1) > self.absX:
@@ -25,10 +31,11 @@ class MoveWall(Wall):
 
     def changeVelocityX(self):
         self.velocityX *= -1
+        self.changeAlpha()
 
     def changeVelocityY(self):
         self.velocityY *= -1
+        self.changeAlpha()
 
-    @staticmethod
-    def getInstance():
-        return MoveWall.__instance
+    def changeAlpha(self):
+        self.velocityAlpha = atan2(self.velocityY, self.velocityX + eps)

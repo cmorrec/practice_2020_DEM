@@ -6,6 +6,73 @@ from Ball import *
 
 # В будущем нужно реализовать  проверку о ненакладывании мячей один на другой
 
+def distanceNow(i, j):
+    # Расстояние между двумя шарами в данный момент времени
+    return sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2)
+
+
+def distanceNext(i, j):
+    # Расстояние между двумя шарами в следующий момент времени
+    return sqrt(((i.x + i.velocityX) - (j.x + j.velocityX)) ** 2 + (
+            (i.y + i.velocityY) - (j.y + j.velocityY)) ** 2)
+
+
+def isCross(i, j):
+    # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
+    if distanceNext(i, j) < distanceNow(i, j) < (i.radius + j.radius):
+        return True
+    return False
+
+
+def rotation(i, j, velocity1YLocal, velocity2YLocal):
+    velocityThetaI = i.velocityTheta
+    velocityThetaJ = j.velocityTheta
+
+    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
+    j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
+
+
+def method(i, j):
+    # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
+    # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
+    # переход в локальную систему координат)
+    # Также учет диссипации при каждом столкновении шаров
+
+    # Угол между линией удара и горизонталью
+    gamma = atan2((i.y - j.y), (i.x - j.x))
+    # Углы направления шаров в локальной системе координат
+    alphaRadian1Local = i.alphaRadian - gamma
+    alphaRadian2Local = j.alphaRadian - gamma
+    # Скорости шаров в локальной системе координат
+    velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
+    velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
+    velocity2XLocal = j.velocityAbsolute * cos(alphaRadian2Local)
+    velocity2YLocal = j.velocityAbsolute * sin(alphaRadian2Local)
+
+    # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
+    velocity1XLocalNew = ((i.mass - j.mass) * velocity1XLocal + 2 * j.mass * velocity2XLocal) / (i.mass + j.mass)
+    velocity2XLocalNew = (2 * i.mass * velocity1XLocal + (j.mass - i.mass) * velocity2XLocal) / (i.mass + j.mass)
+    # Демпфирование
+    dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * i.cn
+    dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * j.cn
+    dampeningTangentI = (velocity1YLocal - velocity2YLocal - (i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
+    dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
+    # Учет демпфирования
+    velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
+    velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
+    velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
+    velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
+    # Задание новой угловой скорости дисков
+    rotation(i, j, velocity1YLocal, velocity2YLocal)
+    # Возвращение к глобальной системе координат
+    newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
+    newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
+    newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
+    newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
+    # Задание нового вектора скорости
+    i.changeVelocity(newAlphaI, newVelocityAbsoluteI)
+    j.changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
+
 
 class Elements:
     def __init__(self, balls, canvas):
@@ -52,8 +119,8 @@ class Elements:
 
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
-                if self.isCross(i, j):
-                    self.method(i, j)
+                if isCross(self.balls[i], self.balls[j]):
+                    method(self.balls[i], self.balls[j])
 
     def setAcceleration(self):
         for ball in self.balls:
@@ -61,84 +128,9 @@ class Elements:
 
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
-                if self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
+                if distanceNow(self.balls[i], self.balls[j]) < (self.balls[i].radius + self.balls[j].radius):
                     self.balls[i].isCrossAnything = True
                     self.balls[j].isCrossAnything = True
 
         for ball in self.balls:
             ball.setAcceleration()
-
-    def isCross(self, i, j):
-        # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
-        if self.distanceNext(i, j) < self.distanceNow(i, j) < (self.balls[i].radius + self.balls[j].radius):
-            return True
-        return False
-
-    def distanceNow(self, i, j):
-        # Расстояние между двумя шарами в данный момент времени
-        return sqrt((self.balls[i].x - self.balls[j].x) ** 2 + (self.balls[i].y - self.balls[j].y) ** 2)
-
-    def distanceNext(self, i, j):
-        # Расстояние между двумя шарами в следующий момент времени
-        return sqrt(((self.balls[i].x + self.balls[i].velocityX) - (self.balls[j].x + self.balls[j].velocityX)) ** 2 + (
-                (self.balls[i].y + self.balls[i].velocityY) - (self.balls[j].y + self.balls[j].velocityY)) ** 2)
-
-    def rotation(self, i, j, velocity1YLocal, velocity2YLocal):
-        velocityThetaI = self.balls[i].velocityTheta
-        velocityThetaJ = self.balls[j].velocityTheta
-
-        self.balls[i].velocityTheta += (1 / (self.balls[i].mass * self.balls[i].radius)) * (
-                1 - self.balls[i].cs) * (velocity1YLocal - velocity2YLocal - (
-                velocityThetaI * self.balls[i].radius + velocityThetaJ * self.balls[j].radius))
-        self.balls[j].velocityTheta += (1 / (self.balls[j].mass * self.balls[j].radius)) * (
-                1 - self.balls[j].cs) * (velocity2YLocal - velocity1YLocal - (
-                velocityThetaI * self.balls[i].radius + velocityThetaJ * self.balls[j].radius))
-        print(self.balls[i].velocityTheta, self.balls[j].velocityTheta)
-
-    def method(self, i, j):
-        # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
-        # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
-        # переход в локальную систему координат)
-        # Также учет диссипации при каждом столкновении шаров
-
-        # Угол между линией удара и горизонталью
-        gamma = atan2((self.balls[i].y - self.balls[j].y), (self.balls[i].x - self.balls[j].x))
-        # Углы направления шаров в локальной системе координат
-        alphaRadian1Local = self.balls[i].alphaRadian - gamma
-        alphaRadian2Local = self.balls[j].alphaRadian - gamma
-        # Скорости шаров в локальной системе координат
-        velocity1XLocal = self.balls[i].velocityAbsolute * cos(alphaRadian1Local)
-        velocity1YLocal = self.balls[i].velocityAbsolute * sin(alphaRadian1Local)
-        velocity2XLocal = self.balls[j].velocityAbsolute * cos(alphaRadian2Local)
-        velocity2YLocal = self.balls[j].velocityAbsolute * sin(alphaRadian2Local)
-
-        # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
-        velocity1XLocalNew = ((self.balls[i].mass - self.balls[j].mass) * velocity1XLocal + 2 * self.balls[
-            j].mass * velocity2XLocal) / (self.balls[i].mass + self.balls[j].mass)
-        velocity2XLocalNew = (2 * self.balls[i].mass * velocity1XLocal + (
-                self.balls[j].mass - self.balls[i].mass) * velocity2XLocal) / (
-                                     self.balls[i].mass + self.balls[j].mass)
-        # Демпфирование
-        dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * self.balls[i].cn
-        dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * self.balls[j].cn
-        dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
-                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-            j].radius)) * self.balls[i].cs
-        dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
-                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-            j].radius)) * self.balls[i].cs
-        # Учет демпфирования
-        velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
-        velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
-        velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
-        velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
-        # Задание новой угловой скорости дисков
-        self.rotation(i, j, velocity1YLocal, velocity2YLocal)
-        # Возвращение к глобальной системе координат
-        newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
-        newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
-        newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
-        newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
-        # Задание нового вектора скорости
-        self.balls[i].changeVelocity(newAlphaI, newVelocityAbsoluteI)
-        self.balls[j].changeVelocity(newAlphaJ, newVelocityAbsoluteJ)

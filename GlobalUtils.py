@@ -37,5 +37,3 @@ def dampeningVelocity(dampening, velocity):
         return velocity - dampening
     else:
         return 0
-
-# Возможно стоит хранить шаг по времени, ускорение и пр.
