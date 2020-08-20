@@ -1,4 +1,4 @@
-from Line import *
+from MoveLine import *
 from Coordinate import *
 
 
@@ -26,7 +26,7 @@ class Wall:
         if lines is None:
             lines = []
             for i in range(len(coordinates)):
-                lines.append(Line(coordinates[i % len(coordinates)], coordinates[(i + 1) % len(coordinates)]))
+                lines.append(MoveLine(coordinates[i % len(coordinates)], coordinates[(i + 1) % len(coordinates)]))
         self.accelerationX = accelerationX
         self.accelerationY = accelerationY
         self.coordinates = coordinates
