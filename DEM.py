@@ -1,18 +1,4 @@
-from MoveWall import *
 from Elements import *
-
-n = 3
-print("Количество шаров: ", n)
-x = 250
-print("Дефолтная координата х шара в начальный момент времени: ", x)
-y = 250
-print("Дефолтная координата y шара в начальный момент времени: ", y)
-velocity = 5
-print("Дефолтная скорость шара равна: ", velocity)
-radius = 25
-print("Дефолтный радиус шара равен: ", radius)
-alpha = 30
-print("Дефолтный поворот вектора скорости относительно горизонтали: ", alpha)
 
 coordinatesFile = open('wall_coordinates.txt', 'r')
 coordinatesFromFile = []

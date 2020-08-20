@@ -87,12 +87,13 @@ class Elements:
         velocityThetaI = self.balls[i].velocityTheta
         velocityThetaJ = self.balls[j].velocityTheta
 
-        self.balls[i].velocityTheta += (self.balls[j].mass / (self.balls[i].mass * self.balls[i].radius)) * (
+        self.balls[i].velocityTheta += (1 / (self.balls[i].mass * self.balls[i].radius)) * (
                 1 - self.balls[i].cs) * (velocity1YLocal - velocity2YLocal - (
                 velocityThetaI * self.balls[i].radius + velocityThetaJ * self.balls[j].radius))
-        self.balls[j].velocityTheta += (self.balls[i].mass / (self.balls[j].mass * self.balls[j].radius)) * (
-                1 - self.balls[j].cs) * (velocity1YLocal - velocity2YLocal - (
+        self.balls[j].velocityTheta += (1 / (self.balls[j].mass * self.balls[j].radius)) * (
+                1 - self.balls[j].cs) * (velocity2YLocal - velocity1YLocal - (
                 velocityThetaI * self.balls[i].radius + velocityThetaJ * self.balls[j].radius))
+        print(self.balls[i].velocityTheta, self.balls[j].velocityTheta)
 
     def method(self, i, j):
         # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
@@ -110,30 +111,29 @@ class Elements:
         velocity1YLocal = self.balls[i].velocityAbsolute * sin(alphaRadian1Local)
         velocity2XLocal = self.balls[j].velocityAbsolute * cos(alphaRadian2Local)
         velocity2YLocal = self.balls[j].velocityAbsolute * sin(alphaRadian2Local)
-        # Относительная скорость и демпфирование
-        dampeningNormal = (abs(velocity1XLocal - velocity2XLocal)) * self.balls[i].cn
-        dampeningTangent = (abs(velocity1YLocal - velocity2YLocal) - (
-                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
-            j].radius)) * self.balls[i].cs
 
-        # Непосредственно решение задачи о нецентральном упругом ударе двух дисков, задание новой угловой скорости дисков
+        # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
         velocity1XLocalNew = ((self.balls[i].mass - self.balls[j].mass) * velocity1XLocal + 2 * self.balls[
             j].mass * velocity2XLocal) / (self.balls[i].mass + self.balls[j].mass)
         velocity2XLocalNew = (2 * self.balls[i].mass * velocity1XLocal + (
                 self.balls[j].mass - self.balls[i].mass) * velocity2XLocal) / (
                                      self.balls[i].mass + self.balls[j].mass)
-        self.rotation(i, j, velocity1YLocal, velocity2YLocal)
+        # Демпфирование
+        dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * self.balls[i].cn
+        dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * self.balls[j].cn
+        dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
+                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+            j].radius)) * self.balls[i].cs
+        dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
+                self.balls[i].velocityTheta * self.balls[i].radius + self.balls[j].velocityTheta * self.balls[
+            j].radius)) * self.balls[i].cs
         # Учет демпфирования
-        if abs(velocity1XLocalNew) - dampeningNormal > 0:
-            velocity1XLocalNew = (abs(velocity1XLocalNew) - dampeningNormal) * velocity1XLocalNew / abs(
-                velocity1XLocalNew)
-        else:
-            velocity1XLocalNew = 0
-        if abs(velocity2XLocalNew) - dampeningNormal > 0:
-            velocity2XLocalNew = (abs(velocity2XLocalNew) - dampeningNormal) * velocity2XLocalNew / abs(
-                velocity2XLocalNew)
-        else:
-            velocity2XLocalNew = 0
+        velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
+        velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
+        velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
+        velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
+        # Задание новой угловой скорости дисков
+        self.rotation(i, j, velocity1YLocal, velocity2YLocal)
         # Возвращение к глобальной системе координат
         newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
         newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma

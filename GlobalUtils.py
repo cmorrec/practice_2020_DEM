@@ -31,4 +31,11 @@ def saveResults(elements):
         ballsEndFile.write(line + '\n')
     ballsEndFile.close()
 
+
+def dampeningVelocity(dampening, velocity):
+    if abs(velocity) - abs(dampening) > 0:
+        return velocity - dampening
+    else:
+        return 0
+
 # Возможно стоит хранить шаг по времени, ускорение и пр.

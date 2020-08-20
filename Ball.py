@@ -22,7 +22,6 @@ class Ball:
         self.velocityX = velocity * cos(self.alphaRadian)
         self.velocityY = velocity * sin(self.alphaRadian)
         self.velocityTheta = 0
-        # self.wall = wall
         self.canvas = canvas
         self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
         self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,
@@ -34,12 +33,9 @@ class Ball:
         self.canvas.move(self.id, self.velocityX, self.velocityY)  # прорисовка движения
 
     def rotationIndicator(self):
-        if self.theta <= 3140 or self.theta >= -3140:
-            self.theta += self.velocityTheta * deltaTime
-        else:
-            self.theta = 0
-        # self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
-        #                    self.y + self.radius * sin(self.theta))
+        self.theta += (self.velocityTheta * deltaTime) % 2 * pi
+        self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
+                           self.y + self.radius * sin(self.theta))
         self.canvas.move(self.id2, self.velocityX, self.velocityY)
 
     def movePolygon(self):
@@ -80,13 +76,9 @@ class Ball:
                     velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
                     velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
                     dampeningNormal = velocityXLocal * cn_wall
-                    self.velocityTheta -= 1 / self.radius * (1 - cs_wall) * (
+                    self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
                             velocityYLocal - (self.velocityTheta * self.radius))
-                    if abs(velocityXLocal) - dampeningNormal > 0:
-                        velocityXLocalNew = (abs(velocityXLocal) - dampeningNormal) * velocityXLocal / abs(
-                            velocityXLocal)
-                    else:
-                        velocityXLocalNew = 0
+                    velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
                     self.changeVelocity(atan2(velocityYLocal, velocityXLocalNew + eps) + line.alphaNorm,
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocal ** 2))
 

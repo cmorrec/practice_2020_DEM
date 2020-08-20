@@ -1,6 +1,10 @@
 from GlobalUtils import *
 
 
+# На данный момент класс не используется и является лишь родителем используемого
+# класса MoveLine
+
+
 class Line:
     def __init__(self, coordinate1, coordinate2):
         self.x1 = coordinate1.x
