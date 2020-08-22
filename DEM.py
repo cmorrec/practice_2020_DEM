@@ -1,5 +1,5 @@
 from Elements import *
-
+from PIL import ImageTk
 coordinatesFile = open('wall_coordinates.txt', 'r')
 coordinatesFromFile = []
 
@@ -39,9 +39,32 @@ tk = Tk()
 tk.title('DEM')
 tk.resizable(0, 0)
 tk.wm_attributes('-topmost', 1)
+tk.columnconfigure(0)
+tk.columnconfigure(1)
+tk.columnconfigure(2)
+tk.rowconfigure(0)
+tk.rowconfigure(1)
 canvas = Canvas(tk, width=mWidth, height=mHeight, highlightthickness=0)
-canvas.pack()
+canvas.grid(row=0, columnspan=3)
+but_1 = Button(text='Start',
+               width=17, height=2,
+               bg='#5195fc', fg='white',
+               activebackground='#77DDE7',  # цвет нажатой кнопки
+               activeforeground='#FF2400',  # цвет надписи когда кнопка нажата
+               font='Hack 16')  # шрифт и размер надписи
+artem = ImageTk.PhotoImage(file="folder.png")
+but_2 = Button(image=artem)
+but_3 = Button(text='Stop',
+               width=17, height=2,
+               bg='#fc5151', fg='white',
+               activebackground='#77DDE7',
+               activeforeground='#FF2400',
+               font='Hack 16')
+
+
 tk.update()
+
+
 
 wall = MoveWall(canvas, 'black', coordinatesFromFile, accelerationX, accelerationY, None, velocityXWall, velocityYWall,
                 absXWall, absYWall)
@@ -66,6 +89,13 @@ for line in ballsStartFile:
 ballsStartFile.close()
 
 elements = Elements(ballsFromFile, canvas)
+
+but_1.bind('<Button-1>', elements.start)  # Обработчик событий
+but_1.grid(row=1, column=0, padx=3)  # используем метод pack для отображения кнопки - в нём можно задать положение кнопки
+but_2.grid(row=1, column=1)
+but_3.bind('<Button-1>', elements.exit)
+but_3.grid(row=1, column=2, padx=3)
+
 while not elements.starts:
     if elements.started:
         elements.draw()

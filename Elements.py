@@ -83,9 +83,6 @@ class Elements:
         self.starts = False
         self.started = False
         self.canvas = canvas
-        self.canvas.bind_all('<KeyPress-s>', self.start)  # s - начало движения
-        self.canvas.bind_all('<KeyPress-e>', self.exit)  # e - конец движения
-
     def energyMonitoring(self):
         print("Количество энергии", self.energy(), "\n")
         if self.energy() < eps:

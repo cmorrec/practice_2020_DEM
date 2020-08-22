@@ -3,6 +3,7 @@ import numpy as np
 import time
 from tkinter import *
 
+
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 
 eps = 1e-5
