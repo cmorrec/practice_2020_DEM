@@ -60,11 +60,7 @@ but_3 = Button(text='Stop',
                activebackground='#77DDE7',
                activeforeground='#FF2400',
                font='Hack 16')
-
-
 tk.update()
-
-
 
 wall = MoveWall(canvas, 'black', coordinatesFromFile, accelerationX, accelerationY, None, velocityXWall, velocityYWall,
                 absXWall, absYWall)
@@ -93,7 +89,7 @@ elements = Elements(ballsFromFile, canvas)
 but_1.bind('<Button-1>', elements.start)  # Обработчик событий
 but_1.grid(row=1, column=0, padx=3)  # используем метод pack для отображения кнопки - в нём можно задать положение кнопки
 but_2.grid(row=1, column=1)
-but_3.bind('<Button-1>', elements.exit)
+but_3.bind('<Button-3>', elements.exit)
 but_3.grid(row=1, column=2, padx=3)
 
 while not elements.starts:

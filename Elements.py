@@ -77,12 +77,10 @@ def method(i, j):
 class Elements:
     def __init__(self, balls, canvas):
         self.balls = balls
-        self.ballsCrossing = []
-        for i in range(len(balls)):
-            self.ballsCrossing.append(False)
         self.starts = False
         self.started = False
         self.canvas = canvas
+
     def energyMonitoring(self):
         print("Количество энергии", self.energy(), "\n")
         if self.energy() < eps:
