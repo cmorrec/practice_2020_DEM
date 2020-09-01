@@ -4,8 +4,19 @@ from PIL import ImageTk
 ballStartFileName1 = './ball_sets/4_ball.txt'
 ballStartFileName4 = './ball_sets/4_plate.txt'
 ballStartFileName4Custom = './ball_sets/4_plate_custom.txt'
+ballStartFileName2Vol = './ball_sets/2_plate_volume.txt'
+ballStartFileName2Den = './ball_sets/2_plate_density.txt'
 
-coordinatesFileName = './walls_dynamic/square.txt'
+coordinatesFileNameCircle = './walls_dynamic/circle.txt'
+coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
+coordinatesFileNameCylinderCone = './walls_dynamic/cylinder_cone.txt'
+coordinatesFileNamePolygon = './walls_dynamic/polygon.txt'
+coordinatesFileNameRhombus = './walls_dynamic/rhombus.txt'
+coordinatesFileNameSquare = './walls_dynamic/square.txt'
+coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
+coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
+
+coordinatesFileName = coordinatesFileNameSquare
 ballStartFileName = ballStartFileName4Custom
 
 coordinatesFile = open(coordinatesFileName, 'r')
