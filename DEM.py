@@ -1,72 +1,110 @@
-from Ball import *
-from Coordinate import *
-from Line import *
-from Wall import *
 from Elements import *
+from PIL import ImageTk
 
-mWidth = 500
-mHeight = 500
+ballStartFileName1 = './ball_sets/4_ball.txt'
+ballStartFileName4 = './ball_sets/4_plate.txt'
+ballStartFileName4Custom = './ball_sets/4_plate_custom.txt'
 
-n = 3
-print("Количество шаров: ", n)
-x = 250
-print("Дефолтная координата х шара в начальный момент времени: ", x)
-y = 250
-print("Дефолтная координата y шара в начальный момент времени: ", y)
-velocity = 5
-print("Дефолтная скорость шара равна: ", velocity)
-radius = 25
-print("Дефолтный радиус шара равен: ", radius)
-alpha = 30
-print("Дефолтный поворот вектора скорости относительно горизонтали: ", alpha)
+coordinatesFileName = './walls_dynamic/square.txt'
+ballStartFileName = ballStartFileName4Custom
+
+coordinatesFile = open(coordinatesFileName, 'r')
+coordinatesFromFile = []
+
+isFirstLine = True
+
+velocityXWall = float(0)
+velocityYWall = float(0)
+absXWall = float(0)
+absYWall = float(0)
+
+for line in coordinatesFile:
+    words = line.split()
+    data = []
+    if isFirstLine:
+        velocityXWall = float(words[0])
+        velocityYWall = float(words[1])
+        absXWall = float(words[2])
+        absYWall = float(words[3])
+        isFirstLine = False
+    else:
+        for word in words:
+            data.append(float(word))
+    if len(data) > 0:
+        coordinatesFromFile.append(Coordinate(data[0], data[1]))
+
+coordinatesFile.close()
+
+xCoordinates = []
+yCoordinates = []
+for coordinate in coordinatesFromFile:
+    xCoordinates.append(coordinate.x)
+    yCoordinates.append(coordinate.y)
+mWidth = max(xCoordinates) - min(xCoordinates) + absXWall
+mHeight = max(yCoordinates) - min(yCoordinates) + absYWall
 
 tk = Tk()
 tk.title('DEM')
 tk.resizable(0, 0)
 tk.wm_attributes('-topmost', 1)
+tk.columnconfigure(0)
+tk.columnconfigure(1)
+tk.columnconfigure(2)
+tk.rowconfigure(0)
+tk.rowconfigure(1)
 canvas = Canvas(tk, width=mWidth, height=mHeight, highlightthickness=0)
-canvas.pack()
+canvas.grid(row=0, columnspan=3)
+but_1 = Button(text='Start',
+               width=17, height=2,
+               bg='#5195fc', fg='white',
+               activebackground='#77DDE7',  # цвет нажатой кнопки
+               activeforeground='#FF2400',  # цвет надписи когда кнопка нажата
+               font='Hack 16')  # шрифт и размер надписи
+artem = ImageTk.PhotoImage(file="folder.png")
+but_2 = Button(image=artem)
+but_3 = Button(text='Stop',
+               width=17, height=2,
+               bg='#fc5151', fg='white',
+               activebackground='#77DDE7',
+               activeforeground='#FF2400',
+               font='Hack 16')
 tk.update()
 
-# Класс Wall может принимать в себя любое количество линий(4 - это для примера)
-# Для большего количества точек(и соотвественно линий), надо создать их дополнительно и добавить в массив
-# При желании посмотреть на другие фигуры раскомментируйте(и закомментируйте) соотвествующие участки кода
+wall = MoveWall(canvas, 'black', coordinatesFromFile, accelerationX, accelerationY, None, velocityXWall, velocityYWall,
+                absXWall, absYWall)
 
-# Ромб
-coordinate1 = Coordinate(mWidth / 2, 0)
-coordinate2 = Coordinate(mWidth, mHeight / 2)
-coordinate3 = Coordinate(mWidth / 2, mHeight)
-coordinate4 = Coordinate(0, mHeight / 2)
+ballsStartFile = open(ballStartFileName, 'r')
+ballsFromFile = []
 
-# Прямоугольник
-# coordinate1 = Coordinate(0, 0)
-# coordinate2 = Coordinate(mWidth, 0)
-# coordinate3 = Coordinate(mWidth, mHeight)
-# coordinate4 = Coordinate(0, mHeight)
+for line in ballsStartFile:
+    words = line.split()
+    data = []
+    j = 0
+    color = ''
+    for word in words:
+        if j != len(words) - 1:
+            data.append(float(word))
+        else:
+            color = word
+        j += 1
+    if len(data) > 0:
+        ballsFromFile.append(Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
 
-# Трапеция
-# coordinate1 = Coordinate(mWidth / 4, 0)
-# coordinate2 = Coordinate(3 * mWidth / 4, 0)
-# coordinate3 = Coordinate(mWidth, mHeight - 50)
-# coordinate4 = Coordinate(0, mHeight - 50)
+ballsStartFile.close()
 
-coordinates = np.array([coordinate1, coordinate2, coordinate3, coordinate3])
+elements = Elements(ballsFromFile, canvas)
 
-line1 = Line(coordinate1.x, coordinate1.y, coordinate2.x, coordinate2.y)
-line2 = Line(coordinate2.x, coordinate2.y, coordinate3.x, coordinate3.y)
-line3 = Line(coordinate3.x, coordinate3.y, coordinate4.x, coordinate4.y)
-line4 = Line(coordinate4.x, coordinate4.y, coordinate1.x, coordinate1.y)
-lines = np.array([line1, line2, line3, line4])
+but_1.bind('<Button-1>', elements.start)  # Обработчик событий
+but_1.grid(row=1, column=0, padx=3)  # используем метод pack для отображения кнопки - в нём можно задать положение кнопки
+but_2.grid(row=1, column=1)
+but_3.bind('<Button-1>', elements.exit)
+but_3.grid(row=1, column=2, padx=3)
 
-wall = Wall(coordinates, lines, canvas, 'black')
-ball1 = Ball(x, y, canvas, 'red', radius + 10, alpha, velocity + 3, wall)
-ball2 = Ball(x + 80, y, canvas, 'green', radius, 2 * alpha, velocity - 3, wall)
-ball3 = Ball(x - 80, y, canvas, 'blue', radius - 10, -alpha, velocity, wall)
-balls = np.array([ball1, ball2, ball3])
-elements = Elements(balls, canvas)
 while not elements.starts:
     if elements.started:
         elements.draw()
     tk.update_idletasks()
     tk.update()
-    time.sleep(0.05)
+    time.sleep(deltaTime)
+
+saveResults(elements)

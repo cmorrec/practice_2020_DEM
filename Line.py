@@ -1,15 +1,16 @@
 from GlobalUtils import *
 
 
-# Для синтаксического сахара необходим конструктор, принимающий на вход два объекта класса Coordinate
+# На данный момент класс не используется и является лишь родителем используемого
+# класса MoveLine
 
 
 class Line:
-    def __init__(self, x1, y1, x2, y2):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+    def __init__(self, coordinate1, coordinate2):
+        self.x1 = coordinate1.x
+        self.x2 = coordinate2.x
+        self.y1 = coordinate1.y
+        self.y2 = coordinate2.y
         self.abs = sqrt((self.x2 - self.x1) ** 2 + (self.y2 - self.y1) ** 2)
         # Следующие три строки исключают возможность деления на ноль
         distY = abs(self.y2 - self.y1)
@@ -26,7 +27,8 @@ class Line:
         # Координаты точки на прямой этой линии до которой от центра шарика расстояние h
         xH = x0 + h * cos(pi - self.alphaNorm)
         yH = y0 - h * sin(pi - self.alphaNorm)
-        if (h < radius) and (self.isLine(xH, yH) or abs(self.x1 - self.x2) < eps or abs(self.y1 - self.y2) < eps):
+        if (h < radius) and (self.isLine(xH, yH) or abs(self.x1 - self.x2) < eps or abs(
+                self.y1 - self.y2) < eps):
             return True
         else:
             return False
