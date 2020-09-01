@@ -14,20 +14,27 @@ class MoveWall(Wall):
         self.absX = absX
         self.absY = absY
         MoveWall.__instance = self
+        self.flagMove = True
+        self.canvas.bind_all('<KeyPress-u>', self.upVelocity)
+        self.canvas.bind_all('<KeyPress-d>', self.downVelocity)
+        self.canvas.bind_all('<KeyPress-l>', self.leftVelocity)
+        self.canvas.bind_all('<KeyPress-r>', self.rightVelocity)
+        self.canvas.bind_all('<KeyPress-s>', self.changeFlag)
 
     @staticmethod
     def getInstance():
         return MoveWall.__instance
 
     def move(self):
-        if abs(self.lines[0].x1 - self.lines[0].startX1) > self.absX:
+        if self.lines[0].x1 - self.lines[0].startX1 > self.absX or self.lines[0].x1 - self.lines[0].startX1 < 0:
             self.changeVelocityX()
-        if abs(self.lines[0].y1 - self.lines[0].startY1) > self.absY:
+        if self.lines[0].y1 - self.lines[0].startY1 > self.absY or self.lines[0].y1 - self.lines[0].startY1 < 0:
             self.changeVelocityY()
-        for line in self.lines:
-            self.canvas.move(line.id, self.velocityX, self.velocityY)  # прорисовка движения стенки
-            line.setCoordinates(Coordinate(line.x1 + self.velocityX, line.y1 + self.velocityY),
-                                Coordinate(line.x2 + self.velocityX, line.y2 + self.velocityY))
+        if self.flagMove:
+            for line in self.lines:
+                self.canvas.move(line.id, self.velocityX, self.velocityY)  # прорисовка движения стенки
+                line.setCoordinates(Coordinate(line.x1 + self.velocityX, line.y1 + self.velocityY),
+                                    Coordinate(line.x2 + self.velocityX, line.y2 + self.velocityY))
 
     def changeVelocityX(self):
         self.velocityX *= -1
@@ -39,3 +46,33 @@ class MoveWall(Wall):
 
     def changeAlpha(self):
         self.velocityAlpha = atan2(self.velocityY, self.velocityX + eps)
+
+    def upVelocity(self, event):
+        if self.velocityY >= 0:
+            self.velocityY += 1
+        else:
+            self.velocityY -= 1
+
+    def downVelocity(self, event):
+        if self.velocityY >= 0:
+            self.velocityY -= 1
+        else:
+            self.velocityY += 1
+
+    def rightVelocity(self, event):
+        if self.velocityX >= 0:
+            self.velocityX += 1
+        else:
+            self.velocityX -= 1
+
+    def leftVelocity(self, event):
+        if self.velocityX >= 0:
+            self.velocityX -= 1
+        else:
+            self.velocityX += 1
+
+    def changeFlag(self, event):
+        if self.flagMove:
+            self.flagMove = False
+        else:
+            self.flagMove = True
