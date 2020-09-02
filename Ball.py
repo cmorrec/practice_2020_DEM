@@ -33,7 +33,7 @@ class Ball:
         self.canvas.move(self.id, self.velocityX, self.velocityY)  # прорисовка движения
 
     def rotationIndicator(self):
-        self.theta += (self.velocityTheta * deltaTime) % (2 * pi)
+        self.theta += self.velocityTheta % (2 * pi)
         self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
                            self.y + self.radius * sin(self.theta))
         self.canvas.move(self.id2, self.velocityX, self.velocityY)
@@ -76,7 +76,7 @@ class Ball:
                     alphaRadianLocal = self.alphaRadian - line.alphaNorm
                     velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
                     velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
-                    if (wall.flagMove):
+                    if wall.flagMove:
                         velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
                         velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
                     else:
@@ -91,7 +91,6 @@ class Ball:
                     velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
                     self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
-
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
