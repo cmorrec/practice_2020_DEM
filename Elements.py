@@ -28,8 +28,10 @@ def rotation(i, j, velocity1YLocal, velocity2YLocal):
     velocityThetaI = i.velocityTheta
     velocityThetaJ = j.velocityTheta
 
-    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
-    j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
+    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
+                velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
+    j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (
+                velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
 
 
 def method(i, j):
@@ -55,8 +57,10 @@ def method(i, j):
     # Демпфирование
     dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * i.cn
     dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * j.cn
-    dampeningTangentI = (velocity1YLocal - velocity2YLocal - (i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
-    dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
+    dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
+                i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
+    dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
+                i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
     # Учет демпфирования
     velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
     velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
@@ -80,6 +84,14 @@ class Elements:
         self.starts = False
         self.started = False
         self.canvas = canvas
+        self.startEnergy = 0
+        self.energyFlag = 0
+
+    def stopIfLowEnergy(self):
+        if self.energy() < self.startEnergy * 0.004 and not MoveWall.getInstance().flagMove == True:
+            self.started = False
+            saveResults(self)
+            self.energyMonitoring()
 
     def energyMonitoring(self):
         print("Количество энергии", self.energy(), "\n")
@@ -89,6 +101,11 @@ class Elements:
     def start(self, event):
         self.started = True
         self.energyMonitoring()
+        if self.energyFlag == 0:
+            for ball in self.balls:
+                self.startEnergy += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.25 * ball.mass * (
+                            ball.radius ** 2) * (ball.velocityTheta ** 2)
+            self.energyFlag = 1
 
     def exit(self, event):
         self.started = False
@@ -98,10 +115,12 @@ class Elements:
     def energy(self):
         energyCount = 0
         for ball in self.balls:
-            energyCount += ball.mass * (ball.velocityAbsolute ** 2)
+            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.25 * ball.mass * (ball.radius ** 2) * (
+                        ball.velocityTheta ** 2)
         return energyCount
 
     def draw(self):
+        self.stopIfLowEnergy()
         self.move()
         MoveWall.getInstance().move()
         for ball in self.balls:
