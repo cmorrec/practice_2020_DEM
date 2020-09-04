@@ -15,9 +15,9 @@ cn_wall = 0.1
 cs_wall = 0.2
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 1
-kn = 10 * 1e7
-ks = 10 * 1e7
+accelerationY = 2
+kn = 1 * 1e5
+ks = 1 * 1e2
 
 
 def saveResults(elements):

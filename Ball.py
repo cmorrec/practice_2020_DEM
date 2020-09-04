@@ -37,8 +37,8 @@ class Ball:
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
         self.canvas.move(self.id, self.velocityX * deltaTime, self.velocityY * deltaTime)  # прорисовка движения
-        if abs(self.accelerationBallAbsolute) > eps:
-            self.removeAccelerationBall()
+        # if abs(self.accelerationBallAbsolute) > eps:
+        #     self.removeAccelerationBall()
 
     def rotationIndicator(self):
         self.theta += (self.velocityTheta * deltaTime) % (2 * pi)
@@ -60,9 +60,9 @@ class Ball:
             self.comeBack()
         # Обновление направлений скоростей
         self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + (
-                    self.accelerationX - self.accelerationBallX) * deltaTime
+                self.accelerationX - self.accelerationBallX) * deltaTime
         self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + (
-                    self.accelerationY - self.accelerationBallY) * deltaTime
+                self.accelerationY - self.accelerationBallY) * deltaTime
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
                             sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
 
@@ -139,20 +139,17 @@ class Ball:
                     accelerationNormal = forceNormal / self.mass
                     accelerationTangent = forceTangent / self.mass
 
-                    velocityXLocal -= accelerationNormal * deltaTime
-                    self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
-                                        sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
+                    self.saveAcceleration(line.alphaNorm, accelerationNormal, accelerationTangent)
+                    break
+                # accelerationTheta = forceTangent * (self.radius - entryNormal) / self.momentInertial
 
-                    # self.saveAcceleration(line.alphaNorm, accelerationNormal, accelerationTangent)
-                    # accelerationTheta = forceTangent * (self.radius - entryNormal) / self.momentInertial
-
-                    # self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
-                    #         velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
-                    #                               deltaTime ** 2)
-                    # velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
-                    # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
-                    # self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
-                    #                     sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
+                # self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
+                #         velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
+                #                               deltaTime ** 2)
+                # velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
+                # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
+                # self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
+                #                     sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
@@ -226,22 +223,28 @@ class Ball:
         return self.velocityAbsolute / deltaTime
 
     def saveAcceleration(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
-        self.accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
-        self.accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
-        self.accelerationBallX = self.accelerationBallAbsolute * cos(self.accelerationBallAlpha)
-        self.accelerationBallY = self.accelerationBallAbsolute * sin(self.accelerationBallAlpha)
+        accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
+        accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
+        self.accelerationBallX += accelerationBallAbsolute * cos(accelerationBallAlpha)
+        self.accelerationBallY += accelerationBallAbsolute * sin(accelerationBallAlpha)
+        self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
+        self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
 
     def setAcceleration(self):
         if self.isCrossAnything:
             self.removeAcceleration()
+            return
         else:
             self.addAcceleration()
+            self.removeAccelerationBall()
 
     def removeAcceleration(self):
         self.accelerationX = 0
         self.accelerationY = 0
 
     def removeAccelerationBall(self):
+        if self.accelerationBallAbsolute > eps:
+            print(self.accelerationBallAbsolute, 'remove')
         self.accelerationBallX = 0
         self.accelerationBallY = 0
         self.accelerationBallAbsolute = 0
