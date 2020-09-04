@@ -30,13 +30,13 @@ class Ball:
 
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
-        self.canvas.move(self.id, self.velocityX, self.velocityY)  # прорисовка движения
+        self.canvas.move(self.id, self.velocityX * deltaTime, self.velocityY * deltaTime)  # прорисовка движения
 
     def rotationIndicator(self):
-        self.theta += self.velocityTheta % (2 * pi)
+        self.theta += (self.velocityTheta * deltaTime) % (2 * pi)
         self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
                            self.y + self.radius * sin(self.theta))
-        self.canvas.move(self.id2, self.velocityX, self.velocityY)
+        self.canvas.move(self.id2, self.velocityX * deltaTime, self.velocityY * deltaTime)
 
     def movePolygon(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
@@ -51,8 +51,8 @@ class Ball:
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
-        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.accelerationX
-        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.accelerationY
+        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.accelerationX * deltaTime
+        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.accelerationY * deltaTime
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
                             sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
 
@@ -86,7 +86,8 @@ class Ball:
                     dampeningNormal = velocityXLocal * cn_wall
                     dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall
                     self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
-                            velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius))
+                            velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
+                                   deltaTime ** 2)
                     velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
                     velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
                     self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
@@ -100,13 +101,13 @@ class Ball:
         if not self.isInsidePolygon():
             distNow *= -1
 
-        self.x += self.velocityX
-        self.y += self.velocityY
+        self.x += self.velocityX * deltaTime
+        self.y += self.velocityY * deltaTime
         distAfter = line.distanceToLine(self.x, self.y)
         if not self.isInsidePolygon():
             distAfter *= -1
-        self.x -= self.velocityX
-        self.y -= self.velocityY
+        self.x -= self.velocityX * deltaTime
+        self.y -= self.velocityY * deltaTime
 
         return distNow > distAfter
 

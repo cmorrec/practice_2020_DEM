@@ -32,9 +32,9 @@ class MoveWall(Wall):
             self.revertVelocityY()
         if self.flagMove:
             for line in self.lines:
-                self.canvas.move(line.id, self.velocityX, self.velocityY)  # прорисовка движения стенки
-                line.setCoordinates(Coordinate(line.x1 + self.velocityX, line.y1 + self.velocityY),
-                                    Coordinate(line.x2 + self.velocityX, line.y2 + self.velocityY))
+                self.canvas.move(line.id, self.velocityX * deltaTime, self.velocityY * deltaTime)  # прорисовка движения стенки
+                line.setCoordinates(Coordinate(line.x1 + self.velocityX * deltaTime, line.y1 + self.velocityY * deltaTime),
+                                    Coordinate(line.x2 + self.velocityX * deltaTime, line.y2 + self.velocityY * deltaTime))
 
     def revertVelocityX(self):
         self.velocityX *= -1
@@ -49,27 +49,27 @@ class MoveWall(Wall):
 
     def upVelocity(self, event):
         if self.velocityY >= 0:
-            self.changeVelocityY(1)
+            self.changeVelocityY(10)
         else:
-            self.changeVelocityY(-1)
+            self.changeVelocityY(-10)
 
     def downVelocity(self, event):
         if self.velocityY >= 0:
-            self.changeVelocityY(-1)
+            self.changeVelocityY(-10)
         else:
-            self.changeVelocityY(1)
+            self.changeVelocityY(10)
 
     def rightVelocity(self, event):
         if self.velocityX >= 0:
-            self.changeVelocityX(1)
+            self.changeVelocityX(10)
         else:
-            self.changeVelocityX(-1)
+            self.changeVelocityX(-10)
 
     def leftVelocity(self, event):
         if self.velocityX >= 0:
-            self.changeVelocityX(-1)
+            self.changeVelocityX(-10)
         else:
-            self.changeVelocityX(1)
+            self.changeVelocityX(10)
 
     def changeVelocityX(self, decrement):
         self.velocityX += decrement

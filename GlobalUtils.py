@@ -9,13 +9,14 @@ from tkinter import *
 eps = 1e-5
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
-deltaTime = 1e-5
+deltaTime = 0.1
+deltaTimeDraw = 1e-7
 # Шаг по времени
 cn_wall = 0.1
 cs_wall = 0.2
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 0.1
+accelerationY = 2
 
 
 def saveResults(elements):

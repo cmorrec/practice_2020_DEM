@@ -46,7 +46,10 @@ class Line:
         b = sqrt((self.x1 - x0) ** 2 + (self.y1 - y0) ** 2)
         c = self.abs
         p = (a + b + c) / 2
-        h = 2 * sqrt(p * (p - a) * (p - b) * (p - c)) / c
+        if (p * (p - a) * (p - b) * (p - c)) > 0:
+            h = 2 * sqrt(p * (p - a) * (p - b) * (p - c)) / c
+        else:
+            h = 2 * sqrt(p * (p - a) * (p - b) * (p - c) * (-1)) / c
         return h
 
     def crossVerticalUp(self, x0, y0):

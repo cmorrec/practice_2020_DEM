@@ -13,8 +13,8 @@ def distanceNow(i, j):
 
 def distanceNext(i, j):
     # Расстояние между двумя шарами в следующий момент времени
-    return sqrt(((i.x + i.velocityX) - (j.x + j.velocityX)) ** 2 + (
-            (i.y + i.velocityY) - (j.y + j.velocityY)) ** 2)
+    return sqrt(((i.x + i.velocityX * deltaTime) - (j.x + j.velocityX * deltaTime)) ** 2 + (
+            (i.y + i.velocityY * deltaTime) - (j.y + j.velocityY * deltaTime)) ** 2)
 
 
 def isCross(i, j):
@@ -29,9 +29,11 @@ def rotation(i, j, velocity1YLocal, velocity2YLocal):
     velocityThetaJ = j.velocityTheta
 
     i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
-                velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
+                velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
+                                   deltaTime ** 2)
     j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (
-                velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius))
+                velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
+                                   deltaTime ** 2)
 
 
 def method(i, j):
@@ -58,9 +60,9 @@ def method(i, j):
     dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * i.cn
     dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * j.cn
     dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
-                i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
+            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
     dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
-                i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
+            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
     # Учет демпфирования
     velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
     velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
@@ -84,11 +86,11 @@ class Elements:
         self.starts = False
         self.started = False
         self.canvas = canvas
-        self.startEnergy = 0
-        self.energyFlag = 0
+        self.startEnergy = self.energy()
 
     def stopIfLowEnergy(self):
-        if self.energy() < self.startEnergy * 0.004 and not MoveWall.getInstance().flagMove == True:
+        if (self.energy() < self.startEnergy * 0.004) and (
+                not MoveWall.getInstance().flagMove or MoveWall.getInstance().velocityAbsolute < eps):
             self.started = False
             saveResults(self)
             self.energyMonitoring()
@@ -101,11 +103,6 @@ class Elements:
     def start(self, event):
         self.started = True
         self.energyMonitoring()
-        if self.energyFlag == 0:
-            for ball in self.balls:
-                self.startEnergy += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.25 * ball.mass * (
-                            ball.radius ** 2) * (ball.velocityTheta ** 2)
-            self.energyFlag = 1
 
     def exit(self, event):
         self.started = False
@@ -116,7 +113,7 @@ class Elements:
         energyCount = 0
         for ball in self.balls:
             energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.25 * ball.mass * (ball.radius ** 2) * (
-                        ball.velocityTheta ** 2)
+                    ball.velocityTheta ** 2)
         return energyCount
 
     def draw(self):

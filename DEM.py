@@ -1,11 +1,12 @@
 from Elements import *
 from PIL import ImageTk
 
-ballStartFileName1 = './ball_sets/4_ball.txt'
-ballStartFileName4 = './ball_sets/4_plate.txt'
-ballStartFileName4Custom = './ball_sets/4_plate_custom.txt'
-ballStartFileName2Vol = './ball_sets/2_plate_volume.txt'
-ballStartFileName2Den = './ball_sets/2_plate_density.txt'
+ballStartFileName1Ball = './ball_sets/1_ball.txt'
+ballStartFileName4Ball = './ball_sets/4_ball.txt'
+ballStartFileName2PlateVol = './ball_sets/2_plate_volume.txt'
+ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
+ballStartFileName4Plate = './ball_sets/4_plate.txt'
+ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
 
 coordinatesFileNameCircle = './walls_dynamic/circle.txt'
 coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
@@ -17,7 +18,7 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileName4Custom
+ballStartFileName = ballStartFileName4PlateCustom
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -116,6 +117,6 @@ while not elements.starts:
         elements.draw()
     tk.update_idletasks()
     tk.update()
-    time.sleep(deltaTime)
+    time.sleep(deltaTimeDraw)
 
 saveResults(elements)
