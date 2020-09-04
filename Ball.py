@@ -9,12 +9,13 @@ class Ball:
         self.x = x
         self.y = y
         self.theta = 0
+        self.radius = radius
         self.mass = density * pi * radius ** 2
+        self.momentInertial = 0.5 * self.mass * (self.radius ** 2)
         # Коэффициент контактного демпфирования в нормальном направлении
         self.cn = cn
         # Коэффициент контактного демпфирования в тангенциальном направлении
         self.cs = cs
-        self.radius = radius
         self.accelerationX = accelerationX
         self.accelerationY = accelerationY
         self.velocityAbsolute = velocity
@@ -28,9 +29,16 @@ class Ball:
                                       fill="black")
         self.isCrossAnything = False
 
+        self.accelerationBallX = 0
+        self.accelerationBallY = 0
+        self.accelerationBallAbsolute = 0
+        self.accelerationBallAlpha = 0
+
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
         self.canvas.move(self.id, self.velocityX * deltaTime, self.velocityY * deltaTime)  # прорисовка движения
+        if abs(self.accelerationBallAbsolute) > eps:
+            self.removeAccelerationBall()
 
     def rotationIndicator(self):
         self.theta += (self.velocityTheta * deltaTime) % (2 * pi)
@@ -47,12 +55,14 @@ class Ball:
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
         if self.crossPolygon():
-            self.resetPolygon()
+            self.resetPolygonForce()
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
-        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.accelerationX * deltaTime
-        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.accelerationY * deltaTime
+        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + (
+                    self.accelerationX - self.accelerationBallX) * deltaTime
+        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + (
+                    self.accelerationY - self.accelerationBallY) * deltaTime
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
                             sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
 
@@ -84,14 +94,65 @@ class Ball:
                         velocityYLocalWall = 0
                     velocityXLocal += velocityXLocalWall
                     dampeningNormal = velocityXLocal * cn_wall
-                    dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall
+                    dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall  # убрать скорость стенки
                     self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
                             velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
-                                   deltaTime ** 2)
+                                                  deltaTime ** 2)
                     velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
                     velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
                     self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
+
+    def resetPolygonForce(self):
+        # Находим линию, которую пересекает шарик и изменяем угол шарика по известной формуле:
+        # alpha = 2 * beta - alpha
+        wall = MoveWall.getInstance()
+        for line in wall.lines:
+            if line.crossLine(self.x, self.y, self.radius):
+                # Проверка на то двигается ли мячик к линии или от нее
+                # (во втором случае менять направление не нужно)
+                if self.resetForLine(line):
+                    alphaRadianLocal = self.alphaRadian - line.alphaNorm
+                    if wall.flagMove:
+                        velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
+                        velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
+                    else:
+                        velocityXLocalWall = 0
+                        velocityYLocalWall = 0
+
+                    velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
+                    velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
+
+                    dampeningNormal = velocityXLocal * cn_wall
+                    dampeningTangent = velocityYLocal * cs_wall
+
+                    velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
+                    velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+
+                    entryNormal = (velocityXLocal - velocityXLocalWall) * deltaTime
+                    entryTangent = (velocityYLocal - velocityYLocalWall - (
+                            self.velocityTheta * self.radius)) * deltaTime
+
+                    forceNormal = kn * entryNormal
+                    forceTangent = ks * entryTangent
+
+                    accelerationNormal = forceNormal / self.mass
+                    accelerationTangent = forceTangent / self.mass
+
+                    velocityXLocal -= accelerationNormal * deltaTime
+                    self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
+                                        sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
+
+                    # self.saveAcceleration(line.alphaNorm, accelerationNormal, accelerationTangent)
+                    # accelerationTheta = forceTangent * (self.radius - entryNormal) / self.momentInertial
+
+                    # self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
+                    #         velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
+                    #                               deltaTime ** 2)
+                    # velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
+                    # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
+                    # self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
+                    #                     sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
@@ -164,6 +225,12 @@ class Ball:
     def getAcceleration(self):
         return self.velocityAbsolute / deltaTime
 
+    def saveAcceleration(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
+        self.accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
+        self.accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
+        self.accelerationBallX = self.accelerationBallAbsolute * cos(self.accelerationBallAlpha)
+        self.accelerationBallY = self.accelerationBallAbsolute * sin(self.accelerationBallAlpha)
+
     def setAcceleration(self):
         if self.isCrossAnything:
             self.removeAcceleration()
@@ -173,6 +240,12 @@ class Ball:
     def removeAcceleration(self):
         self.accelerationX = 0
         self.accelerationY = 0
+
+    def removeAccelerationBall(self):
+        self.accelerationBallX = 0
+        self.accelerationBallY = 0
+        self.accelerationBallAbsolute = 0
+        self.accelerationBallAlpha = 0
 
     def addAcceleration(self):
         self.accelerationX = MoveWall.getInstance().accelerationX
