@@ -156,8 +156,8 @@ class Elements:
     def energy(self):
         energyCount = 0
         for ball in self.balls:
-            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
-                        ball.velocityTheta ** 2)
+            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2)+ 0.5 * ball.momentInertial * (
+                        ball.velocityTheta ** 2) + ball.mass*accelerationY*(MoveWall.getInstance().lines[2].y1 - ball.y)
         return energyCount
 
     def draw(self):
