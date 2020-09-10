@@ -15,6 +15,13 @@ class MoveWall(Wall):
         self.absY = absY
         MoveWall.__instance = self
         self.flagMove = True
+        self.maxY = self.lines[0].y1
+        for line in self.lines:
+            if line.y1 > self.maxY:
+                self.maxY = line.y1
+            if line.y2 > self.maxY:
+                self.maxY = line.y2
+        self.maxY += absY
         self.canvas.bind_all('<KeyPress-u>', self.upVelocity)
         self.canvas.bind_all('<KeyPress-d>', self.downVelocity)
         self.canvas.bind_all('<KeyPress-l>', self.leftVelocity)

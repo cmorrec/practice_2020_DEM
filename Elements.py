@@ -154,10 +154,22 @@ class Elements:
         self.energyMonitoring()
 
     def energy(self):
+        energyCount = self.energyKinetic() + self.energyPotential()
+        return energyCount
+
+    def energyKinetic(self):
         energyCount = 0
         for ball in self.balls:
-            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2)+ 0.5 * ball.momentInertial * (
-                        ball.velocityTheta ** 2) + ball.mass*accelerationY*(MoveWall.getInstance().lines[2].y1 - ball.y)
+            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
+                        ball.velocityTheta ** 2)
+        print('kinetic', energyCount)
+        return energyCount
+
+    def energyPotential(self):
+        energyCount = 0
+        for ball in self.balls:
+            energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
+        print('potential', energyCount)
         return energyCount
 
     def draw(self):

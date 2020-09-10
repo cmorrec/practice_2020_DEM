@@ -28,7 +28,6 @@ class Ball:
         self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,
                                       fill="black")
         self.isCrossAnything = False
-
         self.accelerationBallX = 0
         self.accelerationBallY = 0
         self.accelerationBallAbsolute = 0
@@ -55,16 +54,23 @@ class Ball:
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
         if self.crossPolygon():
-            self.resetPolygonForce()
+            #self.resetPolygon()
+            self.toSpringForce(True)
         elif not self.isInsidePolygon():
-            self.comeBack()
+            #self.comeBack()
+            self.info()
+            self.toSpringForce(False)
         # Обновление направлений скоростей
-        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + (
-                self.accelerationX - self.accelerationBallX) * deltaTime
-        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + (
-                self.accelerationY - self.accelerationBallY) * deltaTime
-        self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
-                            sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
+        self.addVelocity(0.5 * (self.accelerationX - self.accelerationBallX),
+                         0.5 * (self.accelerationY - self.accelerationBallY))
+
+    def info(self):
+        print('velocityAlpha', self.alphaRadian)
+        print('velocityAbs', self.velocityAbsolute)
+        print('velocityX', self.velocityX)
+        print('velocityY', self.velocityY)
+        print('accelerationX', self.accelerationBallX)
+        print('accelerationY', self.accelerationBallY)
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией
@@ -111,45 +117,89 @@ class Ball:
             if line.crossLine(self.x, self.y, self.radius):
                 # Проверка на то двигается ли мячик к линии или от нее
                 # (во втором случае менять направление не нужно)
+                # if self.resetForLine(line):
+                alphaRadianLocal = self.alphaRadian - line.alphaNorm
+                if wall.flagMove:
+                    velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
+                    velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
+                else:
+                    velocityXLocalWall = 0
+                    velocityYLocalWall = 0
+
+                velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
+                velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
+
+                dampeningNormal = velocityXLocal * cn_wall
+                dampeningTangent = velocityYLocal * cs_wall
+
+                velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
+                velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+
+                entryNormal = (velocityXLocal - velocityXLocalWall) * deltaTime
+                entryTangent = (velocityYLocal - velocityYLocalWall - (
+                        self.velocityTheta * self.radius)) * deltaTime
+
+                forceNormal = kn * entryNormal
+                forceTangent = ks * entryTangent
+
+                accelerationNormal = forceNormal / self.mass
+                accelerationTangent = forceTangent / self.mass
+
+                self.saveAcceleration(line.alphaNorm, accelerationNormal, accelerationTangent)
+                break
+
+    def toSpringForce(self, isCrossLine):
+        wall = MoveWall.getInstance()
+        closestLine = None
+        if isCrossLine:
+            minDistance = wall.lines[0].distanceToLine(self.x, self.y)
+            closestLine = wall.lines[0]
+            for line in wall.lines:
+                if minDistance > line.distanceToLine(self.x, self.y):
+                    minDistance = line.distanceToLine(self.x, self.y)
+                    closestLine = line
+        else:
+            for line in wall.lines:
+                h = line.distanceToLine(self.x, self.y)
                 if self.resetForLine(line):
-                    alphaRadianLocal = self.alphaRadian - line.alphaNorm
-                    if wall.flagMove:
-                        velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
-                        velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
-                    else:
-                        velocityXLocalWall = 0
-                        velocityYLocalWall = 0
-
-                    velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
-                    velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
-
-                    dampeningNormal = velocityXLocal * cn_wall
-                    dampeningTangent = velocityYLocal * cs_wall
-
-                    velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
-                    velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
-
-                    entryNormal = (velocityXLocal - velocityXLocalWall) * deltaTime
-                    entryTangent = (velocityYLocal - velocityYLocalWall - (
-                            self.velocityTheta * self.radius)) * deltaTime
-
-                    forceNormal = kn * entryNormal
-                    forceTangent = ks * entryTangent
-
-                    accelerationNormal = forceNormal / self.mass
-                    accelerationTangent = forceTangent / self.mass
-
-                    self.saveAcceleration(line.alphaNorm, accelerationNormal, accelerationTangent)
+                    xH = self.x + h * cos((-1) * self.alphaRadian)
+                    yH = self.y - h * sin((-1) * self.alphaRadian)
+                else:
+                    xH = self.x + h * cos(self.alphaRadian)
+                    yH = self.y - h * sin(self.alphaRadian)
+                if line.isLine(xH, yH) or abs(line.x1 - line.x2) < eps \
+                        or abs(line.y1 - line.y2) < eps:
+                    closestLine = line
                     break
-                # accelerationTheta = forceTangent * (self.radius - entryNormal) / self.momentInertial
 
-                # self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
-                #         velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
-                #                               deltaTime ** 2)
-                # velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
-                # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
-                # self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
-                #                     sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
+        alphaRadianLocal = self.alphaRadian - closestLine.alphaNorm
+        if wall.flagMove:
+            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
+            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
+        else:
+            velocityXLocalWall = 0
+            velocityYLocalWall = 0
+
+        velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
+        velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
+
+        dampeningNormal = velocityXLocal * cn_wall
+        dampeningTangent = velocityYLocal * cs_wall
+
+        velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
+        velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+
+        entryNormal = (velocityXLocal - velocityXLocalWall) * deltaTime
+        entryTangent = (velocityYLocal - velocityYLocalWall - (
+                self.velocityTheta * self.radius)) * deltaTime
+
+        forceNormal = kn * entryNormal
+        forceTangent = ks * entryTangent
+
+        accelerationNormal = forceNormal / self.mass
+        accelerationTangent = forceTangent / self.mass
+
+        self.saveAcceleration(closestLine.alphaNorm, accelerationNormal, accelerationTangent)
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
@@ -159,13 +209,15 @@ class Ball:
         if not self.isInsidePolygon():
             distNow *= -1
 
-        self.x += self.velocityX * deltaTime
-        self.y += self.velocityY * deltaTime
+        self.displace()
         distAfter = line.distanceToLine(self.x, self.y)
         if not self.isInsidePolygon():
             distAfter *= -1
-        self.x -= self.velocityX * deltaTime
-        self.y -= self.velocityY * deltaTime
+        self.velocityX *= -1
+        self.velocityY *= -1
+        self.displace()
+        self.velocityX *= -1
+        self.velocityY *= -1
 
         return distNow > distAfter
 
@@ -232,19 +284,18 @@ class Ball:
 
     def setAcceleration(self):
         if self.isCrossAnything:
-            self.removeAcceleration()
+            #self.removeAcceleration()
             return
         else:
             self.addAcceleration()
-            self.removeAccelerationBall()
+            if self.isInsidePolygon():
+                self.removeAccelerationBall()
 
     def removeAcceleration(self):
         self.accelerationX = 0
         self.accelerationY = 0
 
     def removeAccelerationBall(self):
-        if self.accelerationBallAbsolute > eps:
-            print(self.accelerationBallAbsolute, 'remove')
         self.accelerationBallX = 0
         self.accelerationBallY = 0
         self.accelerationBallAbsolute = 0
@@ -253,3 +304,13 @@ class Ball:
     def addAcceleration(self):
         self.accelerationX = MoveWall.getInstance().accelerationX
         self.accelerationY = MoveWall.getInstance().accelerationY
+
+    def displace(self):
+        self.x += self.velocityX * deltaTime
+        self.y += self.velocityY * deltaTime
+
+    def addVelocity(self, accelerationX, accelerationY):
+        self.velocityX += 0.5 * accelerationX * deltaTime
+        self.velocityY += 0.5 * accelerationY * deltaTime
+        self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
+                            sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
