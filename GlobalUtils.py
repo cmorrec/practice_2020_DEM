@@ -2,7 +2,7 @@ from math import *
 import numpy as np
 import time
 from tkinter import *
-
+import matplotlib.pyplot as plt
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 
 eps = 1e-5
@@ -18,7 +18,11 @@ accelerationX = 0
 accelerationY = 1
 kn = 1 * 1e5
 ks = 1 * 1e1
-
+# Энергия
+kineticPlot = []
+potentialPlot = []
+summaryPlot = []
+stepCount = [0,0,0]
 
 def saveResults(elements):
     # Запись результатов в файл

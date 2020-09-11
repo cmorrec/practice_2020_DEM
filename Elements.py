@@ -1,4 +1,5 @@
 from Ball import *
+import matplotlib.pyplot as plt
 
 
 # Класс Elements содержит в себе массив шаров и координирует их движение между собой,
@@ -131,6 +132,7 @@ class Elements:
         self.started = False
         self.canvas = canvas
         self.startEnergy = self.energy()
+        self.step = 0
 
     def stopIfLowEnergy(self):
         if (self.energy() < self.startEnergy * 0.004) and (
@@ -152,17 +154,37 @@ class Elements:
         self.started = False
         saveResults(self)
         self.energyMonitoring()
+        self.plotter()
+
+    def plotter(self):
+        plt.style.use('fivethirtyeight')
+
+        fig, ax = plt.subplots(figsize=(8, 3))
+        ax.plot(stepCount, kineticPlot, label ='Кинетическая')
+        ax.plot(stepCount, potentialPlot, label = 'Потенциальная')
+        ax.plot(stepCount, summaryPlot, label ='Суммарная')
+        ax.set_title('')
+        ax.legend(loc='upper left')
+        ax.set_ylabel('')
+        ax.set_xlabel('Steps')
+        # ax.set_xlim(xmin=nrg[0], xmax=nrg[-1])
+        fig.tight_layout()
+
+        plt.show()
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
+        summaryPlot.append(energyCount)
+
         return energyCount
 
     def energyKinetic(self):
         energyCount = 0
         for ball in self.balls:
             energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
-                        ball.velocityTheta ** 2)
+                    ball.velocityTheta ** 2)
         print('kinetic', energyCount)
+        kineticPlot.append(energyCount)
         return energyCount
 
     def energyPotential(self):
@@ -170,11 +192,15 @@ class Elements:
         for ball in self.balls:
             energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
         print('potential', energyCount)
+        potentialPlot.append(energyCount)
         return energyCount
 
     def draw(self):
         # self.stopIfLowEnergy()
         self.move()
+        self.energy()
+        self.step += 1
+        stepCount.append(self.step)
         MoveWall.getInstance().move()
         for ball in self.balls:
             ball.drawPolygon()
