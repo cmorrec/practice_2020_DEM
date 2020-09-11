@@ -159,7 +159,7 @@ class Elements:
     def plotter(self):
         plt.style.use('fivethirtyeight')
 
-        fig, ax = plt.subplots(figsize=(8, 3))
+        fig, ax = plt.subplots(figsize=(8, 8))
         ax.plot(stepCount, kineticPlot, label ='Кинетическая')
         ax.plot(stepCount, potentialPlot, label = 'Потенциальная')
         ax.plot(stepCount, summaryPlot, label ='Суммарная')
@@ -174,6 +174,7 @@ class Elements:
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
+        print('summ', energyCount)
         summaryPlot.append(energyCount)
 
         return energyCount
@@ -183,7 +184,6 @@ class Elements:
         for ball in self.balls:
             energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
                     ball.velocityTheta ** 2)
-        print('kinetic', energyCount)
         kineticPlot.append(energyCount)
         return energyCount
 
@@ -191,7 +191,6 @@ class Elements:
         energyCount = 0
         for ball in self.balls:
             energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
-        print('potential', energyCount)
         potentialPlot.append(energyCount)
         return energyCount
 

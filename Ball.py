@@ -35,7 +35,7 @@ class Ball:
 
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
-        self.canvas.move(self.id, self.velocityX * deltaTime, self.velocityY * deltaTime)  # прорисовка движения
+        self.canvas.move(self.id, self.velocityX * deltaTime - 0.5*(accelerationX-self.accelerationBallX)*deltaTime**2, self.velocityY * deltaTime - 0.5*(accelerationY - self.accelerationBallY)*deltaTime**2)  # прорисовка движения
         # if abs(self.accelerationBallAbsolute) > eps:
         #     self.removeAccelerationBall()
 
@@ -61,8 +61,8 @@ class Ball:
             self.info()
             self.toSpringForce(False)
         # Обновление направлений скоростей
-        self.addVelocity(0.5 * (self.accelerationX - self.accelerationBallX),
-                         0.5 * (self.accelerationY - self.accelerationBallY))
+        self.addVelocity((self.accelerationX - self.accelerationBallX),
+                         (self.accelerationY - self.accelerationBallY))
 
     def info(self):
         print('velocityAlpha', self.alphaRadian)
@@ -310,7 +310,7 @@ class Ball:
         self.y += self.velocityY * deltaTime
 
     def addVelocity(self, accelerationX, accelerationY):
-        self.velocityX += 0.5 * accelerationX * deltaTime
-        self.velocityY += 0.5 * accelerationY * deltaTime
+        self.velocityX +=  accelerationX * deltaTime
+        self.velocityY +=  accelerationY * deltaTime
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
                             sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
