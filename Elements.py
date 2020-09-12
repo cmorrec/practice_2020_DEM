@@ -1,5 +1,7 @@
-from Ball import *
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+
+from Ball import *
 
 
 # Класс Elements содержит в себе массив шаров и координирует их движение между собой,
@@ -158,14 +160,58 @@ class Elements:
 
     def plotter(self):
         plt.style.use('fivethirtyeight')
-
-        fig, ax = plt.subplots(figsize=(8, 8))
-        ax.plot(stepCount, kineticPlot, label ='Кинетическая')
-        ax.plot(stepCount, potentialPlot, label = 'Потенциальная')
-        ax.plot(stepCount, summaryPlot, label ='Суммарная')
+        fig = plt.figure(figsize=(8, 8))
+        ax = plt.subplot(111)
+        ax.plot(stepCount, kineticPlot, label='Кинетическая')
+        ax.plot(stepCount, potentialPlot, label='Потенциальная')
+        ax.plot(stepCount, summaryPlot, label='Суммарная')
         ax.set_title('')
-        ax.legend(loc='upper left')
-        ax.set_ylabel('')
+        chartBox = ax.get_position()
+        ax.set_position([chartBox.x0, chartBox.y0, chartBox.width * 0.7, chartBox.height])
+        ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
+        ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
+        ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(50))
+        ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
+        ax.tick_params(axis='both',
+                       which='major',
+                       direction='inout',
+                       length=20,
+                       width=2,
+                       color='#e54747',
+                       pad=10,
+                       labelsize=10,
+                       labelcolor='#000',
+                       bottom=True,
+                       top=True,
+                       left=True,
+                       right=True,
+                       labelbottom=True,
+                       labeltop=True,
+                       labelleft=True,
+                       labelright=True,
+                       labelrotation=70)
+
+        ax.tick_params(axis='both',
+                       which='minor',
+                       direction='out',
+                       length=10,
+                       width=1,
+                       color='#e54747',
+                       pad=10,
+                       labelsize=15,
+                       labelcolor='#000',
+                       bottom=True,
+                       top=True,
+                       left=True,
+                       right=True)
+        ax.grid(which='major',
+                color='k')
+        ax.minorticks_on()
+        ax.grid(which='minor',
+                color='gray',
+                linestyle=':')
+        ax.set_ylabel('Energy, 10e5 J')
         ax.set_xlabel('Steps')
         # ax.set_xlim(xmin=nrg[0], xmax=nrg[-1])
         fig.tight_layout()
@@ -175,7 +221,7 @@ class Elements:
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
         print('summ', energyCount)
-        summaryPlot.append(energyCount)
+        summaryPlot.append(energyCount / 1e5)
 
         return energyCount
 
@@ -184,14 +230,14 @@ class Elements:
         for ball in self.balls:
             energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
                     ball.velocityTheta ** 2)
-        kineticPlot.append(energyCount)
+        kineticPlot.append(energyCount / 1e5)
         return energyCount
 
     def energyPotential(self):
         energyCount = 0
         for ball in self.balls:
             energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
-        potentialPlot.append(energyCount)
+        potentialPlot.append(energyCount / 1e5)
         return energyCount
 
     def draw(self):
