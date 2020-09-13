@@ -1,4 +1,6 @@
 from Elements import *
+from BallForce import BallForce
+from ElementsForce import *
 from PIL import ImageTk
 
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
@@ -18,7 +20,7 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileName1Ball
+ballStartFileName = ballStartFileName4Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -100,14 +102,16 @@ for line in ballsStartFile:
             color = word
         j += 1
     if len(data) > 0:
-        ballsFromFile.append(Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
+        ballsFromFile.append(
+            BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
 
 ballsStartFile.close()
 
-elements = Elements(ballsFromFile, canvas)
+elements = ElementsForce(ballsFromFile, canvas)
 
 but_1.bind('<Button-1>', elements.start)  # Обработчик событий
-but_1.grid(row=1, column=0, padx=3)  # используем метод pack для отображения кнопки - в нём можно задать положение кнопки
+but_1.grid(row=1, column=0,
+           padx=3)  # используем метод pack для отображения кнопки - в нём можно задать положение кнопки
 but_2.grid(row=1, column=1)
 but_3.bind('<Button-1>', elements.exit)
 but_3.grid(row=1, column=2, padx=3)

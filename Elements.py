@@ -1,6 +1,3 @@
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-
 from Ball import *
 
 
@@ -83,50 +80,6 @@ def method(i, j):
     j.changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
 
 
-def methodForce(i, j):
-    # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
-    # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
-    # переход в локальную систему координат)
-    # Также учет диссипации при каждом столкновении шаров
-
-    # Угол между линией удара и горизонталью
-    gamma = atan2((i.y - j.y), (i.x - j.x))
-    # Углы направления шаров в локальной системе координат
-    alphaRadian1Local = i.alphaRadian - gamma
-    alphaRadian2Local = j.alphaRadian - gamma
-    # Скорости шаров в локальной системе координат
-    velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
-    velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
-    velocity2XLocal = j.velocityAbsolute * cos(alphaRadian2Local)
-    velocity2YLocal = j.velocityAbsolute * sin(alphaRadian2Local)
-
-    # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
-    velocity1XLocalNew = ((i.mass - j.mass) * velocity1XLocal + 2 * j.mass * velocity2XLocal) / (i.mass + j.mass)
-    velocity2XLocalNew = (2 * i.mass * velocity1XLocal + (j.mass - i.mass) * velocity2XLocal) / (i.mass + j.mass)
-    # Демпфирование
-    dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * i.cn
-    dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * j.cn
-    dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
-    dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
-    # Учет демпфирования
-    velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
-    velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
-    velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
-    velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
-    # Задание новой угловой скорости дисков
-    rotation(i, j, velocity1YLocal, velocity2YLocal)
-    # Возвращение к глобальной системе координат
-    newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
-    newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
-    newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
-    newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
-    # Задание нового вектора скорости
-    i.changeVelocity(newAlphaI, newVelocityAbsoluteI)
-    j.changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
-
-
 class Elements:
     def __init__(self, balls, canvas):
         self.balls = balls
@@ -156,67 +109,7 @@ class Elements:
         self.started = False
         saveResults(self)
         self.energyMonitoring()
-        self.plotter()
-
-    def plotter(self):
-        plt.style.use('fivethirtyeight')
-        fig = plt.figure(figsize=(8, 8))
-        ax = plt.subplot(111)
-        ax.plot(stepCount, kineticPlot, label='Кинетическая')
-        ax.plot(stepCount, potentialPlot, label='Потенциальная')
-        ax.plot(stepCount, summaryPlot, label='Суммарная')
-        ax.set_title('')
-        chartBox = ax.get_position()
-        ax.set_position([chartBox.x0, chartBox.y0, chartBox.width * 0.7, chartBox.height])
-        ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
-        ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
-        ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(50))
-        ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
-        ax.tick_params(axis='both',
-                       which='major',
-                       direction='inout',
-                       length=20,
-                       width=2,
-                       color='#e54747',
-                       pad=10,
-                       labelsize=10,
-                       labelcolor='#000',
-                       bottom=True,
-                       top=True,
-                       left=True,
-                       right=True,
-                       labelbottom=True,
-                       labeltop=True,
-                       labelleft=True,
-                       labelright=True,
-                       labelrotation=70)
-
-        ax.tick_params(axis='both',
-                       which='minor',
-                       direction='out',
-                       length=10,
-                       width=1,
-                       color='#e54747',
-                       pad=10,
-                       labelsize=15,
-                       labelcolor='#000',
-                       bottom=True,
-                       top=True,
-                       left=True,
-                       right=True)
-        ax.grid(which='major',
-                color='k')
-        ax.minorticks_on()
-        ax.grid(which='minor',
-                color='gray',
-                linestyle=':')
-        ax.set_ylabel('Energy, 10e5 J')
-        ax.set_xlabel('Steps')
-        # ax.set_xlim(xmin=nrg[0], xmax=nrg[-1])
-        fig.tight_layout()
-
-        plt.show()
+        plotter()
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
