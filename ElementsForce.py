@@ -19,30 +19,47 @@ def methodForce(i, j):
     velocity2YLocal = j.velocityAbsolute * sin(alphaRadian2Local)
 
     # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
-    velocity1XLocalNew = ((i.mass - j.mass) * velocity1XLocal + 2 * j.mass * velocity2XLocal) / (i.mass + j.mass)
-    velocity2XLocalNew = (2 * i.mass * velocity1XLocal + (j.mass - i.mass) * velocity2XLocal) / (i.mass + j.mass)
+    entryNormal1 = (velocity1XLocal - velocity2XLocal) * deltaTime
+    entryNormal2 = (velocity2XLocal - velocity1XLocal) * deltaTime
+    entryTangent1 = (velocity1YLocal - velocity2YLocal - (
+            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * deltaTime
+    entryTangent2 = (velocity2YLocal - velocity1YLocal - (
+            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * deltaTime
+
+    forceNormal1 = kn * entryNormal1
+    forceTangent1 = ks * entryTangent1
+    forceNormal2 = kn * entryNormal2
+    forceTangent2 = ks * entryTangent2
+
+    accelerationNormal1 = forceNormal1 / i.mass
+    accelerationTangent1 = forceTangent1 / i.mass
+    accelerationNormal2 = forceNormal2 / j.mass
+    accelerationTangent2 = forceTangent2 / j.mass
+
     # Демпфирование
-    dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * i.cn
-    dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * j.cn
-    dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
-    dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
+    # dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * i.cn
+    # dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * j.cn
+    # dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
+    #         i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
+    # dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
+    #         i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
     # Учет демпфирования
-    velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
-    velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
-    velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
-    velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
+    # velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
+    # velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
+    # velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
+    # velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
     # Задание новой угловой скорости дисков
     rotation(i, j, velocity1YLocal, velocity2YLocal)
     # Возвращение к глобальной системе координат
-    newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
-    newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
-    newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
-    newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
+    # newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
+    # newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
+    # newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
+    # newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
     # Задание нового вектора скорости
-    i.changeVelocity(newAlphaI, newVelocityAbsoluteI)
-    j.changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
+    # i.changeVelocity(newAlphaI, newVelocityAbsoluteI)
+    # j.changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
+    i.saveAcceleration(gamma, accelerationNormal1, accelerationTangent1)
+    j.saveAcceleration(gamma, accelerationNormal2, accelerationTangent2)
 
 
 class ElementsForce(Elements):

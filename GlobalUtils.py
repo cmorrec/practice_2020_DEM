@@ -18,7 +18,7 @@ cs_wall = 0.2
 # коэффициенты демпфирования для стенок
 accelerationX = 0
 accelerationY = 10
-kn = 1 * 1e5
+kn = 1 * 1e4
 ks = 1 * 1e1
 # Энергия
 kineticPlot = []
