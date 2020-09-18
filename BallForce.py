@@ -12,9 +12,9 @@ class BallForce(Ball):
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
         self.canvas.move(self.id,
-                         self.velocityX * deltaTime - 0.5 * (accelerationX - self.accelerationBallX) * deltaTime ** 2,
-                         self.velocityY * deltaTime - 0.5 * (
-                                 accelerationY - self.accelerationBallY) * deltaTime ** 2)  # прорисовка движения
+                         self.velocityX * deltaTime + 0.5 * (accelerationX - self.accelerationBallX) * (deltaTime ** 2),
+                         self.velocityY * deltaTime + 0.5 * (
+                                 accelerationY - self.accelerationBallY) * (deltaTime ** 2))  # прорисовка движения
 
     def movePolygon(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
