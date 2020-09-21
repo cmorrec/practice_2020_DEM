@@ -25,9 +25,9 @@ class BallForce(Ball):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
         if self.crossPolygon():
-            self.toSpringForce(True)
+            self.toSpringForceLength(True)
         elif not self.isInsidePolygon():
-            self.toSpringForce(False)
+            self.toSpringForceLength(False)
         # Обновление направлений скоростей
         self.addVelocity((self.accelerationX - self.accelerationBallX),
                          (self.accelerationY - self.accelerationBallY))
@@ -85,11 +85,80 @@ class BallForce(Ball):
 
         self.saveAcceleration(closestLine.alphaNorm, accelerationNormal, accelerationTangent)
 
+    def toSpringForceLength(self, isCrossLine):
+        wall = MoveWall.getInstance()
+        closestLine = None
+        if isCrossLine:
+            minDistance = wall.lines[0].distanceToLine(self.x, self.y)
+            closestLine = wall.lines[0]
+            for line in wall.lines:
+                if minDistance > line.distanceToLine(self.x, self.y):
+                    minDistance = line.distanceToLine(self.x, self.y)
+                    closestLine = line
+        else:
+            for line in wall.lines:
+                h = line.distanceToLine(self.x, self.y)
+                if self.resetForLine(line):
+                    xH = self.x + h * cos((-1) * self.alphaRadian)
+                    yH = self.y - h * sin((-1) * self.alphaRadian)
+                else:
+                    xH = self.x + h * cos(self.alphaRadian)
+                    yH = self.y - h * sin(self.alphaRadian)
+                if line.isLine(xH, yH) or abs(line.x1 - line.x2) < eps \
+                        or abs(line.y1 - line.y2) < eps:
+                    closestLine = line
+                    break
+
+        alphaRadianLocal = self.alphaRadian - closestLine.alphaNorm
+        if wall.flagMove:
+            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
+            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
+        else:
+            velocityXLocalWall = 0
+            velocityYLocalWall = 0
+
+        velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
+        velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
+
+        dampeningNormal = velocityXLocal * cn_wall
+        dampeningTangent = velocityYLocal * cs_wall
+
+        velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
+        velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+        if closestLine.alphaTau * 180 / pi == 90 or closestLine.alphaTau * 180 / pi == -90  or closestLine.alphaTau * 180 / pi == 180:
+            entryNormal = (self.radius - closestLine.distanceToLine(self.x, self.y))
+            entryTangent = 2 * sqrt(2 * self.radius * entryNormal - entryNormal ** 2) - ((
+                    self.velocityTheta * self.radius)) * deltaTime
+            forceNormal = - kn * entryNormal
+            forceTangent = ks * entryTangent
+        else:
+            print(2)
+            entryNormal = (closestLine.distanceToLine(self.x, self.y) - self.radius)
+            entryTangent = 2 * sqrt(2 * self.radius * (-entryNormal) + entryNormal ** 2) - ((
+                    self.velocityTheta * self.radius)) * deltaTime
+            forceNormal = - kn * entryNormal
+            forceTangent = ks * entryTangent
+
+
+
+        accelerationNormal = forceNormal / self.mass
+        accelerationTangent = forceTangent / self.mass
+
+        self.saveAccelerationLength(closestLine.alphaNorm, accelerationNormal, accelerationTangent)
+
     def saveAcceleration(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
         accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
         accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
         self.accelerationBallX += accelerationBallAbsolute * cos(accelerationBallAlpha)
         self.accelerationBallY += accelerationBallAbsolute * sin(accelerationBallAlpha)
+        self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
+        self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
+
+    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
+        accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
+        accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
+        self.accelerationBallX = accelerationBallAbsolute * cos(accelerationBallAlpha)
+        self.accelerationBallY = accelerationBallAbsolute * sin(accelerationBallAlpha)
         self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
         self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
 
