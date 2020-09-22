@@ -8,17 +8,18 @@ import matplotlib.ticker as ticker
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 
 eps = 1e-11
+inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
 deltaTime = 0.001
-deltaTimeDraw = 1e-5
+deltaTimeDraw = 1e-10
 # Шаг по времени
-cn_wall = 0.5
-cs_wall = 0.5
+cn_wall = 0.01
+cs_wall = 0.01
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 10
-kn = 5 * 1e6
+accelerationY = 100
+kn = 1 * 1e6
 ks = 1 * 1e1
 # Энергия
 kineticPlot = []

@@ -53,7 +53,6 @@ class Ball:
             self.resetPolygon()
         elif not self.isInsidePolygon():
             self.comeBack()
-            # self.info()
         # Обновление направлений скоростей
         self.addVelocity(self.accelerationX, self.accelerationY)
 
@@ -62,8 +61,6 @@ class Ball:
         print('velocityAbs', self.velocityAbsolute)
         print('velocityX', self.velocityX)
         print('velocityY', self.velocityY)
-        print('accelerationX', self.accelerationBallX)
-        print('accelerationY', self.accelerationBallY)
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией

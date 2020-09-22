@@ -17,7 +17,8 @@ class Line:
         if distY < eps:
             distY = eps
         # Угол направления линии
-        self.alphaTau = acos((self.x2 - self.x1) / self.abs) * (self.y2 - self.y1) / distY
+        # self.alphaTau = acos((self.x2 - self.x1) / self.abs) * (self.y2 - self.y1) / distY
+        self.alphaTau = atan2(self.y2 - self.y1, self.x2 - self.x1 + eps)
         # Угол нормали к линии
         self.alphaNorm = self.alphaTau + (pi / 2)
 
@@ -27,7 +28,9 @@ class Line:
         # Координаты точки на прямой этой линии до которой от центра шарика расстояние h
         xH = x0 + h * cos(pi - self.alphaNorm)
         yH = y0 - h * sin(pi - self.alphaNorm)
-        if (h < radius) and (self.isLine(xH, yH) or abs(self.x1 - self.x2) < eps or abs(
+        xH2 = x0 + h * cos(pi - (-1) * self.alphaNorm)
+        yH2 = y0 - h * sin(pi - (-1) * self.alphaNorm)
+        if (h < radius) and (self.isLine(xH, yH) or self.isLine(xH2, yH2) or abs(self.x1 - self.x2) < eps or abs(
                 self.y1 - self.y2) < eps):
             return True
         else:

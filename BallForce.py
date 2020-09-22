@@ -25,44 +25,31 @@ class BallForce(Ball):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
         if self.crossPolygon():
-            self.toSpringForceLength(True)
+            self.toSpringForce()
         elif not self.isInsidePolygon():
-            self.toSpringForceLength(False)
+            self.comeBack()
         # Обновление направлений скоростей
         self.addVelocity((self.accelerationX - self.accelerationBallX),
                          (self.accelerationY - self.accelerationBallY))
 
-    def toSpringForce(self, isCrossLine):
+    def getCrossingLine(self):
         wall = MoveWall.getInstance()
-        closestLine = None
-        if isCrossLine:
-            minDistance = wall.lines[0].distanceToLine(self.x, self.y)
-            closestLine = wall.lines[0]
-            for line in wall.lines:
-                if minDistance > line.distanceToLine(self.x, self.y):
-                    minDistance = line.distanceToLine(self.x, self.y)
-                    closestLine = line
-        else:
-            for line in wall.lines:
-                h = line.distanceToLine(self.x, self.y)
-                if self.resetForLine(line):
-                    xH = self.x + h * cos((-1) * self.alphaRadian)
-                    yH = self.y - h * sin((-1) * self.alphaRadian)
-                else:
-                    xH = self.x + h * cos(self.alphaRadian)
-                    yH = self.y - h * sin(self.alphaRadian)
-                if line.isLine(xH, yH) or abs(line.x1 - line.x2) < eps \
-                        or abs(line.y1 - line.y2) < eps:
-                    closestLine = line
-                    break
+        minDistance = wall.lines[0].distanceToLine(self.x, self.y)
+        crossingLine = wall.lines[0]
+        for line in wall.lines:
+            if minDistance > line.distanceToLine(self.x, self.y):
+                minDistance = line.distanceToLine(self.x, self.y)
+                crossingLine = line
+        return crossingLine
+
+    def toSpringForce(self):
+        wall = MoveWall.getInstance()
+
+        closestLine = self.getCrossingLine()
+
+        isToLine = self.resetForLine(closestLine)
 
         alphaRadianLocal = self.alphaRadian - closestLine.alphaNorm
-        if wall.flagMove:
-            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
-            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
-        else:
-            velocityXLocalWall = 0
-            velocityYLocalWall = 0
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
@@ -72,6 +59,26 @@ class BallForce(Ball):
 
         velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
         velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+
+        if wall.flagMove:
+            # velocityNormal = wall.velocityAbsolute * cos(pi / 2 - closestLine.alphaNorm)
+            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
+            # velocityTangent = wall.velocityAbsolute * sin(pi / 2 - closestLine.alphaNorm)
+            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
+            # if velocityXLocalWall * velocityXLocal > 0:
+            velocityXLocalWall *= -1
+            # if velocityYLocalWall * velocityYLocal > 0:
+            velocityYLocalWall *= -1
+        else:
+            velocityXLocalWall = 0
+            velocityYLocalWall = 0
+
+        self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + closestLine.alphaNorm,
+                            sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
+
+        if not isToLine:
+            velocityXLocal *= -1
+            velocityYLocal *= -1
 
         entryNormal = (velocityXLocal - velocityXLocalWall) * deltaTime
         entryTangent = (velocityYLocal - velocityYLocalWall - (
@@ -85,80 +92,76 @@ class BallForce(Ball):
 
         self.saveAcceleration(closestLine.alphaNorm, accelerationNormal, accelerationTangent)
 
-    def toSpringForceLength(self, isCrossLine):
+    def comeBack(self):
         wall = MoveWall.getInstance()
-        closestLine = None
-        if isCrossLine:
-            minDistance = wall.lines[0].distanceToLine(self.x, self.y)
-            closestLine = wall.lines[0]
-            for line in wall.lines:
-                if minDistance > line.distanceToLine(self.x, self.y):
-                    minDistance = line.distanceToLine(self.x, self.y)
-                    closestLine = line
-        else:
-            for line in wall.lines:
-                h = line.distanceToLine(self.x, self.y)
-                if self.resetForLine(line):
-                    xH = self.x + h * cos((-1) * self.alphaRadian)
-                    yH = self.y - h * sin((-1) * self.alphaRadian)
-                else:
-                    xH = self.x + h * cos(self.alphaRadian)
-                    yH = self.y - h * sin(self.alphaRadian)
-                if line.isLine(xH, yH) or abs(line.x1 - line.x2) < eps \
-                        or abs(line.y1 - line.y2) < eps:
-                    closestLine = line
-                    break
+        minX = wall.lines[0].x1
+        minY = wall.lines[0].y1
+        maxX = wall.lines[0].x1
+        maxY = wall.lines[0].y1
+        for line in wall.lines:
+            if line.x1 > maxX:
+                maxX = line.x1
+            if line.x2 > maxX:
+                maxX = line.x2
+            if line.x1 < minX:
+                minX = line.x1
+            if line.x2 < minX:
+                minX = line.x2
+            if line.y1 > maxY:
+                maxY = line.y1
+            if line.y2 > maxY:
+                maxY = line.y2
+            if line.y1 < minY:
+                minY = line.y1
+            if line.y2 < minY:
+                minY = line.y2
+        x0 = (maxX - minX) / 2 + minX
+        y0 = (maxY - minY) / 2 + minY
 
-        alphaRadianLocal = self.alphaRadian - closestLine.alphaNorm
-        if wall.flagMove:
-            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
-            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
-        else:
-            velocityXLocalWall = 0
-            velocityYLocalWall = 0
-
-        velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
-        velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
-
-        dampeningNormal = velocityXLocal * cn_wall
-        dampeningTangent = velocityYLocal * cs_wall
-
-        velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
-        velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
-        if closestLine.alphaTau * 180 / pi == 90 or closestLine.alphaTau * 180 / pi == -90  or closestLine.alphaTau * 180 / pi == 180:
-            entryNormal = (self.radius - closestLine.distanceToLine(self.x, self.y))
-            entryTangent = 2 * sqrt(2 * self.radius * entryNormal - entryNormal ** 2) - ((
-                    self.velocityTheta * self.radius)) * deltaTime
-            forceNormal = - kn * entryNormal
-            forceTangent = ks * entryTangent
-        else:
-            print(2)
-            entryNormal = (closestLine.distanceToLine(self.x, self.y) - self.radius)
-            entryTangent = 2 * sqrt(2 * self.radius * (-entryNormal) + entryNormal ** 2) - ((
-                    self.velocityTheta * self.radius)) * deltaTime
-            forceNormal = - kn * entryNormal
-            forceTangent = ks * entryTangent
-
-
-
+        entryNormal = sqrt((x0 - self.x) ** 2 + (y0 - self.y) ** 2)
+        forceNormal = (-1) * 1e3 * entryNormal
         accelerationNormal = forceNormal / self.mass
-        accelerationTangent = forceTangent / self.mass
+        alpha = atan2((1) * (y0 - self.y), (1) * (x0 - self.x) + eps)
 
-        self.saveAccelerationLength(closestLine.alphaNorm, accelerationNormal, accelerationTangent)
+        self.saveAcceleration(alpha, accelerationNormal, 0)
+
+    # def toSpringForceLength(self):
+    #     wall = MoveWall.getInstance()
+    #     closestLine = self.getCrossingLine()
+    #
+    #     alphaRadianLocal = self.alphaRadian - closestLine.alphaNorm
+    #     if wall.flagMove:
+    #         velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
+    #         velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
+    #     else:
+    #         velocityXLocalWall = 0
+    #         velocityYLocalWall = 0
+    #
+    #     velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
+    #     velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
+    #
+    #     dampeningNormal = velocityXLocal * cn_wall
+    #     dampeningTangent = velocityYLocal * cs_wall
+    #
+    #     velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
+    #     velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+    #
+    #     entryNormal = self.radius - closestLine.distanceToLine(self.x, self.y)
+    #     forceNormal = (-1) * kn * entryNormal
+    #     accelerationNormal = forceNormal / self.mass
+    #
+    #     entryTangent = 2 * sqrt(2 * self.radius * entryNormal - entryNormal ** 2) - (
+    #             self.velocityTheta * self.radius) * deltaTime
+    #     forceTangent = ks * entryTangent
+    #     accelerationTangent = forceTangent / self.mass
+    #
+    #     self.saveAcceleration(closestLine.alphaNorm, accelerationNormal, accelerationTangent)
 
     def saveAcceleration(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
         accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
         accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
         self.accelerationBallX += accelerationBallAbsolute * cos(accelerationBallAlpha)
         self.accelerationBallY += accelerationBallAbsolute * sin(accelerationBallAlpha)
-        self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
-        self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
-
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
-        accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
-        accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
-        self.accelerationBallX = accelerationBallAbsolute * cos(accelerationBallAlpha)
-        self.accelerationBallY = accelerationBallAbsolute * sin(accelerationBallAlpha)
         self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
         self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
 
@@ -177,41 +180,39 @@ class BallForce(Ball):
         self.accelerationBallAbsolute = 0
         self.accelerationBallAlpha = 0
 
-    # def resetPolygonForce(self):
-    #     # Находим линию, которую пересекает шарик и изменяем угол шарика по известной формуле:
-    #     # alpha = 2 * beta - alpha
+    # def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
+    #     accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
+    #     accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
+    #     self.accelerationBallX = accelerationBallAbsolute * cos(accelerationBallAlpha)
+    #     self.accelerationBallY = accelerationBallAbsolute * sin(accelerationBallAlpha)
+    #     self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
+    #     self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
+    # def isInsideThatPolygon(self, lines):
+    #     # Направляем луч из центра шарика вертикально вверх и считаем количество пересечений с линиями стенки
+    #     # Если количество пересечений кратно двум, значит мяч вышел за границу стенки
+    #     summary = 0
+    #     for line in lines:
+    #         if line.crossVerticalUp(self.x, self.y):
+    #             summary += 1
+    #     if summary % 2 == 1:
+    #         return True
+    #     else:
+    #         return False
+    #
+    # def getNeededLine(self):
     #     wall = MoveWall.getInstance()
+    #     lastLine = wall.lines[len(wall.lines) - 1]
+    #     xB = lastLine.x2 + inf * cos(lastLine.alphaNorm)
+    #     yB = lastLine.y2 - inf * sin(lastLine.alphaNorm)
     #     for line in wall.lines:
-    #         if line.crossLine(self.x, self.y, self.radius):
-    #             # Проверка на то двигается ли мячик к линии или от нее
-    #             # (во втором случае менять направление не нужно)
-    #             # if self.resetForLine(line):
-    #             alphaRadianLocal = self.alphaRadian - line.alphaNorm
-    #             if wall.flagMove:
-    #                 velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
-    #                 velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
-    #             else:
-    #                 velocityXLocalWall = 0
-    #                 velocityYLocalWall = 0
-    #
-    #             velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
-    #             velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
-    #
-    #             dampeningNormal = velocityXLocal * cn_wall
-    #             dampeningTangent = velocityYLocal * cs_wall
-    #
-    #             velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
-    #             velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
-    #
-    #             entryNormal = (velocityXLocal - velocityXLocalWall) * deltaTime
-    #             entryTangent = (velocityYLocal - velocityYLocalWall - (
-    #                     self.velocityTheta * self.radius)) * deltaTime
-    #
-    #             forceNormal = kn * entryNormal
-    #             forceTangent = ks * entryTangent
-    #
-    #             accelerationNormal = forceNormal / self.mass
-    #             accelerationTangent = forceTangent / self.mass
-    #
-    #             self.saveAcceleration(line.alphaNorm, accelerationNormal, accelerationTangent)
-    #             break
+    #         xA = line.x2 + inf * cos(line.alphaNorm)
+    #         yA = line.y2 - inf * sin(line.alphaNorm)
+    #         lines = [Line(Coordinate(line.x1, line.y1), Coordinate(line.x2, line.y2)),
+    #                  Line(Coordinate(line.x2, line.y2), Coordinate(xA, yA)),
+    #                  Line(Coordinate(xA, yA), Coordinate(xB, yB)),
+    #                  Line(Coordinate(xB, yB), Coordinate(line.x1, line.y1))]
+    #         if self.isInsideThatPolygon(lines):
+    #             return line
+    #         xB = xA
+    #         yB = yA
+    #     return wall.lines[0]

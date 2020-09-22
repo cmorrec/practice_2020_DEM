@@ -23,7 +23,7 @@ from Coordinate import *
 class Wall:
     __instance = None
 
-    def __init__(self, canvas, color, coordinates=None, accelerationX=0, accelerationY=0, lines=None):
+    def __init__(self, canvas=None, color=None, coordinates=None, accelerationX=0, accelerationY=0, lines=None):
         if coordinates is None:
             coordinates = [Coordinate(), Coordinate()]
         if lines is None:

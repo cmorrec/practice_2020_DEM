@@ -4,6 +4,7 @@ from ElementsForce import *
 from PIL import ImageTk
 
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
+ballStartFileName2Ball = './ball_sets/2_ball.txt'
 ballStartFileName4Ball = './ball_sets/4_ball.txt'
 ballStartFileName2PlateVol = './ball_sets/2_plate_volume.txt'
 ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
@@ -20,7 +21,7 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileName1Ball
+ballStartFileName = ballStartFileName2Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -74,8 +75,8 @@ but_1 = Button(text='Start',
                activebackground='#77DDE7',  # цвет нажатой кнопки
                activeforeground='#FF2400',  # цвет надписи когда кнопка нажата
                font='Hack 16')  # шрифт и размер надписи
-artem = ImageTk.PhotoImage(file="folder.png")
-but_2 = Button(image=artem)
+folderImage = ImageTk.PhotoImage(file="folder.png")
+but_2 = Button(image=folderImage)
 but_3 = Button(text='Stop',
                width=17, height=2,
                bg='#fc5151', fg='white',
