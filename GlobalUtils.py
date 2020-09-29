@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
-
+epsVelocity = 10
 eps = 1e-11
 inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел

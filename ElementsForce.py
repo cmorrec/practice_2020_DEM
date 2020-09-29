@@ -1,5 +1,20 @@
 from Elements import *
 
+def rotationForce(i, j, velocity1YLocal, velocity2YLocal):
+    velocityThetaI = i.velocityTheta
+    velocityThetaJ = j.velocityTheta
+
+    i.velocityTheta += (1 /(i.mass * i.radius)) * (1 - i.cs) * (
+            (velocity1YLocal - velocity2YLocal)*deltaTime - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
+                               deltaTime**2)
+    j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (
+            velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
+                               deltaTime ** 2)
+def isCrossForce(i, j):
+    # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
+    if distanceNow(i, j) < (i.radius + j.radius):
+        return True
+    return False
 
 def methodForce(i, j):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
@@ -56,8 +71,8 @@ def methodForce(i, j):
     # Задание новой угловой скорости дисков
     # rotation(i, j, velocity1YLocal, velocity2YLocal)
 
-    i.saveAcceleration(gamma, accelerationNormal1, accelerationTangent1)
-    j.saveAcceleration(gamma, accelerationNormal2, accelerationTangent2)
+    i.saveAcceleration(gamma, accelerationNormal1, 0)
+    j.saveAcceleration(gamma, accelerationNormal2, 0)
 
 
 def methodForceLength(i, j):
@@ -77,16 +92,30 @@ def methodForceLength(i, j):
     velocity2XLocal = j.velocityAbsolute * cos(alphaRadian2Local)
     velocity2YLocal = j.velocityAbsolute * sin(alphaRadian2Local)
 
+    # Демпфирование
+    dampeningNormalI = (velocity1XLocal - velocity2XLocal) * i.cn
+    dampeningNormalJ = (velocity2XLocal - velocity1XLocal) * j.cn
+    dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
+            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
+    dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
+            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
+    # Учет демпфирования
+    velocity1XLocal = dampeningVelocity(dampeningNormalI, velocity1XLocal)
+    velocity2XLocal = dampeningVelocity(dampeningNormalJ, velocity2XLocal)
+    velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
+    velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
+    i.changeVelocity(atan2(velocity1YLocal, velocity1XLocal + eps) + gamma,
+                     sqrt(velocity1XLocal ** 2 + velocity1YLocal ** 2))
+    j.changeVelocity(atan2(velocity2YLocal, velocity2XLocal + eps) + gamma,
+                     sqrt(velocity2XLocal ** 2 + velocity2YLocal ** 2))
     # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
     entryNormal1 = (i.radius + j.radius - sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2))
     entryNormal2 = (i.radius + j.radius - sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2))
-    entryTangent1 = (2 * sqrt(2 * i.radius * entryNormal1 - entryNormal1 ** 2) - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * deltaTime
-    entryTangent2 = (2 * sqrt(2 * j.radius * entryNormal2 - entryNormal2 ** 2) - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * deltaTime
+    entryTangent1 = (2 * sqrt(abs(2 * i.radius * entryNormal1 - entryNormal1 ** 2)))
+    entryTangent2 = (2 * sqrt(abs(2 * j.radius * entryNormal2 - entryNormal2 ** 2)))
 
     forceNormal1 = - kn * entryNormal1
-    forceTangent1 = - ks * entryTangent1
+    forceTangent1 = -ks * entryTangent1
     forceNormal2 = kn * entryNormal2
     forceTangent2 = ks * entryTangent2
 
@@ -95,30 +124,11 @@ def methodForceLength(i, j):
     accelerationNormal2 = forceNormal2 / j.mass
     accelerationTangent2 = forceTangent2 / j.mass
 
-    # Демпфирование
-    # dampeningNormalI = (velocity1XLocalNew - velocity2XLocalNew) * i.cn
-    # dampeningNormalJ = (velocity2XLocalNew - velocity1XLocalNew) * j.cn
-    # dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
-    #         i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
-    # dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
-    #         i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
-    # Учет демпфирования
-    # velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
-    # velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
-    # velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
-    # velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
-    # Задание новой угловой скорости дисков
+
     rotation(i, j, velocity1YLocal, velocity2YLocal)
-    # Возвращение к глобальной системе координат
-    # newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
-    # newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
-    # newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
-    # newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
-    # Задание нового вектора скорости
-    # i.changeVelocity(newAlphaI, newVelocityAbsoluteI)
-    # j.changeVelocity(newAlphaJ, newVelocityAbsoluteJ)
-    i.saveAccelerationLength(gamma, accelerationNormal1, accelerationTangent1)
-    j.saveAccelerationLength(gamma, accelerationNormal2, accelerationTangent2)
+
+    i.saveAccelerationLength(gamma, accelerationNormal1, 0)
+    j.saveAccelerationLength(gamma, accelerationNormal2, 0)
 
 
 class ElementsForce(Elements):
@@ -128,5 +138,11 @@ class ElementsForce(Elements):
 
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
-                if isCross(self.balls[i], self.balls[j]):
-                    methodForce(self.balls[i], self.balls[j])
+                if isCrossForce(self.balls[i], self.balls[j]):
+                    if not (self.balls[i].crossPolygon() and self.balls[j].crossPolygon()):
+                        methodForceLength(self.balls[i], self.balls[j])
+                    elif (self.balls[i].velocityAbsolute < epsVelocity and self.balls[j].velocityAbsolute < epsVelocity) and (self.balls[i].crossPolygon() and self.balls[j].crossPolygon()):
+                        self.balls[i].velocityAbsolute = 0
+                        self.balls[j].velocityAbsolute = 0
+                        self.balls[i].accelerationY = 0
+                        self.balls[i].accelerationY = 0

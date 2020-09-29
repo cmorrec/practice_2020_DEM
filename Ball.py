@@ -156,7 +156,8 @@ class Ball:
 
         for line in MoveWall.getInstance().lines:
             if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
-                self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
+                # self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
+                self.alphaRadian += pi
                 return
 
     def changeVelocity(self, newAlpha, newVelocityAbsolute):
