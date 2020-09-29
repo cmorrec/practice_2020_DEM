@@ -54,8 +54,8 @@ def plotter():
     ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
     ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(50))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 10))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 2))
     ax.tick_params(axis='both',
                    which='major',
                    direction='inout',

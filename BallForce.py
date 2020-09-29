@@ -92,8 +92,8 @@ class BallForce(Ball):
 
         self.saveAcceleration(closestLine.alphaNorm, accelerationNormal, 0)
 
-    def comeBack(self):
-        self.alphaRadian += pi
+    # def comeBack(self):
+
         # wall = MoveWall.getInstance()
         # minX = wall.lines[0].x1
         # minY = wall.lines[0].y1
