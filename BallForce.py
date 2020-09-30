@@ -94,37 +94,37 @@ class BallForce(Ball):
 
     # def comeBack(self):
 
-        # wall = MoveWall.getInstance()
-        # minX = wall.lines[0].x1
-        # minY = wall.lines[0].y1
-        # maxX = wall.lines[0].x1
-        # maxY = wall.lines[0].y1
-        # for line in wall.lines:
-        #     if line.x1 > maxX:
-        #         maxX = line.x1
-        #     if line.x2 > maxX:
-        #         maxX = line.x2
-        #     if line.x1 < minX:
-        #         minX = line.x1
-        #     if line.x2 < minX:
-        #         minX = line.x2
-        #     if line.y1 > maxY:
-        #         maxY = line.y1
-        #     if line.y2 > maxY:
-        #         maxY = line.y2
-        #     if line.y1 < minY:
-        #         minY = line.y1
-        #     if line.y2 < minY:
-        #         minY = line.y2
-        # x0 = (maxX - minX) / 2 + minX
-        # y0 = (maxY - minY) / 2 + minY
-        #
-        # entryNormal = sqrt((x0 - self.x) ** 2 + (y0 - self.y) ** 2)
-        # forceNormal = (-1) * 1e3 * entryNormal
-        # accelerationNormal = forceNormal / self.mass
-        # alpha = atan2((1) * (y0 - self.y), (1) * (x0 - self.x) + eps)
-        #
-        # self.saveAcceleration(alpha, accelerationNormal, 0)
+    # wall = MoveWall.getInstance()
+    # minX = wall.lines[0].x1
+    # minY = wall.lines[0].y1
+    # maxX = wall.lines[0].x1
+    # maxY = wall.lines[0].y1
+    # for line in wall.lines:
+    #     if line.x1 > maxX:
+    #         maxX = line.x1
+    #     if line.x2 > maxX:
+    #         maxX = line.x2
+    #     if line.x1 < minX:
+    #         minX = line.x1
+    #     if line.x2 < minX:
+    #         minX = line.x2
+    #     if line.y1 > maxY:
+    #         maxY = line.y1
+    #     if line.y2 > maxY:
+    #         maxY = line.y2
+    #     if line.y1 < minY:
+    #         minY = line.y1
+    #     if line.y2 < minY:
+    #         minY = line.y2
+    # x0 = (maxX - minX) / 2 + minX
+    # y0 = (maxY - minY) / 2 + minY
+    #
+    # entryNormal = sqrt((x0 - self.x) ** 2 + (y0 - self.y) ** 2)
+    # forceNormal = (-1) * 1e3 * entryNormal
+    # accelerationNormal = forceNormal / self.mass
+    # alpha = atan2((1) * (y0 - self.y), (1) * (x0 - self.x) + eps)
+    #
+    # self.saveAcceleration(alpha, accelerationNormal, 0)
 
     def toSpringForceLength(self):
         wall = MoveWall.getInstance()
@@ -210,6 +210,7 @@ class BallForce(Ball):
         self.accelerationBallY = accelerationBallAbsolute * sin(accelerationBallAlpha)
         self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
         self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
+
     # def isInsideThatPolygon(self, lines):
     #     # Направляем луч из центра шарика вертикально вверх и считаем количество пересечений с линиями стенки
     #     # Если количество пересечений кратно двум, значит мяч вышел за границу стенки

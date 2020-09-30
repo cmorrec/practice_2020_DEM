@@ -1,20 +1,25 @@
 from Elements import *
 
+
 def rotationForce(i, j, velocity1YLocal, velocity2YLocal):
     velocityThetaI = i.velocityTheta
     velocityThetaJ = j.velocityTheta
 
-    i.velocityTheta += (1 /(i.mass * i.radius)) * (1 - i.cs) * (
-            (velocity1YLocal - velocity2YLocal)*deltaTime - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
-                               deltaTime**2)
+    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
+            (velocity1YLocal - velocity2YLocal) * deltaTime - (
+                velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
+                               deltaTime ** 2)
     j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (
             velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
                                deltaTime ** 2)
+
+
 def isCrossForce(i, j):
     # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
     if distanceNow(i, j) < (i.radius + j.radius):
         return True
     return False
+
 
 def methodForce(i, j):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
@@ -46,7 +51,7 @@ def methodForce(i, j):
     velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
     velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
     i.changeVelocity(atan2(velocity1YLocal, velocity1XLocal + eps) + gamma,
-                        sqrt(velocity1XLocal ** 2 + velocity1YLocal ** 2))
+                     sqrt(velocity1XLocal ** 2 + velocity1YLocal ** 2))
     j.changeVelocity(atan2(velocity2YLocal, velocity2XLocal + eps) + gamma,
                      sqrt(velocity2XLocal ** 2 + velocity2YLocal ** 2))
 
@@ -124,7 +129,6 @@ def methodForceLength(i, j):
     accelerationNormal2 = forceNormal2 / j.mass
     accelerationTangent2 = forceTangent2 / j.mass
 
-
     rotation(i, j, velocity1YLocal, velocity2YLocal)
 
     i.saveAccelerationLength(gamma, accelerationNormal1, 0)
@@ -138,11 +142,5 @@ class ElementsForce(Elements):
 
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
-                if isCrossForce(self.balls[i], self.balls[j]):
-                    if not (self.balls[i].crossPolygon() and self.balls[j].crossPolygon()):
-                        methodForceLength(self.balls[i], self.balls[j])
-                    elif (self.balls[i].velocityAbsolute < epsVelocity and self.balls[j].velocityAbsolute < epsVelocity) and (self.balls[i].crossPolygon() and self.balls[j].crossPolygon()):
-                        self.balls[i].velocityAbsolute = 0
-                        self.balls[j].velocityAbsolute = 0
-                        self.balls[i].accelerationY = 0
-                        self.balls[i].accelerationY = 0
+                if isCross(self.balls[i], self.balls[j]):
+                    methodForceLength(self.balls[i], self.balls[j])
