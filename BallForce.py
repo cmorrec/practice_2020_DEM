@@ -42,6 +42,20 @@ class BallForce(Ball):
                 crossingLine = line
         return crossingLine
 
+    def jerk(self, velocity, acceleration, k, mass):
+        b = 0
+        accelerationFirst = acceleration
+        accelerationNext = 0
+        while abs((accelerationNext - acceleration) / acceleration) > epsAcceleration:
+            if accelerationNext != 0:
+                acceleration = accelerationNext
+            deltaEntry = velocity*deltaTime + accelerationNext / 2 * deltaTime**2 + b / 6 * deltaTime**3
+            deltaForce = k * deltaEntry
+            accelerationNext = acceleration + deltaForce/mass
+            b = (accelerationNext - accelerationFirst) / deltaTime
+        print(b)
+        return b
+
     def toSpringForce(self):
         wall = MoveWall.getInstance()
 
@@ -170,13 +184,16 @@ class BallForce(Ball):
 
         entryNormal = self.radius - k * closestLine.distanceToLine(self.x, self.y)
         forceNormal = (-1) * kn * entryNormal
-
         accelerationNormal = forceNormal / self.mass
+        b = self.jerk(velocityXLocal, accelerationNormal, kn, self.mass)
+        accelerationNormal += b * deltaTime / 3
+
         entryTangent = 2 * sqrt(2 * self.radius * entryNormal - entryNormal ** 2) - (
                 self.velocityTheta * self.radius) * deltaTime
-
         forceTangent = ks * entryTangent
         accelerationTangent = forceTangent / self.mass
+        c = self.jerk(velocityYLocal, accelerationTangent, ks, self.mass)
+        accelerationTangent += c * deltaTime / 3
 
         self.saveAccelerationLength(closestLine.alphaNorm, accelerationNormal, 0)
 
@@ -202,6 +219,7 @@ class BallForce(Ball):
         self.accelerationBallY = 0
         self.accelerationBallAbsolute = 0
         self.accelerationBallAlpha = 0
+        self.b = 0
 
     def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
         accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal

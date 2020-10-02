@@ -7,6 +7,7 @@ import matplotlib.ticker as ticker
 
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 10
+epsAcceleration = 0.1
 eps = 1e-11
 inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
@@ -54,8 +55,8 @@ def plotter():
     ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
     ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 10))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 2))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 40))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 8))
     ax.tick_params(axis='both',
                    which='major',
                    direction='inout',

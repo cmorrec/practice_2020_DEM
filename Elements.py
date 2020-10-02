@@ -113,7 +113,7 @@ class Elements:
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
-        print('summ', energyCount)
+        # print('summ', energyCount)
         summaryPlot.append(energyCount / 1e5)
 
         return energyCount
