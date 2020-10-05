@@ -12,9 +12,10 @@ class BallForce(Ball):
     def drawPolygon(self):
         self.movePolygon()  # фактическое движение
         self.canvas.move(self.id,
-                         self.velocityX * deltaTime + 0.5 * (accelerationX - self.accelerationBallX) * (deltaTime ** 2),
+                         self.velocityX * deltaTime + 0.5 * (accelerationX - self.accelerationBallX) * (
+                                     deltaTime ** 2) + self.jerk * cos(self.accelerationBallAlpha) * deltaTime ** 3 / 3,
                          self.velocityY * deltaTime + 0.5 * (
-                                 self.accelerationY - self.accelerationBallY) * (deltaTime ** 2))  # прорисовка движения
+                                 self.accelerationY - self.accelerationBallY) * (deltaTime ** 2) + self.jerk * sin(self.accelerationBallAlpha) * deltaTime ** 3 / 3)  # прорисовка движения
 
     def movePolygon(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
@@ -29,8 +30,11 @@ class BallForce(Ball):
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
-        self.addVelocity((self.accelerationX - self.accelerationBallX),
-                         (self.accelerationY - self.accelerationBallY))
+        self.addVelocity(
+            (self.accelerationX - self.accelerationBallX + self.jerk * cos(self.accelerationBallAlpha) * deltaTime / 2),
+            (self.accelerationY - self.accelerationBallY + self.jerk * sin(self.accelerationBallAlpha) * deltaTime / 2))
+
+
 
     def getCrossingLine(self):
         wall = MoveWall.getInstance()
@@ -42,19 +46,18 @@ class BallForce(Ball):
                 crossingLine = line
         return crossingLine
 
-    def jerk(self, velocity, acceleration, k, mass):
+    def getJerk(self, velocity, acceleration, k, mass):
         b = 0
         accelerationFirst = acceleration
         accelerationNext = 0
-        while abs((accelerationNext - acceleration) / acceleration) > epsAcceleration:
+        while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
             if accelerationNext != 0:
                 acceleration = accelerationNext
-            deltaEntry = velocity*deltaTime + accelerationNext / 2 * deltaTime**2 + b / 6 * deltaTime**3
+            deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + b / 6 * deltaTime ** 3
             deltaForce = k * deltaEntry
-            accelerationNext = acceleration + deltaForce/mass
+            accelerationNext = acceleration + deltaForce / mass
             b = (accelerationNext - accelerationFirst) / deltaTime
-        print(b)
-        return b
+        self.jerk = b
 
     def toSpringForce(self):
         wall = MoveWall.getInstance()
@@ -185,15 +188,15 @@ class BallForce(Ball):
         entryNormal = self.radius - k * closestLine.distanceToLine(self.x, self.y)
         forceNormal = (-1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
-        b = self.jerk(velocityXLocal, accelerationNormal, kn, self.mass)
-        accelerationNormal += b * deltaTime / 3
+        self.getJerk(velocityXLocal, accelerationNormal, kn, self.mass)
+        accelerationNormal += self.jerk * deltaTime
 
-        entryTangent = 2 * sqrt(2 * self.radius * entryNormal - entryNormal ** 2) - (
-                self.velocityTheta * self.radius) * deltaTime
-        forceTangent = ks * entryTangent
-        accelerationTangent = forceTangent / self.mass
-        c = self.jerk(velocityYLocal, accelerationTangent, ks, self.mass)
-        accelerationTangent += c * deltaTime / 3
+        # entryTangent = 2 * sqrt(2 * self.radius * entryNormal - entryNormal ** 2) - (
+        #         self.velocityTheta * self.radius) * deltaTime
+        # forceTangent = ks * entryTangent
+        # accelerationTangent = forceTangent / self.mass
+        # self.getJerk(velocityYLocal, accelerationTangent, ks, self.mass)
+        # accelerationTangent += self.jerk * deltaTime / 3
 
         self.saveAccelerationLength(closestLine.alphaNorm, accelerationNormal, 0)
 
@@ -219,7 +222,7 @@ class BallForce(Ball):
         self.accelerationBallY = 0
         self.accelerationBallAbsolute = 0
         self.accelerationBallAlpha = 0
-        self.b = 0
+        self.jerk = 0
 
     def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
         accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal

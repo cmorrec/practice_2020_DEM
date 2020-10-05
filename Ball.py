@@ -18,6 +18,7 @@ class Ball:
         self.cs = cs
         self.accelerationX = accelerationX
         self.accelerationY = accelerationY
+        self.jerk = 0
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180
         self.velocityX = velocity * cos(self.alphaRadian)

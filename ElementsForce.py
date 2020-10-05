@@ -130,7 +130,10 @@ def methodForceLength(i, j):
     accelerationTangent2 = forceTangent2 / j.mass
 
     rotation(i, j, velocity1YLocal, velocity2YLocal)
-
+    i.getJerk(velocity1XLocal, accelerationNormal1 + accelerationNormal2, kn, i.mass)
+    accelerationNormal1 += i.jerk * deltaTime
+    i.getJerk(velocity2XLocal, accelerationNormal1 + accelerationNormal2, kn, j.mass)
+    accelerationNormal1 += j.jerk * deltaTime
     i.saveAccelerationLength(gamma, accelerationNormal1, 0)
     j.saveAccelerationLength(gamma, accelerationNormal2, 0)
 
