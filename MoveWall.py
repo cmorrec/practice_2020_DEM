@@ -32,11 +32,6 @@ class MoveWall(Wall):
     def getInstance():
         return MoveWall.__instance
 
-    # def __new__(cls):
-    #     if not hasattr(cls, 'instance'):
-    #         cls.instance = super(MoveWall, cls).__new__(cls)
-    #     return cls.instance
-
     def move(self):
         if self.lines[0].x1 - self.lines[0].startX1 > self.absX or self.lines[0].x1 - self.lines[0].startX1 < 0:
             self.revertVelocityX()

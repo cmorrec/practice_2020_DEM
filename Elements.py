@@ -24,16 +24,18 @@ def isCross(i, j):
     return False
 
 
+def rotationBall(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal):
+    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
+            velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
+                               deltaTime ** 2)
+
+
 def rotation(i, j, velocity1YLocal, velocity2YLocal):
     velocityThetaI = i.velocityTheta
     velocityThetaJ = j.velocityTheta
 
-    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
-            velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
-                               deltaTime ** 2)
-    j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (
-            velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
-                               deltaTime ** 2)
+    rotationBall(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal)
+    rotationBall(j, i, velocityThetaI, velocityThetaJ, velocity2YLocal, velocity1YLocal)
 
 
 def method(i, j):
@@ -89,17 +91,8 @@ class Elements:
         self.startEnergy = self.energy()
         self.step = 0
 
-    def stopIfLowEnergy(self):
-        if (self.energy() < self.startEnergy * 0.004) and (
-                not MoveWall.getInstance().flagMove or MoveWall.getInstance().velocityAbsolute < eps):
-            self.started = False
-            saveResults(self)
-            self.energyMonitoring()
-
     def energyMonitoring(self):
         print("Количество энергии", self.energy(), "\n")
-        # if self.energy() < eps:
-        #     self.starts = True
 
     def start(self, event):
         self.started = True
@@ -113,9 +106,7 @@ class Elements:
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
-        # print('summ', energyCount)
         summaryPlot.append(energyCount / 1e5)
-
         return energyCount
 
     def energyKinetic(self):
@@ -134,20 +125,22 @@ class Elements:
         return energyCount
 
     def draw(self):
-        # self.stopIfLowEnergy()
         self.move()
         self.energy()
         self.step += 1
         stepCount.append(self.step)
         MoveWall.getInstance().move()
         for ball in self.balls:
-            ball.drawPolygon()
-            ball.rotationIndicator()
+            ball.draw()
 
     def move(self):
-        # В случае столкновения шаров друг с другом решается задача о нецентральном упругом ударе
+        # В случае касания шара с шаром или шара со стенкой -- отключается для этого шара поле ускорений
+        # Дело в том что если этого не делать ускорение продавит шар за пределы стенки в какой-то момент,
+        # а именно в тот момент, когда шары должны находиться в состоянии равновесия.
+        # Это особенность только аналитического метода
         self.setAcceleration()
 
+        # В случае столкновения шаров друг с другом решается задача о нецентральном неупругом ударе
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
                 if isCross(self.balls[i], self.balls[j]):

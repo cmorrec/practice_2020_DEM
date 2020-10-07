@@ -16,8 +16,8 @@ class Ball:
         self.cn = cn
         # Коэффициент контактного демпфирования в тангенциальном направлении
         self.cs = cs
-        self.accelerationX = accelerationX
-        self.accelerationY = accelerationY
+        self.accelerationX = MoveWall.getInstance().accelerationX
+        self.accelerationY = MoveWall.getInstance().accelerationY
         self.jerk = 0
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180
@@ -30,11 +30,15 @@ class Ball:
                                       fill="black")
         self.isCrossAnything = False
 
-    def drawPolygon(self):
-        self.movePolygon()  # фактическое движение
+    def canvasMove(self):
         self.canvas.move(self.id,
-                         self.velocityX * deltaTime - 0.5 * accelerationX * deltaTime ** 2,
-                         self.velocityY * deltaTime - 0.5 * accelerationY * deltaTime ** 2)  # прорисовка движения
+                         self.velocityX * deltaTime - 0.5 * self.accelerationX * (deltaTime ** 2),
+                         self.velocityY * deltaTime - 0.5 * self.accelerationY * (deltaTime ** 2))
+
+    def draw(self):
+        self.move()  # фактическое движение
+        self.canvasMove()  # прорисовка движения
+        self.rotationIndicator()
 
     def rotationIndicator(self):
         self.theta += (self.velocityTheta * deltaTime) % (2 * pi)
@@ -42,7 +46,7 @@ class Ball:
                            self.y + self.radius * sin(self.theta))
         self.canvas.move(self.id2, self.velocityX * deltaTime, self.velocityY * deltaTime)
 
-    def movePolygon(self):
+    def move(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
         self.x = (pos[0] + pos[2]) / 2  # можно найти координаты центра
         self.y = (pos[1] + pos[3]) / 2
@@ -50,18 +54,22 @@ class Ball:
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
+
         if self.crossPolygon():
-            self.resetPolygon()
+            self.expand()
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
+        self.addVelocityMethod()
+
+    def addVelocityMethod(self):
         self.addVelocity(self.accelerationX, self.accelerationY)
 
-    def info(self):
-        print('velocityAlpha', self.alphaRadian)
-        print('velocityAbs', self.velocityAbsolute)
-        print('velocityX', self.velocityX)
-        print('velocityY', self.velocityY)
+    # def info(self):
+    #     print('velocityAlpha', self.alphaRadian)
+    #     print('velocityAbs', self.velocityAbsolute)
+    #     print('velocityX', self.velocityX)
+    #     print('velocityY', self.velocityY)
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией
@@ -70,7 +78,7 @@ class Ball:
                 return True
         return False
 
-    def resetPolygon(self):
+    def expand(self):
         # Находим линию, которую пересекает шарик и изменяем угол шарика по известной формуле:
         # alpha = 2 * beta - alpha
         wall = MoveWall.getInstance()

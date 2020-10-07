@@ -4,6 +4,7 @@ import time
 from tkinter import *
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from PIL import ImageTk
 
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 10
@@ -32,7 +33,7 @@ stepCount = [0, 0, 0]
 def saveResults(elements):
     # Запись результатов в файл
     ballsEndFile = open('balls_end.txt', 'w')
-    linesEndFile = ['x\t\t\t\t\t\t\ty\t\tradius\t\talpha\t\t\tvelocity\t\tacceleration']
+    linesEndFile = ['\t\tx\t\t\t\t\ty\t\tradius\t\talpha\t\t\tvelocity\t\tacceleration']
     for ball in elements.balls:
         linesEndFile.append(
             str(ball.x) + ' ' + str(ball.y) + ' ' + str(ball.radius) + ' ' + str(ball.getAlpha()) + ' ' + str(

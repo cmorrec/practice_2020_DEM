@@ -1,19 +1,6 @@
 from Elements import *
 
 
-def rotationForce(i, j, velocity1YLocal, velocity2YLocal):
-    velocityThetaI = i.velocityTheta
-    velocityThetaJ = j.velocityTheta
-
-    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
-            (velocity1YLocal - velocity2YLocal) * deltaTime - (
-                velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
-                               deltaTime ** 2)
-    j.velocityTheta += (1 / (j.mass * j.radius)) * (1 - j.cs) * (
-            velocity2YLocal - velocity1YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
-                               deltaTime ** 2)
-
-
 def isCrossForce(i, j):
     # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
     if distanceNow(i, j) < (i.radius + j.radius):
@@ -21,7 +8,7 @@ def isCrossForce(i, j):
     return False
 
 
-def methodForce(i, j):
+def methodForce(i, j, numberOfI, numberOfJ):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
     # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
     # переход в локальную систему координат)
@@ -56,94 +43,57 @@ def methodForce(i, j):
                      sqrt(velocity2XLocal ** 2 + velocity2YLocal ** 2))
 
     # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
-    entryNormal1 = (velocity1XLocal - velocity2XLocal) * deltaTime
-    entryNormal2 = (velocity2XLocal - velocity1XLocal) * deltaTime
-    entryTangent1 = (velocity1YLocal - velocity2YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * deltaTime
-    entryTangent2 = (velocity2YLocal - velocity1YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * deltaTime
+    entryNormal = (i.radius + j.radius - sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2))
+    # entryTangent1 = (2 * sqrt(abs(2 * i.radius * entryNormal1 - entryNormal1 ** 2)))
+    # entryTangent2 = (2 * sqrt(abs(2 * j.radius * entryNormal2 - entryNormal2 ** 2)))
 
-    forceNormal1 = kn * entryNormal1
-    forceTangent1 = ks * entryTangent1
-    forceNormal2 = kn * entryNormal2
-    forceTangent2 = ks * entryTangent2
+    forceNormal1 = (1) * kn * entryNormal
+    forceNormal2 = (-1) * kn * entryNormal
+    # forceTangent1 = ks * entryTangent1
+    # forceTangent2 = ks * entryTangent2
 
     accelerationNormal1 = forceNormal1 / i.mass
-    accelerationTangent1 = forceTangent1 / i.mass
     accelerationNormal2 = forceNormal2 / j.mass
-    accelerationTangent2 = forceTangent2 / j.mass
+    # accelerationTangent1 = forceTangent1 / i.mass
+    # accelerationTangent2 = forceTangent2 / j.mass
 
-    # Задание новой угловой скорости дисков
     # rotation(i, j, velocity1YLocal, velocity2YLocal)
+    jerkI = i.getJerk(velocity1XLocal, accelerationNormal1, kn, i.mass)
+    accelerationNormal1 += jerkI * deltaTime
+    jerkJ = j.getJerk(velocity2XLocal, accelerationNormal2, kn, j.mass)
+    accelerationNormal2 += jerkJ * deltaTime
 
-    i.saveAcceleration(gamma, accelerationNormal1, 0)
-    j.saveAcceleration(gamma, accelerationNormal2, 0)
+    i.saveAccelerationLength(gamma, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)
+    j.saveAccelerationLength(gamma, accelerationNormal2, jerkJ, isBall=True, number=numberOfI)
 
 
-def methodForceLength(i, j):
-    # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
-    # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
-    # переход в локальную систему координат)
-    # Также учет диссипации при каждом столкновении шаров
+def isCrossBefore(i, j, numberOfI, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
+    for interaction in i.interactionArray:
+        if interaction.isBall and interaction.number == numberOfJ:
+            return True
+    return False
 
-    # Угол между линией удара и горизонталью
-    gamma = atan2((i.y - j.y), (i.x - j.x))
-    # Углы направления шаров в локальной системе координат
-    alphaRadian1Local = i.alphaRadian - gamma
-    alphaRadian2Local = j.alphaRadian - gamma
-    # Скорости шаров в локальной системе координат
-    velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
-    velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
-    velocity2XLocal = j.velocityAbsolute * cos(alphaRadian2Local)
-    velocity2YLocal = j.velocityAbsolute * sin(alphaRadian2Local)
 
-    # Демпфирование
-    dampeningNormalI = (velocity1XLocal - velocity2XLocal) * i.cn
-    dampeningNormalJ = (velocity2XLocal - velocity1XLocal) * j.cn
-    dampeningTangentI = (velocity1YLocal - velocity2YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
-    dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
-            i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
-    # Учет демпфирования
-    velocity1XLocal = dampeningVelocity(dampeningNormalI, velocity1XLocal)
-    velocity2XLocal = dampeningVelocity(dampeningNormalJ, velocity2XLocal)
-    velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
-    velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
-    i.changeVelocity(atan2(velocity1YLocal, velocity1XLocal + eps) + gamma,
-                     sqrt(velocity1XLocal ** 2 + velocity1YLocal ** 2))
-    j.changeVelocity(atan2(velocity2YLocal, velocity2XLocal + eps) + gamma,
-                     sqrt(velocity2XLocal ** 2 + velocity2YLocal ** 2))
-    # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
-    entryNormal1 = (i.radius + j.radius - sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2))
-    entryNormal2 = (i.radius + j.radius - sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2))
-    entryTangent1 = (2 * sqrt(abs(2 * i.radius * entryNormal1 - entryNormal1 ** 2)))
-    entryTangent2 = (2 * sqrt(abs(2 * j.radius * entryNormal2 - entryNormal2 ** 2)))
-
-    forceNormal1 = - kn * entryNormal1
-    forceTangent1 = -ks * entryTangent1
-    forceNormal2 = kn * entryNormal2
-    forceTangent2 = ks * entryTangent2
-
-    accelerationNormal1 = forceNormal1 / i.mass
-    accelerationTangent1 = forceTangent1 / i.mass
-    accelerationNormal2 = forceNormal2 / j.mass
-    accelerationTangent2 = forceTangent2 / j.mass
-
-    rotation(i, j, velocity1YLocal, velocity2YLocal)
-    i.getJerk(velocity1XLocal, accelerationNormal1 + accelerationNormal2, kn, i.mass)
-    accelerationNormal1 += i.jerk * deltaTime
-    i.getJerk(velocity2XLocal, accelerationNormal1 + accelerationNormal2, kn, j.mass)
-    accelerationNormal1 += j.jerk * deltaTime
-    i.saveAccelerationLength(gamma, accelerationNormal1, 0)
-    j.saveAccelerationLength(gamma, accelerationNormal2, 0)
+def deleteInteraction(i, numberOfJ):
+    for interaction in i.interactionArray:
+        if interaction.isBall and interaction.number == numberOfJ:
+            i.interactionArray.remove(interaction)
+            break
 
 
 class ElementsForce(Elements):
+    def __init__(self, balls, canvas):
+        Elements.__init__(self, balls, canvas)
+
     def move(self):
-        # В случае столкновения шаров друг с другом решается задача о нецентральном упругом ударе
-        self.setAcceleration()
+        # Есть необходимость отключения не глобальных ускорений, а ускорений взаимодействия,
+        # поэтому этот метод и строчка неизменны
+        # self.setAcceleration()
 
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
-                if isCross(self.balls[i], self.balls[j]):
-                    methodForceLength(self.balls[i], self.balls[j])
+                if isCrossForce(self.balls[i], self.balls[j]):
+                    methodForce(self.balls[i], self.balls[j], i, j)
+                elif isCrossBefore(self.balls[i], self.balls[j], i, j):
+                    deleteInteraction(self.balls[i], j)
+                    deleteInteraction(self.balls[j], i)

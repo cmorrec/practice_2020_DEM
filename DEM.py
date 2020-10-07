@@ -1,7 +1,7 @@
-from Elements import *
 from BallForce import BallForce
 from ElementsForce import *
-from PIL import ImageTk
+
+isForce = True
 
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
 ballStartFileName2Ball = './ball_sets/2_ball.txt'
@@ -10,6 +10,7 @@ ballStartFileName2PlateVol = './ball_sets/2_plate_volume.txt'
 ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
 ballStartFileName4Plate = './ball_sets/4_plate.txt'
 ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
+ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
 
 coordinatesFileNameCircle = './walls_dynamic/circle.txt'
 coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
@@ -20,8 +21,8 @@ coordinatesFileNameSquare = './walls_dynamic/square.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
-coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileName2Ball
+coordinatesFileName = coordinatesFileNameRhombus
+ballStartFileName = ballStartFileName4Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -103,12 +104,19 @@ for line in ballsStartFile:
             color = word
         j += 1
     if len(data) > 0:
-        ballsFromFile.append(
-            BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
+        if isForce:
+            ballsFromFile.append(
+                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
+        else:
+            ballsFromFile.append(
+                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
 
 ballsStartFile.close()
 
-elements = ElementsForce(ballsFromFile, canvas)
+if isForce:
+    elements = ElementsForce(ballsFromFile, canvas)
+else:
+    elements = Elements(ballsFromFile, canvas)
 
 but_1.bind('<Button-1>', elements.start)  # Обработчик событий
 but_1.grid(row=1, column=0,

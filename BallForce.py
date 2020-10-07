@@ -1,23 +1,25 @@
 from Ball import *
+from Interaction import *
 
 
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
         Ball.__init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas)
-        self.accelerationBallX = 0
-        self.accelerationBallY = 0
-        self.accelerationBallAbsolute = 0
-        self.accelerationBallAlpha = 0
+        self.accelerationInteractionX = 0
+        self.accelerationInteractionY = 0
+        self.jerkX = 0
+        self.jerkY = 0
+        self.interactionArray = []
 
-    def drawPolygon(self):
-        self.movePolygon()  # фактическое движение
+    def canvasMove(self):
         self.canvas.move(self.id,
-                         self.velocityX * deltaTime + 0.5 * (accelerationX - self.accelerationBallX) * (
-                                     deltaTime ** 2) + self.jerk * cos(self.accelerationBallAlpha) * deltaTime ** 3 / 3,
-                         self.velocityY * deltaTime + 0.5 * (
-                                 self.accelerationY - self.accelerationBallY) * (deltaTime ** 2) + self.jerk * sin(self.accelerationBallAlpha) * deltaTime ** 3 / 3)  # прорисовка движения
+                         self.velocityX * deltaTime - 0.5 * (self.accelerationX + self.accelerationInteractionX) * (
+                                 deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3,
+                         self.velocityY * deltaTime - 0.5 * (
+                                 self.accelerationY + self.accelerationInteractionY) * (
+                                 deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3)
 
-    def movePolygon(self):
+    def move(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
         self.x = (pos[0] + pos[2]) / 2  # можно найти координаты центра
         self.y = (pos[1] + pos[3]) / 2
@@ -25,48 +27,60 @@ class BallForce(Ball):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
-        if self.crossPolygon():
-            self.toSpringForceLength()
-        elif not self.isInsidePolygon():
+        i = 0
+        isCrossLine = False
+        for line in MoveWall.getInstance().lines:
+            if line.crossLine(self.x, self.y, self.radius):
+                self.expandForce(line, i)
+                isCrossLine = True
+            elif self.isCrossLineBefore(i) and self.isInsidePolygon():
+                self.deleteInteractionLine(i)
+            i += 1
+
+        if (not self.isInsidePolygon()) and (not isCrossLine):
             self.comeBack()
+
         # Обновление направлений скоростей
+        self.addVelocityMethod()
+
+    def addVelocityMethod(self):
+        self.accelerationInteractionX = 0
+        self.accelerationInteractionY = 0
+        for interaction in self.interactionArray:
+            self.accelerationInteractionX += interaction.accelerationX
+            self.accelerationInteractionY += interaction.accelerationY
+
+        self.jerkX = 0
+        self.jerkY = 0
+        for interaction in self.interactionArray:
+            self.jerkX += interaction.jerkX
+            self.jerkY += interaction.jerkY
+
         self.addVelocity(
-            (self.accelerationX - self.accelerationBallX + self.jerk * cos(self.accelerationBallAlpha) * deltaTime / 2),
-            (self.accelerationY - self.accelerationBallY + self.jerk * sin(self.accelerationBallAlpha) * deltaTime / 2))
-
-
-
-    def getCrossingLine(self):
-        wall = MoveWall.getInstance()
-        minDistance = wall.lines[0].distanceToLine(self.x, self.y)
-        crossingLine = wall.lines[0]
-        for line in wall.lines:
-            if minDistance > line.distanceToLine(self.x, self.y):
-                minDistance = line.distanceToLine(self.x, self.y)
-                crossingLine = line
-        return crossingLine
+            (self.accelerationX + self.accelerationInteractionX - self.jerkX * deltaTime / 2),
+            (self.accelerationY + self.accelerationInteractionY - self.jerkY * deltaTime / 2))
 
     def getJerk(self, velocity, acceleration, k, mass):
-        b = 0
+        jerk = 0
         accelerationFirst = acceleration
         accelerationNext = 0
         while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
             if accelerationNext != 0:
                 acceleration = accelerationNext
-            deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + b / 6 * deltaTime ** 3
+            deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
             deltaForce = k * deltaEntry
             accelerationNext = acceleration + deltaForce / mass
-            b = (accelerationNext - accelerationFirst) / deltaTime
-        self.jerk = b
+            jerk = (accelerationNext - accelerationFirst) / deltaTime
+        return jerk
 
-    def toSpringForce(self):
+    def expandForce(self, line, numberOfLine):
         wall = MoveWall.getInstance()
 
-        closestLine = self.getCrossingLine()
+        # closestLine, numberOfLine = self.getCrossingLine()
 
-        isToLine = self.resetForLine(closestLine)
+        isToLine = self.resetForLine(line)
 
-        alphaRadianLocal = self.alphaRadian - closestLine.alphaNorm
+        alphaRadianLocal = self.alphaRadian - line.alphaNorm
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
@@ -78,9 +92,7 @@ class BallForce(Ball):
         velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
 
         if wall.flagMove:
-            # velocityNormal = wall.velocityAbsolute * cos(pi / 2 - closestLine.alphaNorm)
             velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
-            # velocityTangent = wall.velocityAbsolute * sin(pi / 2 - closestLine.alphaNorm)
             velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
             if velocityXLocalWall * velocityXLocal >= 0:
                 velocityXLocalWall *= 0
@@ -90,91 +102,7 @@ class BallForce(Ball):
             velocityXLocalWall = 0
             velocityYLocalWall = 0
 
-        self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + closestLine.alphaNorm,
-                            sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
-
-        if not isToLine:
-            velocityXLocal *= -1
-            velocityYLocal *= -1
-
-        entryNormal = (velocityXLocal - velocityXLocalWall) * deltaTime
-        entryTangent = (velocityYLocal - velocityYLocalWall - (
-                self.velocityTheta * self.radius)) * deltaTime
-
-        forceNormal = kn * entryNormal
-        forceTangent = ks * entryTangent
-
-        accelerationNormal = forceNormal / self.mass
-        accelerationTangent = forceTangent / self.mass
-
-        self.saveAcceleration(closestLine.alphaNorm, accelerationNormal, 0)
-
-    # def comeBack(self):
-
-    # wall = MoveWall.getInstance()
-    # minX = wall.lines[0].x1
-    # minY = wall.lines[0].y1
-    # maxX = wall.lines[0].x1
-    # maxY = wall.lines[0].y1
-    # for line in wall.lines:
-    #     if line.x1 > maxX:
-    #         maxX = line.x1
-    #     if line.x2 > maxX:
-    #         maxX = line.x2
-    #     if line.x1 < minX:
-    #         minX = line.x1
-    #     if line.x2 < minX:
-    #         minX = line.x2
-    #     if line.y1 > maxY:
-    #         maxY = line.y1
-    #     if line.y2 > maxY:
-    #         maxY = line.y2
-    #     if line.y1 < minY:
-    #         minY = line.y1
-    #     if line.y2 < minY:
-    #         minY = line.y2
-    # x0 = (maxX - minX) / 2 + minX
-    # y0 = (maxY - minY) / 2 + minY
-    #
-    # entryNormal = sqrt((x0 - self.x) ** 2 + (y0 - self.y) ** 2)
-    # forceNormal = (-1) * 1e3 * entryNormal
-    # accelerationNormal = forceNormal / self.mass
-    # alpha = atan2((1) * (y0 - self.y), (1) * (x0 - self.x) + eps)
-    #
-    # self.saveAcceleration(alpha, accelerationNormal, 0)
-
-    def toSpringForceLength(self):
-        wall = MoveWall.getInstance()
-
-        closestLine = self.getCrossingLine()
-
-        isToLine = self.resetForLine(closestLine)
-
-        alphaRadianLocal = self.alphaRadian - closestLine.alphaNorm
-
-        velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
-        velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
-
-        dampeningNormal = velocityXLocal * cn_wall
-        dampeningTangent = velocityYLocal * cs_wall
-
-        velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
-        velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
-
-        if wall.flagMove:
-            # velocityNormal = wall.velocityAbsolute * cos(pi / 2 - closestLine.alphaNorm)
-            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
-            # velocityTangent = wall.velocityAbsolute * sin(pi / 2 - closestLine.alphaNorm)
-            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
-            if velocityXLocalWall * velocityXLocal >= 0:
-                velocityXLocalWall *= 0
-            if velocityYLocalWall * velocityYLocal >= 0:
-                velocityYLocalWall *= 0
-        else:
-            velocityXLocalWall = 0
-            velocityYLocalWall = 0
-
-        self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + closestLine.alphaNorm,
+        self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
                             sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
 
         if not isToLine:
@@ -185,79 +113,49 @@ class BallForce(Ball):
         if not self.isInsidePolygon():
             k = -1
 
-        entryNormal = self.radius - k * closestLine.distanceToLine(self.x, self.y)
-        forceNormal = (-1) * kn * entryNormal
+        entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
+        forceNormal = (1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
-        self.getJerk(velocityXLocal, accelerationNormal, kn, self.mass)
+        jerk = self.getJerk(velocityXLocal, accelerationNormal, kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
 
-        # entryTangent = 2 * sqrt(2 * self.radius * entryNormal - entryNormal ** 2) - (
-        #         self.velocityTheta * self.radius) * deltaTime
-        # forceTangent = ks * entryTangent
-        # accelerationTangent = forceTangent / self.mass
-        # self.getJerk(velocityYLocal, accelerationTangent, ks, self.mass)
-        # accelerationTangent += self.jerk * deltaTime / 3
+        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, isBall=False, number=numberOfLine)
 
-        self.saveAccelerationLength(closestLine.alphaNorm, accelerationNormal, 0)
+    def isCrossLineBefore(self, numberOfLine):
+        for interaction in self.interactionArray:
+            if (not interaction.isBall) and interaction.number == numberOfLine:
+                return True
+        return False
 
-    def saveAcceleration(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
-        accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
-        accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
-        self.accelerationBallX += accelerationBallAbsolute * cos(accelerationBallAlpha)
-        self.accelerationBallY += accelerationBallAbsolute * sin(accelerationBallAlpha)
-        self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
-        self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
+    def deleteInteractionLine(self, numberOfLine):
+        for interaction in self.interactionArray:
+            if (not interaction.isBall) and interaction.number == numberOfLine:
+                self.interactionArray.remove(interaction)
+                break
 
     def setAcceleration(self):
-        if self.isCrossAnything:
-            # self.removeAcceleration()
-            return
-        else:
-            self.addAcceleration()
-            if self.isInsidePolygon():
-                self.removeAccelerationBall()
+        # В силовом методе мы не отключаем поле ускорений, в этом нет необходимости
+        # Но необходимо отключать ускорение от взаимодействия в тот момент,
+        # когда шар ни с кем не пересекается и находится внутри стенки
+        if (not self.isCrossAnything) and self.isInsidePolygon():
+            self.removeAccelerationBall()
 
     def removeAccelerationBall(self):
-        self.accelerationBallX = 0
-        self.accelerationBallY = 0
-        self.accelerationBallAbsolute = 0
-        self.accelerationBallAlpha = 0
-        self.jerk = 0
+        self.accelerationInteractionX = 0
+        self.accelerationInteractionY = 0
+        self.jerkX = 0
+        self.jerkY = 0
 
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent):
-        accelerationBallAlpha = atan2(accelerationTangent, accelerationNormal + eps) + alphaRadianLocal
-        accelerationBallAbsolute = sqrt(accelerationNormal ** 2 + accelerationTangent ** 2)
-        self.accelerationBallX = accelerationBallAbsolute * cos(accelerationBallAlpha)
-        self.accelerationBallY = accelerationBallAbsolute * sin(accelerationBallAlpha)
-        self.accelerationBallAbsolute = sqrt(self.accelerationBallX ** 2 + self.accelerationBallY ** 2)
-        self.accelerationBallAlpha = atan2(self.accelerationBallY, self.accelerationBallX + eps)
+    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal, isBall, number):
+        accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal)
+        accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal)
+        jerkX = jerkNormal * cos(alphaRadianLocal)
+        jerkY = jerkNormal * sin(alphaRadianLocal)
+        for interaction in self.interactionArray:
+            if interaction.number == number and interaction.isBall == isBall:
+                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY)
+                return
+        self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY))
 
-    # def isInsideThatPolygon(self, lines):
-    #     # Направляем луч из центра шарика вертикально вверх и считаем количество пересечений с линиями стенки
-    #     # Если количество пересечений кратно двум, значит мяч вышел за границу стенки
-    #     summary = 0
-    #     for line in lines:
-    #         if line.crossVerticalUp(self.x, self.y):
-    #             summary += 1
-    #     if summary % 2 == 1:
-    #         return True
-    #     else:
-    #         return False
-    #
-    # def getNeededLine(self):
-    #     wall = MoveWall.getInstance()
-    #     lastLine = wall.lines[len(wall.lines) - 1]
-    #     xB = lastLine.x2 + inf * cos(lastLine.alphaNorm)
-    #     yB = lastLine.y2 - inf * sin(lastLine.alphaNorm)
-    #     for line in wall.lines:
-    #         xA = line.x2 + inf * cos(line.alphaNorm)
-    #         yA = line.y2 - inf * sin(line.alphaNorm)
-    #         lines = [Line(Coordinate(line.x1, line.y1), Coordinate(line.x2, line.y2)),
-    #                  Line(Coordinate(line.x2, line.y2), Coordinate(xA, yA)),
-    #                  Line(Coordinate(xA, yA), Coordinate(xB, yB)),
-    #                  Line(Coordinate(xB, yB), Coordinate(line.x1, line.y1))]
-    #         if self.isInsideThatPolygon(lines):
-    #             return line
-    #         xB = xA
-    #         yB = yA
-    #     return wall.lines[0]
+    def addInteraction(self, interaction):
+        self.interactionArray.append(interaction)
