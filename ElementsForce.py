@@ -19,6 +19,7 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # Углы направления шаров в локальной системе координат
     alphaRadian1Local = i.alphaRadian - gamma
     alphaRadian2Local = j.alphaRadian - gamma
+    accelerationYAlphaRadianLocal = pi/2 - gamma
     # Скорости шаров в локальной системе координат
     velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
     velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
@@ -63,8 +64,8 @@ def methodForce(i, j, numberOfI, numberOfJ):
     jerkJ = j.getJerk(velocity2XLocal, accelerationNormal2, kn, j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
-    i.saveAccelerationLength(gamma, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)
-    j.saveAccelerationLength(gamma, accelerationNormal2, jerkJ, isBall=True, number=numberOfI)
+    i.saveAccelerationLength(gamma, accelerationNormal1 + accelerationY*cos(accelerationYAlphaRadianLocal), jerkI, isBall=True, number=numberOfJ)
+    j.saveAccelerationLength(gamma, accelerationNormal2 + accelerationY*cos(accelerationYAlphaRadianLocal), jerkJ, isBall=True, number=numberOfI)
 
 
 def isCrossBefore(i, j, numberOfI, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных

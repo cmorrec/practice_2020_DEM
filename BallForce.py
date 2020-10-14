@@ -81,6 +81,7 @@ class BallForce(Ball):
         isToLine = self.resetForLine(line)
 
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
+        accelerationYRadianLocal = pi/2 - line.alphaNorm
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
@@ -116,7 +117,7 @@ class BallForce(Ball):
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
         forceNormal = (1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
-        jerk = self.getJerk(velocityXLocal, accelerationNormal, kn, self.mass)
+        jerk = self.getJerk(velocityXLocal, accelerationNormal+accelerationY*cos(accelerationYRadianLocal), kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, isBall=False, number=numberOfLine)

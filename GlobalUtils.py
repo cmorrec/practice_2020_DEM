@@ -20,7 +20,7 @@ cn_wall = 0.01
 cs_wall = 0.01
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 100
+accelerationY = 1000
 kn = 1 * 1e7
 ks = 1 * 1e1
 # Энергия
@@ -29,7 +29,23 @@ potentialPlot = []
 summaryPlot = []
 stepCount = [0, 0, 0]
 
-
+def Buttons():
+    but_1 = Button(text='Start',
+                   width=17, height=2,
+                   bg='#5195fc', fg='white',
+                   activebackground='#77DDE7',  # цвет нажатой кнопки
+                   activeforeground='#FF2400',  # цвет надписи когда кнопка нажата
+                   font='Hack 16')  # шрифт и размер надписи
+    folderImage = ImageTk.PhotoImage(file="folder.png")
+    but_2 = Button(image=folderImage)
+    but_3 = Button(text='Stop',
+                   width=17, height=2,
+                   bg='#fc5151', fg='white',
+                   activebackground='#77DDE7',
+                   activeforeground='#FF2400',
+                   font='Hack 16')
+    buttons = [but_1, but_2, but_3]
+    return (buttons)
 def saveResults(elements):
     # Запись результатов в файл
     ballsEndFile = open('balls_end.txt', 'w')
@@ -56,8 +72,8 @@ def plotter():
     ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
     ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 40))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * 8))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100)*(stepCount[-1]//100*10)))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100)*(stepCount[-1]//100*20)))
     ax.tick_params(axis='both',
                    which='major',
                    direction='inout',
