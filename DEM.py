@@ -21,8 +21,8 @@ coordinatesFileNameSquare = './walls_dynamic/square.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
-coordinatesFileName = coordinatesFileNameRhombus
-ballStartFileName = ballStartFileName2Ball
+coordinatesFileName = coordinatesFileNameSquare
+ballStartFileName = ballStartFileName4Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []

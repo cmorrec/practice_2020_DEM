@@ -24,20 +24,28 @@ def isCross(i, j):
     return False
 
 
-def rotationBall(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal):
-    i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
-            velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
-                               deltaTime ** 2)
+def rotationBallHerz(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal):
+    n = sqrt((16 * i.radius * j.radius)/(9 * pi**2 * kn**2 * (i.radius + j.radius)))
+    mu = 2000
+    Force = mu * n * sqrt(abs(velocity1XLocal - velocity2XLocal))**3
+    i.velocityTheta += Force / (i.radius * i.mass) * (1-i.cs) * (velocity1YLocal - velocity2YLocal)
+    # i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
+    #         velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
+    #                            deltaTime ** 2)
+def rotationBallCS(i, dampeningTangentI):
+    i.velocityTheta += sqrt(dampeningTangentI * 2 / i.momentInertial)
 
 
-def rotation(i, j, velocity1YLocal, velocity2YLocal):
+def rotationHerz(i, j, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal):
     velocityThetaI = i.velocityTheta
     velocityThetaJ = j.velocityTheta
-
-    rotationBall(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal)
-    rotationBall(j, i, velocityThetaI, velocityThetaJ, velocity2YLocal, velocity1YLocal)
-
-
+    rotationBallHerz(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal)
+    rotationBallHerz(j, i, velocityThetaI, velocityThetaJ, velocity2YLocal, velocity1YLocal, velocity1XLocal, velocity2XLocal)
+    velocity1YLocal -= sqrt(i.momentInertial*i.velocityTheta**2/i.mass)
+    velocity2YLocal -= sqrt(j.momentInertial * j.velocityTheta ** 2 / j.mass)
+def rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ):
+    i.velocityTheta += - velocity1YLocal/abs(velocity1YLocal+eps)*sqrt(abs(dampeningTangentI * 2 / i.momentInertial))
+    j.velocityTheta += - velocity2YLocal/abs(velocity2YLocal+eps)*sqrt(abs(dampeningTangentJ * 2 / j.momentInertial))
 def method(i, j):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
     # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
@@ -65,13 +73,13 @@ def method(i, j):
             i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * i.cs
     dampeningTangentJ = (velocity2YLocal - velocity1YLocal - (
             i.velocityTheta * i.radius + j.velocityTheta * j.radius)) * j.cs
-    # Учет демпфирования
+    # # Учет демпфирования
     velocity1XLocalNew = dampeningVelocity(dampeningNormalI, velocity1XLocalNew)
     velocity2XLocalNew = dampeningVelocity(dampeningNormalJ, velocity2XLocalNew)
-    velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
-    velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
+    # velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
+    # velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
     # Задание новой угловой скорости дисков
-    rotation(i, j, velocity1YLocal, velocity2YLocal)
+    rotationHerz(i, j, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal)
     # Возвращение к глобальной системе координат
     newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
     newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
@@ -145,6 +153,7 @@ class Elements:
             for j in range(i + 1, len(self.balls)):
                 if isCross(self.balls[i], self.balls[j]):
                     method(self.balls[i], self.balls[j])
+
 
     def setAcceleration(self):
         for ball in self.balls:

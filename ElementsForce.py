@@ -58,14 +58,14 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # accelerationTangent1 = forceTangent1 / i.mass
     # accelerationTangent2 = forceTangent2 / j.mass
 
-    # rotation(i, j, velocity1YLocal, velocity2YLocal)
-    jerkI = i.getJerk(velocity1XLocal, accelerationNormal1, kn, i.mass)
+    rotationCS(i, j,velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
+    jerkI = i.getJerk(velocity1XLocal, accelerationNormal1 + accelerationY*cos(accelerationYAlphaRadianLocal), kn, i.mass)
     accelerationNormal1 += jerkI * deltaTime
-    jerkJ = j.getJerk(velocity2XLocal, accelerationNormal2, kn, j.mass)
+    jerkJ = j.getJerk(velocity2XLocal, accelerationNormal2 + accelerationY*cos(accelerationYAlphaRadianLocal), kn, j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
-    i.saveAccelerationLength(gamma, accelerationNormal1 + accelerationY*cos(accelerationYAlphaRadianLocal), jerkI, isBall=True, number=numberOfJ)
-    j.saveAccelerationLength(gamma, accelerationNormal2 + accelerationY*cos(accelerationYAlphaRadianLocal), jerkJ, isBall=True, number=numberOfI)
+    i.saveAccelerationLength(gamma, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)
+    j.saveAccelerationLength(gamma, accelerationNormal2, jerkJ, isBall=True, number=numberOfI)
 
 
 def isCrossBefore(i, j, numberOfI, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных

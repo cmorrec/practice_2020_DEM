@@ -61,12 +61,13 @@ class BallForce(Ball):
             (self.accelerationY + self.accelerationInteractionY - self.jerkY * deltaTime / 2))
 
     def getJerk(self, velocity, acceleration, k, mass):
-        jerk = 0
         accelerationFirst = acceleration
-        accelerationNext = 0
+        deltaEntry = velocity * deltaTime + acceleration / 2 * deltaTime ** 2
+        deltaForce = k * deltaEntry
+        accelerationNext = acceleration + deltaForce / mass
+        jerk = (accelerationNext - accelerationFirst) / deltaTime
         while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
-            if accelerationNext != 0:
-                acceleration = accelerationNext
+            acceleration = accelerationNext
             deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
             deltaForce = k * deltaEntry
             accelerationNext = acceleration + deltaForce / mass
@@ -105,7 +106,7 @@ class BallForce(Ball):
 
         self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
                             sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
-
+        self.rotationCSWall(velocityYLocal,  dampeningTangent)
         if not isToLine:
             velocityXLocal *= -1
             velocityYLocal *= -1
@@ -121,7 +122,9 @@ class BallForce(Ball):
         accelerationNormal += self.jerk * deltaTime
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, isBall=False, number=numberOfLine)
-
+    def rotationCSWall(self, velocityYLocal,  dampeningTangent):
+        self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
+            abs(dampeningTangent * 2 / self.momentInertial))
     def isCrossLineBefore(self, numberOfLine):
         for interaction in self.interactionArray:
             if (not interaction.isBall) and interaction.number == numberOfLine:

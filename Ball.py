@@ -10,8 +10,8 @@ class Ball:
         self.y = y
         self.theta = 0
         self.radius = radius
-        self.mass = density * pi * radius ** 2
-        self.momentInertial = 0.5 * self.mass * (self.radius ** 2)
+        self.mass = density * 4/3*pi * radius ** 3
+        self.momentInertial = 0.4 * self.mass * (self.radius ** 2)
         # Коэффициент контактного демпфирования в нормальном направлении
         self.cn = cn
         # Коэффициент контактного демпфирования в тангенциальном направлении
@@ -32,19 +32,19 @@ class Ball:
 
     def canvasMove(self):
         self.canvas.move(self.id,
-                         self.velocityX * deltaTime - 0.5 * self.accelerationX * (deltaTime ** 2),
-                         self.velocityY * deltaTime - 0.5 * self.accelerationY * (deltaTime ** 2))
+                         self.velocityX * deltaTime + 0.5 * self.accelerationX * (deltaTime ** 2),
+                         self.velocityY * deltaTime + 0.5 * self.accelerationY * (deltaTime ** 2))
+
+    def rotationIndicator(self):
+        self.theta += (self.velocityTheta) % (2 * pi)
+        self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
+                           self.y + self.radius * sin(self.theta))
+        self.canvas.move(self.id2, self.velocityX * deltaTime, self.velocityY * deltaTime)
 
     def draw(self):
         self.move()  # фактическое движение
         self.canvasMove()  # прорисовка движения
         self.rotationIndicator()
-
-    def rotationIndicator(self):
-        self.theta += (self.velocityTheta * deltaTime) % (2 * pi)
-        self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
-                           self.y + self.radius * sin(self.theta))
-        self.canvas.move(self.id2, self.velocityX * deltaTime, self.velocityY * deltaTime)
 
     def move(self):
         pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
@@ -78,7 +78,7 @@ class Ball:
                 return True
         return False
 
-    def expand(self):
+    def expand(self, velocityYLocalNew=None):
         # Находим линию, которую пересекает шарик и изменяем угол шарика по известной формуле:
         # alpha = 2 * beta - alpha
         wall = MoveWall.getInstance()
@@ -100,14 +100,21 @@ class Ball:
                     velocityXLocal += velocityXLocalWall
                     dampeningNormal = velocityXLocal * cn_wall
                     dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall  # убрать скорость стенки
-                    self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
-                            velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
-                                                  deltaTime ** 2)
+                    self.rotationHerzWall(velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall)
+
+                    # self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
+                    #         velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
+                    #                               deltaTime ** 2)
                     velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
-                    velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
+                    # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
+                    velocityYLocalNew = velocityYLocal - sqrt(self.momentInertial * self.velocityTheta ** 2 / self.mass)
                     self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
-
+    def rotationHerzWall(self, velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall):
+        n = sqrt((16 * self.radius) / (9 * pi ** 2 * kn ** 2 * (self.radius)))
+        mu = 2000
+        Force = mu * n * sqrt(abs(velocityXLocal - velocityXLocalWall)) ** 3
+        self.velocityTheta += Force / (self.radius * self.mass) * (1 - self.cs) * (velocityYLocal - velocityYLocalWall)
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
         # (с учетом нахождения внутри стен)
