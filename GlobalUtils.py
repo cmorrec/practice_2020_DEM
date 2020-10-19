@@ -15,7 +15,6 @@ inf = 1e11
 
 frequency = 0.01  # Это частота приятная глазу, ее лучше не менять
 deltaTime = 0.001  # Не может быть больше чем frequency
-deltaTimeDraw = deltaTime
 # Шаг по времени
 cn_wall = 0.01
 cs_wall = 0.01

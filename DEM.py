@@ -122,7 +122,7 @@ while not elements.starts:
             elements.draw()
     tk.update_idletasks()
     tk.update()
-    time.sleep(deltaTimeDraw)
+    time.sleep(deltaTime)
     i = i % step + 1
 
 saveResults(elements)
