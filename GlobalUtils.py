@@ -20,7 +20,7 @@ cn_wall = 0.01
 cs_wall = 0.01
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 1000
+accelerationY = 10
 kn = 1 * 1e8
 ks = 1 * 1e1
 # Энергия

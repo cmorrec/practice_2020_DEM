@@ -111,18 +111,20 @@ buttons[0].grid(row=1, column=0,
 buttons[1].grid(row=1, column=1)
 buttons[2].bind('<Button-1>', elements.exit)
 buttons[2].grid(row=1, column=2, padx=3)
-
+tk.update_idletasks()
+tk.update()
 
 step = max(int(frequency / deltaTime), 1)
 i = 0
+elements.begin()
 while not elements.starts:
     if elements.started:
         elements.move()
         if abs(i - step) < eps:
             elements.draw()
-    tk.update_idletasks()
-    tk.update()
-    time.sleep(deltaTime)
-    i = i % step + 1
+    if abs(i - step) < eps:
+        tk.update_idletasks()
+        tk.update()
+    i = (i % step) + 1
 
 saveResults(elements)

@@ -117,6 +117,10 @@ class Elements:
         self.started = True
         self.energyMonitoring()
 
+    def begin(self):
+        self.started = True
+        self.energyMonitoring()
+
     def exit(self, event):
         self.started = False
         saveResults(self)
