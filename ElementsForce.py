@@ -88,7 +88,7 @@ class ElementsForce(Elements):
     def __init__(self, balls, canvas):
         Elements.__init__(self, balls, canvas)
 
-    def move(self):
+    def calculation(self):
         # Есть необходимость отключения не глобальных ускорений, а ускорений взаимодействия,
         # поэтому этот метод и строчка неизменны
         # self.setAcceleration()

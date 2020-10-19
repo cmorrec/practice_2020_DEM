@@ -21,7 +21,7 @@ coordinatesFileNameSquare = './walls_dynamic/square.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
-coordinatesFileName = coordinatesFileNameRhombus
+coordinatesFileName = coordinatesFileNameSquare
 ballStartFileName = ballStartFileName4Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
@@ -112,11 +112,17 @@ buttons[1].grid(row=1, column=1)
 buttons[2].bind('<Button-1>', elements.exit)
 buttons[2].grid(row=1, column=2, padx=3)
 
+
+step = max(int(frequency / deltaTime), 1)
+i = 0
 while not elements.starts:
     if elements.started:
-        elements.draw()
+        elements.move()
+        if abs(i - step) < eps:
+            elements.draw()
     tk.update_idletasks()
     tk.update()
     time.sleep(deltaTimeDraw)
+    i = i % step + 1
 
 saveResults(elements)

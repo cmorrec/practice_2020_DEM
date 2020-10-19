@@ -11,19 +11,15 @@ class BallForce(Ball):
         self.jerkY = 0
         self.interactionArray = []
 
-    def canvasMove(self):
-        self.canvas.move(self.id,
-                         self.velocityX * deltaTime - 0.5 * (self.accelerationX + self.accelerationInteractionX) * (
-                                 deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3,
-                         self.velocityY * deltaTime - 0.5 * (
-                                 self.accelerationY + self.accelerationInteractionY) * (
-                                 deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3)
+    # def canvasMove(self):
+    #     self.canvas.move(self.id,
+    #                      self.velocityX * deltaTime - 0.5 * (self.accelerationX + self.accelerationInteractionX) * (
+    #                              deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3,
+    #                      self.velocityY * deltaTime - 0.5 * (
+    #                              self.accelerationY + self.accelerationInteractionY) * (
+    #                              deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3)
 
     def move(self):
-        pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
-        self.x = (pos[0] + pos[2]) / 2  # можно найти координаты центра
-        self.y = (pos[1] + pos[3]) / 2
-
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
@@ -42,6 +38,11 @@ class BallForce(Ball):
 
         # Обновление направлений скоростей
         self.addVelocityMethod()
+        self.x += self.velocityX * deltaTime - 0.5 * (self.accelerationX + self.accelerationInteractionX) * (
+                deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3
+        self.y += self.velocityY * deltaTime - 0.5 * (self.accelerationY + self.accelerationInteractionY) * (
+                deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3
+        self.theta += self.velocityTheta % (2 * pi)
 
     def addVelocityMethod(self):
         self.accelerationInteractionX = 0

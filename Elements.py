@@ -144,15 +144,20 @@ class Elements:
         return energyCount
 
     def draw(self):
-        self.move()
+        for ball in self.balls:
+            ball.draw()
+        MoveWall.getInstance().draw()
+
+    def move(self):
+        self.calculation()
         self.energy()
         self.step += 1
         stepCount.append(self.step)
         MoveWall.getInstance().move()
         for ball in self.balls:
-            ball.draw()
+            ball.move()
 
-    def move(self):
+    def calculation(self):
         # В случае касания шара с шаром или шара со стенкой -- отключается для этого шара поле ускорений
         # Дело в том что если этого не делать ускорение продавит шар за пределы стенки в какой-то момент,
         # а именно в тот момент, когда шары должны находиться в состоянии равновесия.

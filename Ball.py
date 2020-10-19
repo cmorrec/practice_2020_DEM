@@ -8,6 +8,8 @@ class Ball:
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
         self.x = x
         self.y = y
+        self.xLastDraw = x
+        self.yLastDraw = y
         self.theta = 0
         self.radius = radius
         self.mass = density * 4 / 3 * pi * radius ** 3
@@ -31,26 +33,23 @@ class Ball:
         self.isCrossAnything = False
 
     def canvasMove(self):
-        self.canvas.move(self.id,
-                         self.velocityX * deltaTime + 0.5 * self.accelerationX * (deltaTime ** 2),
-                         self.velocityY * deltaTime + 0.5 * self.accelerationY * (deltaTime ** 2))
+        self.canvas.move(self.id, self.x - self.xLastDraw, self.y - self.yLastDraw)
 
     def rotationIndicator(self):
-        self.theta += (self.velocityTheta) % (2 * pi)
         self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
                            self.y + self.radius * sin(self.theta))
-        self.canvas.move(self.id2, self.velocityX * deltaTime, self.velocityY * deltaTime)
+        # self.canvas.move(self.id2, self.x - self.xLastDraw, self.y - self.yLastDraw)
 
     def draw(self):
-        self.move()  # фактическое движение
         self.canvasMove()  # прорисовка движения
         self.rotationIndicator()
+        self.xLastDraw = self.x
+        self.yLastDraw = self.y
+
+    # def move(self):
+    #     self.calculation()  # фактическое движение
 
     def move(self):
-        pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
-        self.x = (pos[0] + pos[2]) / 2  # можно найти координаты центра
-        self.y = (pos[1] + pos[3]) / 2
-
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
@@ -61,6 +60,9 @@ class Ball:
             self.comeBack()
         # Обновление направлений скоростей
         self.addVelocityMethod()
+        self.x += self.velocityX * deltaTime + 0.5 * self.accelerationX * (deltaTime ** 2)
+        self.y += self.velocityY * deltaTime + 0.5 * self.accelerationY * (deltaTime ** 2)
+        self.theta += self.velocityTheta % (2 * pi)
 
     def addVelocityMethod(self):
         self.addVelocity(self.accelerationX, self.accelerationY)
