@@ -19,7 +19,7 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # Углы направления шаров в локальной системе координат
     alphaRadian1Local = i.alphaRadian - gamma
     alphaRadian2Local = j.alphaRadian - gamma
-    accelerationYAlphaRadianLocal = pi/2 - gamma
+    accelerationYAlphaRadianLocal = pi / 2 - gamma
     # Скорости шаров в локальной системе координат
     velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
     velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
@@ -58,10 +58,12 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # accelerationTangent1 = forceTangent1 / i.mass
     # accelerationTangent2 = forceTangent2 / j.mass
 
-    rotationCS(i, j,velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
-    jerkI = i.getJerk(velocity1XLocal, accelerationNormal1 + accelerationY*cos(accelerationYAlphaRadianLocal), kn, i.mass)
+    rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
+    jerkI = i.getJerk(velocity1XLocal, accelerationNormal1 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
+                      i.mass)
     accelerationNormal1 += jerkI * deltaTime
-    jerkJ = j.getJerk(velocity2XLocal, accelerationNormal2 + accelerationY*cos(accelerationYAlphaRadianLocal), kn, j.mass)
+    jerkJ = j.getJerk(velocity2XLocal, accelerationNormal2 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
+                      j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
     i.saveAccelerationLength(gamma, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)

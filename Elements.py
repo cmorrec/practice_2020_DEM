@@ -24,14 +24,17 @@ def isCross(i, j):
     return False
 
 
-def rotationBallHerz(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal):
-    n = sqrt((16 * i.radius * j.radius)/(9 * pi**2 * kn**2 * (i.radius + j.radius)))
+def rotationBallHerz(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal, velocity1XLocal,
+                     velocity2XLocal):
+    n = sqrt((16 * i.radius * j.radius) / (9 * pi ** 2 * kn ** 2 * (i.radius + j.radius)))
     mu = 2000
-    Force = mu * n * sqrt(abs(velocity1XLocal - velocity2XLocal))**3
-    i.velocityTheta += Force / (i.radius * i.mass) * (1-i.cs) * (velocity1YLocal - velocity2YLocal)
+    Force = mu * n * sqrt(abs(velocity1XLocal - velocity2XLocal)) ** 3
+    i.velocityTheta += Force / (i.radius * i.mass) * (1 - i.cs) * (velocity1YLocal - velocity2YLocal)
     # i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
     #         velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
     #                            deltaTime ** 2)
+
+
 def rotationBallCS(i, dampeningTangentI):
     i.velocityTheta += sqrt(dampeningTangentI * 2 / i.momentInertial)
 
@@ -39,13 +42,21 @@ def rotationBallCS(i, dampeningTangentI):
 def rotationHerz(i, j, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal):
     velocityThetaI = i.velocityTheta
     velocityThetaJ = j.velocityTheta
-    rotationBallHerz(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal)
-    rotationBallHerz(j, i, velocityThetaI, velocityThetaJ, velocity2YLocal, velocity1YLocal, velocity1XLocal, velocity2XLocal)
-    velocity1YLocal -= sqrt(i.momentInertial*i.velocityTheta**2/i.mass)
+    rotationBallHerz(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velocity2YLocal, velocity1XLocal,
+                     velocity2XLocal)
+    rotationBallHerz(j, i, velocityThetaI, velocityThetaJ, velocity2YLocal, velocity1YLocal, velocity1XLocal,
+                     velocity2XLocal)
+    velocity1YLocal -= sqrt(i.momentInertial * i.velocityTheta ** 2 / i.mass)
     velocity2YLocal -= sqrt(j.momentInertial * j.velocityTheta ** 2 / j.mass)
+
+
 def rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ):
-    i.velocityTheta += - velocity1YLocal/abs(velocity1YLocal+eps)*sqrt(abs(dampeningTangentI * 2 / i.momentInertial))
-    j.velocityTheta += - velocity2YLocal/abs(velocity2YLocal+eps)*sqrt(abs(dampeningTangentJ * 2 / j.momentInertial))
+    i.velocityTheta += - velocity1YLocal / abs(velocity1YLocal + eps) * sqrt(
+        abs(dampeningTangentI * 2 / i.momentInertial))
+    j.velocityTheta += - velocity2YLocal / abs(velocity2YLocal + eps) * sqrt(
+        abs(dampeningTangentJ * 2 / j.momentInertial))
+
+
 def method(i, j):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
     # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
@@ -153,7 +164,6 @@ class Elements:
             for j in range(i + 1, len(self.balls)):
                 if isCross(self.balls[i], self.balls[j]):
                     method(self.balls[i], self.balls[j])
-
 
     def setAcceleration(self):
         for ball in self.balls:

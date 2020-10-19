@@ -107,7 +107,7 @@ else:
 
 buttons[0].bind('<Button-1>', elements.start)  # Обработчик событий
 buttons[0].grid(row=1, column=0,
-           padx=3)  # используем метод pack для отображения кнопки - в нём можно задать положение кнопки
+                padx=3)  # используем метод pack для отображения кнопки - в нём можно задать положение кнопки
 buttons[1].grid(row=1, column=1)
 buttons[2].bind('<Button-1>', elements.exit)
 buttons[2].grid(row=1, column=2, padx=3)

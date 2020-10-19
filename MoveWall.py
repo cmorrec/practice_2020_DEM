@@ -39,9 +39,11 @@ class MoveWall(Wall):
             self.revertVelocityY()
         if self.flagMove:
             for line in self.lines:
-                self.canvas.move(line.id, self.velocityX * deltaTime, self.velocityY * deltaTime)  # прорисовка движения стенки
-                line.setCoordinates(Coordinate(line.x1 + self.velocityX * deltaTime, line.y1 + self.velocityY * deltaTime),
-                                    Coordinate(line.x2 + self.velocityX * deltaTime, line.y2 + self.velocityY * deltaTime))
+                self.canvas.move(line.id, self.velocityX * deltaTime,
+                                 self.velocityY * deltaTime)  # прорисовка движения стенки
+                line.setCoordinates(
+                    Coordinate(line.x1 + self.velocityX * deltaTime, line.y1 + self.velocityY * deltaTime),
+                    Coordinate(line.x2 + self.velocityX * deltaTime, line.y2 + self.velocityY * deltaTime))
 
     def revertVelocityX(self):
         self.velocityX *= -1

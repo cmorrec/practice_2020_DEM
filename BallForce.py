@@ -82,7 +82,7 @@ class BallForce(Ball):
         isToLine = self.resetForLine(line)
 
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
-        accelerationYRadianLocal = pi/2 - line.alphaNorm
+        accelerationYRadianLocal = pi / 2 - line.alphaNorm
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
@@ -106,7 +106,7 @@ class BallForce(Ball):
 
         self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
                             sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
-        self.rotationCSWall(velocityYLocal,  dampeningTangent)
+        self.rotationCSWall(velocityYLocal, dampeningTangent)
         if not isToLine:
             velocityXLocal *= -1
             velocityYLocal *= -1
@@ -118,13 +118,16 @@ class BallForce(Ball):
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
         forceNormal = (1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
-        jerk = self.getJerk(velocityXLocal, accelerationNormal+accelerationY*cos(accelerationYRadianLocal), kn, self.mass)
+        jerk = self.getJerk(velocityXLocal, accelerationNormal + accelerationY * cos(accelerationYRadianLocal), kn,
+                            self.mass)
         accelerationNormal += self.jerk * deltaTime
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, isBall=False, number=numberOfLine)
-    def rotationCSWall(self, velocityYLocal,  dampeningTangent):
+
+    def rotationCSWall(self, velocityYLocal, dampeningTangent):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
             abs(dampeningTangent * 2 / self.momentInertial))
+
     def isCrossLineBefore(self, numberOfLine):
         for interaction in self.interactionArray:
             if (not interaction.isBall) and interaction.number == numberOfLine:
@@ -159,7 +162,8 @@ class BallForce(Ball):
             if interaction.number == number and interaction.isBall == isBall:
                 interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY)
                 return
-        self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY))
+        self.addInteraction(
+            Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)

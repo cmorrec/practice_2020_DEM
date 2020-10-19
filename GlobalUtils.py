@@ -29,6 +29,7 @@ potentialPlot = []
 summaryPlot = []
 stepCount = [0, 0, 0]
 
+
 def Buttons():
     but_1 = Button(text='Start',
                    width=17, height=2,
@@ -46,6 +47,8 @@ def Buttons():
                    font='Hack 16')
     buttons = [but_1, but_2, but_3]
     return (buttons)
+
+
 def saveResults(elements):
     # Запись результатов в файл
     ballsEndFile = open('balls_end.txt', 'w')
@@ -72,8 +75,8 @@ def plotter():
     ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
     ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100)*(stepCount[-1]//100*10)))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100)*(stepCount[-1]//100*20)))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * (stepCount[-1] // 100 * 10)))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * (stepCount[-1] // 100 * 20)))
     ax.tick_params(axis='both',
                    which='major',
                    direction='inout',

@@ -10,7 +10,7 @@ class Ball:
         self.y = y
         self.theta = 0
         self.radius = radius
-        self.mass = density * 4/3*pi * radius ** 3
+        self.mass = density * 4 / 3 * pi * radius ** 3
         self.momentInertial = 0.4 * self.mass * (self.radius ** 2)
         # Коэффициент контактного демпфирования в нормальном направлении
         self.cn = cn
@@ -110,11 +110,13 @@ class Ball:
                     velocityYLocalNew = velocityYLocal - sqrt(self.momentInertial * self.velocityTheta ** 2 / self.mass)
                     self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
+
     def rotationHerzWall(self, velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall):
         n = sqrt((16 * self.radius) / (9 * pi ** 2 * kn ** 2 * (self.radius)))
         mu = 2000
         Force = mu * n * sqrt(abs(velocityXLocal - velocityXLocalWall)) ** 3
         self.velocityTheta += Force / (self.radius * self.mass) * (1 - self.cs) * (velocityYLocal - velocityYLocalWall)
+
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
         # (с учетом нахождения внутри стен)
