@@ -21,7 +21,7 @@ coordinatesFileNameSquare = './walls_dynamic/square.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
-coordinatesFileName = coordinatesFileNameSquare
+coordinatesFileName = coordinatesFileNameRhombus
 ballStartFileName = ballStartFileName4Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
@@ -73,7 +73,7 @@ canvas.grid(row=0, columnspan=3)
 buttons = Buttons()
 tk.update()
 
-wall = MoveWall(canvas, 'black', coordinatesFromFile, accelerationX, accelerationY, None, velocityXWall, velocityYWall,
+wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, velocityXWall, velocityYWall,
                 absXWall, absYWall)
 
 ballsStartFile = open(ballStartFileName, 'r')
@@ -101,9 +101,9 @@ for line in ballsStartFile:
 ballsStartFile.close()
 
 if isForce:
-    elements = ElementsForce(ballsFromFile, canvas)
+    elements = ElementsForce(np.array(ballsFromFile), canvas)
 else:
-    elements = Elements(ballsFromFile, canvas)
+    elements = Elements(np.array(ballsFromFile), canvas)
 
 buttons[0].bind('<Button-1>', elements.start)  # Обработчик событий
 buttons[0].grid(row=1, column=0,

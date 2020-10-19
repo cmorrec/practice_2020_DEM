@@ -33,7 +33,7 @@ class Wall:
         self.accelerationX = accelerationX
         self.accelerationY = accelerationY
         self.coordinates = coordinates
-        self.lines = lines
+        self.lines = np.array(lines)
         self.canvas = canvas
         for line in self.lines:
             line.setID(canvas.create_line(line.startX1, line.startY1, line.startX2, line.startY2, fill=color))

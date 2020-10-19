@@ -70,7 +70,7 @@ def methodForce(i, j, numberOfI, numberOfJ):
     j.saveAccelerationLength(gamma, accelerationNormal2, jerkJ, isBall=True, number=numberOfI)
 
 
-def isCrossBefore(i, j, numberOfI, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
+def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
     for interaction in i.interactionArray:
         if interaction.isBall and interaction.number == numberOfJ:
             return True
@@ -97,6 +97,6 @@ class ElementsForce(Elements):
             for j in range(i + 1, len(self.balls)):
                 if isCrossForce(self.balls[i], self.balls[j]):
                     methodForce(self.balls[i], self.balls[j], i, j)
-                elif isCrossBefore(self.balls[i], self.balls[j], i, j):
+                elif isCrossBefore(self.balls[i], j):
                     deleteInteraction(self.balls[i], j)
                     deleteInteraction(self.balls[j], i)

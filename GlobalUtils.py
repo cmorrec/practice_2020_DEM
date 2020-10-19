@@ -46,7 +46,7 @@ def Buttons():
                    activeforeground='#FF2400',
                    font='Hack 16')
     buttons = [but_1, but_2, but_3]
-    return (buttons)
+    return buttons
 
 
 def saveResults(elements):
