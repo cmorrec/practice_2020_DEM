@@ -97,7 +97,7 @@ class Elements:
         self.step = 0
 
     def energyMonitoring(self):
-        print("Количество энергии", self.energy(), "\n")
+        print("Количество энергии", self.energyToSee(), "\n")
 
     def start(self, event):
         self.started = True
@@ -112,6 +112,14 @@ class Elements:
         saveResults(self)
         self.energyMonitoring()
         plotter()
+
+    def energyToSee(self):
+        energyCount = 0
+        for ball in self.balls:
+            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
+                    ball.velocityTheta ** 2) + ball.mass * MoveWall.getInstance().accelerationY * (
+                                       MoveWall.getInstance().maxY - ball.y)
+        return energyCount
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()

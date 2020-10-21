@@ -27,7 +27,7 @@ ks = 1 * 1e1
 kineticPlot = []
 potentialPlot = []
 summaryPlot = []
-stepCount = [0, 0, 0]
+stepCount = [0]
 
 
 def Buttons():
