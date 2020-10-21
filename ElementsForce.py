@@ -25,7 +25,6 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # Углы направления шаров в локальной системе координат
     alphaRadian1Local = i.alphaRadian - gama
     alphaRadian2Local = j.alphaRadian - gama
-    accelerationYAlphaRadianLocal = pi / 2 - gama
     # Скорости шаров в локальной системе координат
     velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
     velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
@@ -65,11 +64,9 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # accelerationTangent2 = forceTangent2 / j.mass
 
     # rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
-    jerkI = getJerk(velocity1XLocal, accelerationNormal1 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
-                    i.mass)
+    jerkI = getJerk(velocity1XLocal, accelerationNormal1, kn, i.mass)
     accelerationNormal1 += jerkI * deltaTime
-    jerkJ = getJerk(velocity2XLocal, accelerationNormal2 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
-                    j.mass)
+    jerkJ = getJerk(velocity2XLocal, accelerationNormal2, kn, j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
     i.saveAccelerationLength(gama, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)
@@ -95,10 +92,8 @@ class ElementsForce(Elements):
         Elements.__init__(self, balls, canvas)
 
     def calculation(self):
-        # Есть необходимость отключения не глобальных ускорений, а ускорений взаимодействия,
-        # поэтому этот метод и строчка неизменны
-        # self.setAcceleration()
-
+        # Есть необходимость отключения не глобальных ускорений,
+        # а ускорений взаимодействия, что проверяется отдельно
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
                 if isCrossForce(self.balls[i], self.balls[j]):

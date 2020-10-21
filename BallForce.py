@@ -74,12 +74,9 @@ class BallForce(Ball):
     def expandForce(self, line, numberOfLine):
         wall = MoveWall.getInstance()
 
-        # closestLine, numberOfLine = self.getCrossingLine()
-
         isToLine = self.resetForLine(line)
 
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
-        accelerationYRadianLocal = pi / 2 - line.alphaNorm
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
@@ -115,8 +112,7 @@ class BallForce(Ball):
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
         forceNormal = (1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
-        jerk = getJerk(velocityXLocal, accelerationNormal + accelerationY * cos(accelerationYRadianLocal), kn,
-                       self.mass)
+        jerk = getJerk(velocityXLocal, accelerationNormal, kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, isBall=False, number=numberOfLine)
@@ -180,4 +176,3 @@ class BallForce(Ball):
     #         print('\taccelerationX =', interaction.accelerationX, '\taccelerationY =', interaction.accelerationY)
     #         print('\tjerkX =', interaction.jerkX, '\tjerkY =', interaction.jerkY)
     #     print()
-
