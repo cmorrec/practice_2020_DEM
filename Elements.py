@@ -28,15 +28,8 @@ def rotationBallHerz(i, j, velocityThetaI, velocityThetaJ, velocity1YLocal, velo
                      velocity2XLocal):
     n = sqrt((16 * i.radius * j.radius) / (9 * pi ** 2 * kn ** 2 * (i.radius + j.radius)))
     mu = 2000
-    Force = mu * n * sqrt(abs(velocity1XLocal - velocity2XLocal)) ** 3
-    i.velocityTheta += Force / (i.radius * i.mass) * (1 - i.cs) * (velocity1YLocal - velocity2YLocal)
-    # i.velocityTheta += (1 / (i.mass * i.radius)) * (1 - i.cs) * (
-    #         velocity1YLocal - velocity2YLocal - (velocityThetaI * i.radius + velocityThetaJ * j.radius)) * (
-    #                            deltaTime ** 2)
-
-
-def rotationBallCS(i, dampeningTangentI):
-    i.velocityTheta += sqrt(dampeningTangentI * 2 / i.momentInertial)
+    force = mu * n * sqrt(abs(velocity1XLocal - velocity2XLocal)) ** 3
+    i.velocityTheta += force / (i.radius * i.mass) * (1 - i.cs) * (velocity1YLocal - velocity2YLocal)
 
 
 def rotationHerz(i, j, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal):
@@ -50,13 +43,6 @@ def rotationHerz(i, j, velocity1YLocal, velocity2YLocal, velocity1XLocal, veloci
     velocity2YLocal -= sqrt(j.momentInertial * j.velocityTheta ** 2 / j.mass)
 
 
-def rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ):
-    i.velocityTheta += - velocity1YLocal / abs(velocity1YLocal + eps) * sqrt(
-        abs(dampeningTangentI * 2 / i.momentInertial))
-    j.velocityTheta += - velocity2YLocal / abs(velocity2YLocal + eps) * sqrt(
-        abs(dampeningTangentJ * 2 / j.momentInertial))
-
-
 def method(i, j):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
     # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
@@ -64,10 +50,10 @@ def method(i, j):
     # Также учет диссипации при каждом столкновении шаров
 
     # Угол между линией удара и горизонталью
-    gamma = atan2((i.y - j.y), (i.x - j.x))
+    gama = atan2((i.y - j.y), (i.x - j.x))
     # Углы направления шаров в локальной системе координат
-    alphaRadian1Local = i.alphaRadian - gamma
-    alphaRadian2Local = j.alphaRadian - gamma
+    alphaRadian1Local = i.alphaRadian - gama
+    alphaRadian2Local = j.alphaRadian - gama
     # Скорости шаров в локальной системе координат
     velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
     velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
@@ -90,10 +76,10 @@ def method(i, j):
     # velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
     # velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
     # Задание новой угловой скорости дисков
-    rotationHerz(i, j, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal)
+    # rotationHerz(i, j, velocity1YLocal, velocity2YLocal, velocity1XLocal, velocity2XLocal)
     # Возвращение к глобальной системе координат
-    newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gamma
-    newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gamma
+    newAlphaI = atan2(velocity1YLocal, velocity1XLocalNew + eps) + gama
+    newAlphaJ = atan2(velocity2YLocal, velocity2XLocalNew + eps) + gama
     newVelocityAbsoluteI = sqrt(velocity1XLocalNew ** 2 + velocity1YLocal ** 2)
     newVelocityAbsoluteJ = sqrt(velocity2XLocalNew ** 2 + velocity2YLocal ** 2)
     # Задание нового вектора скорости

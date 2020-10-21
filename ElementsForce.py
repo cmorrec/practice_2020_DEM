@@ -1,3 +1,4 @@
+from BallForce import getJerk
 from Elements import *
 
 
@@ -8,6 +9,20 @@ def isCrossForce(i, j):
     return False
 
 
+# def rotationBallCS(ball, velocityYLocal, dampeningTangentVelocity):
+#     ball.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
+#         ball.mass * abs(dampeningTangentVelocity ** 2 / ball.momentInertial))
+
+
+def rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ):
+    i.rotationCS(velocity1YLocal, dampeningTangentI)
+    j.rotationCS(velocity2YLocal, dampeningTangentJ)
+    # i.velocityTheta += - velocity1YLocal / abs(velocity1YLocal + eps) * sqrt(
+    #     i.mass * abs(dampeningTangentI ** 2 / i.momentInertial))
+    # j.velocityTheta += - velocity2YLocal / abs(velocity2YLocal + eps) * sqrt(
+    #     j.mass * abs(dampeningTangentJ ** 2 / j.momentInertial))
+
+
 def methodForce(i, j, numberOfI, numberOfJ):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
     # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
@@ -15,11 +30,11 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # Также учет диссипации при каждом столкновении шаров
 
     # Угол между линией удара и горизонталью
-    gamma = atan2((i.y - j.y), (i.x - j.x))
+    gama = atan2((i.y - j.y), (i.x - j.x))
     # Углы направления шаров в локальной системе координат
-    alphaRadian1Local = i.alphaRadian - gamma
-    alphaRadian2Local = j.alphaRadian - gamma
-    accelerationYAlphaRadianLocal = pi / 2 - gamma
+    alphaRadian1Local = i.alphaRadian - gama
+    alphaRadian2Local = j.alphaRadian - gama
+    accelerationYAlphaRadianLocal = pi / 2 - gama
     # Скорости шаров в локальной системе координат
     velocity1XLocal = i.velocityAbsolute * cos(alphaRadian1Local)
     velocity1YLocal = i.velocityAbsolute * sin(alphaRadian1Local)
@@ -38,9 +53,9 @@ def methodForce(i, j, numberOfI, numberOfJ):
     velocity2XLocal = dampeningVelocity(dampeningNormalJ, velocity2XLocal)
     velocity1YLocal = dampeningVelocity(dampeningTangentI, velocity1YLocal)
     velocity2YLocal = dampeningVelocity(dampeningTangentJ, velocity2YLocal)
-    i.changeVelocity(atan2(velocity1YLocal, velocity1XLocal + eps) + gamma,
+    i.changeVelocity(atan2(velocity1YLocal, velocity1XLocal + eps) + gama,
                      sqrt(velocity1XLocal ** 2 + velocity1YLocal ** 2))
-    j.changeVelocity(atan2(velocity2YLocal, velocity2XLocal + eps) + gamma,
+    j.changeVelocity(atan2(velocity2YLocal, velocity2XLocal + eps) + gama,
                      sqrt(velocity2XLocal ** 2 + velocity2YLocal ** 2))
 
     # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
@@ -58,16 +73,16 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # accelerationTangent1 = forceTangent1 / i.mass
     # accelerationTangent2 = forceTangent2 / j.mass
 
-    rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
-    jerkI = i.getJerk(velocity1XLocal, accelerationNormal1 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
-                      i.mass)
+    # rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
+    jerkI = getJerk(velocity1XLocal, accelerationNormal1 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
+                    i.mass)
     accelerationNormal1 += jerkI * deltaTime
-    jerkJ = j.getJerk(velocity2XLocal, accelerationNormal2 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
-                      j.mass)
+    jerkJ = getJerk(velocity2XLocal, accelerationNormal2 + accelerationY * cos(accelerationYAlphaRadianLocal), kn,
+                    j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
-    i.saveAccelerationLength(gamma, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)
-    j.saveAccelerationLength(gamma, accelerationNormal2, jerkJ, isBall=True, number=numberOfI)
+    i.saveAccelerationLength(gama, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)
+    j.saveAccelerationLength(gama, accelerationNormal2, jerkJ, isBall=True, number=numberOfI)
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных

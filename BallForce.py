@@ -2,6 +2,21 @@ from Ball import *
 from Interaction import *
 
 
+def getJerk(velocity, acceleration, k, mass):
+    accelerationFirst = acceleration
+    deltaEntry = velocity * deltaTime + acceleration / 2 * deltaTime ** 2
+    deltaForce = k * deltaEntry
+    accelerationNext = acceleration + deltaForce / mass
+    jerk = (accelerationNext - accelerationFirst) / deltaTime
+    while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
+        acceleration = accelerationNext
+        deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
+        deltaForce = k * deltaEntry
+        accelerationNext = acceleration + deltaForce / mass
+        jerk = (accelerationNext - accelerationFirst) / deltaTime
+    return jerk
+
+
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
         Ball.__init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas)
@@ -10,14 +25,6 @@ class BallForce(Ball):
         self.jerkX = 0
         self.jerkY = 0
         self.interactionArray = []
-
-    # def canvasMove(self):
-    #     self.canvas.move(self.id,
-    #                      self.velocityX * deltaTime - 0.5 * (self.accelerationX + self.accelerationInteractionX) * (
-    #                              deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3,
-    #                      self.velocityY * deltaTime - 0.5 * (
-    #                              self.accelerationY + self.accelerationInteractionY) * (
-    #                              deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3)
 
     def move(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
@@ -61,20 +68,6 @@ class BallForce(Ball):
             (self.accelerationX + self.accelerationInteractionX - self.jerkX * deltaTime / 2),
             (self.accelerationY + self.accelerationInteractionY - self.jerkY * deltaTime / 2))
 
-    def getJerk(self, velocity, acceleration, k, mass):
-        accelerationFirst = acceleration
-        deltaEntry = velocity * deltaTime + acceleration / 2 * deltaTime ** 2
-        deltaForce = k * deltaEntry
-        accelerationNext = acceleration + deltaForce / mass
-        jerk = (accelerationNext - accelerationFirst) / deltaTime
-        while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
-            acceleration = accelerationNext
-            deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
-            deltaForce = k * deltaEntry
-            accelerationNext = acceleration + deltaForce / mass
-            jerk = (accelerationNext - accelerationFirst) / deltaTime
-        return jerk
-
     def expandForce(self, line, numberOfLine):
         wall = MoveWall.getInstance()
 
@@ -107,7 +100,7 @@ class BallForce(Ball):
 
         self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
                             sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
-        self.rotationCSWall(velocityYLocal, dampeningTangent)
+        # self.rotationCSWall(velocityYLocal, dampeningTangent)
         if not isToLine:
             velocityXLocal *= -1
             velocityYLocal *= -1
@@ -119,8 +112,8 @@ class BallForce(Ball):
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
         forceNormal = (1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
-        jerk = self.getJerk(velocityXLocal, accelerationNormal + accelerationY * cos(accelerationYRadianLocal), kn,
-                            self.mass)
+        jerk = getJerk(velocityXLocal, accelerationNormal + accelerationY * cos(accelerationYRadianLocal), kn,
+                       self.mass)
         accelerationNormal += self.jerk * deltaTime
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, isBall=False, number=numberOfLine)
@@ -168,3 +161,7 @@ class BallForce(Ball):
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)
+
+    def rotationCS(self, velocityYLocal, dampeningTangentVelocity):
+        self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
+            self.mass * abs(dampeningTangentVelocity ** 2 / self.momentInertial))

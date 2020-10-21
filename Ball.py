@@ -38,16 +38,12 @@ class Ball:
     def rotationIndicator(self):
         self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
                            self.y + self.radius * sin(self.theta))
-        # self.canvas.move(self.id2, self.x - self.xLastDraw, self.y - self.yLastDraw)
 
     def draw(self):
         self.canvasMove()  # прорисовка движения
         self.rotationIndicator()
         self.xLastDraw = self.x
         self.yLastDraw = self.y
-
-    # def move(self):
-    #     self.calculation()  # фактическое движение
 
     def move(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
@@ -102,11 +98,8 @@ class Ball:
                     velocityXLocal += velocityXLocalWall
                     dampeningNormal = velocityXLocal * cn_wall
                     dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall  # убрать скорость стенки
-                    self.rotationHerzWall(velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall)
+                    # self.rotationHerzWall(velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall)
 
-                    # self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
-                    #         velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
-                    #                               deltaTime ** 2)
                     velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
                     # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
                     velocityYLocalNew = velocityYLocal - sqrt(self.momentInertial * self.velocityTheta ** 2 / self.mass)
@@ -114,10 +107,10 @@ class Ball:
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
 
     def rotationHerzWall(self, velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall):
-        n = sqrt((16 * self.radius) / (9 * pi ** 2 * kn ** 2 * (self.radius)))
+        n = sqrt((16 * self.radius) / (9 * pi ** 2 * kn ** 2 * self.radius))
         mu = 2000
-        Force = mu * n * sqrt(abs(velocityXLocal - velocityXLocalWall)) ** 3
-        self.velocityTheta += Force / (self.radius * self.mass) * (1 - self.cs) * (velocityYLocal - velocityYLocalWall)
+        force = mu * n * sqrt(abs(velocityXLocal - velocityXLocalWall)) ** 3
+        self.velocityTheta += force / (self.radius * self.mass) * (1 - self.cs) * (velocityYLocal - velocityYLocalWall)
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
