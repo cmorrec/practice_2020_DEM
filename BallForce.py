@@ -19,7 +19,10 @@ def getJerk(velocity, acceleration, k, mass):
 
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
-        Ball.__init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas)
+        midInteractionNum = 5
+        cnForce = 1 - (1 - cn) ** (1 / midInteractionNum)
+        csForce = 1 - (1 - cs) ** (1 / midInteractionNum)
+        Ball.__init__(self, x, y, radius, alpha, velocity, cnForce, csForce, density, color, canvas)
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
         self.jerkX = 0
@@ -165,3 +168,16 @@ class BallForce(Ball):
     def rotationCS(self, velocityYLocal, dampeningTangentVelocity):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
             self.mass * abs(dampeningTangentVelocity ** 2 / self.momentInertial))
+
+    # def info(self):
+    #     print('velocityAlpha', self.alphaRadian, 'velocityAbs', self.velocityAbsolute)
+    #     print('velocityX', self.velocityX, 'velocityY', self.velocityY)
+    #     print('accelerationX =', self.accelerationX, 'accelerationY =', self.accelerationY)
+    #     print('accelerationInteractionX =', self.accelerationInteractionX, '\taccelerationInteractionY =', self.accelerationInteractionY)
+    #     print('jerkX =', self.jerkX, 'jerkY =', self.jerkY)
+    #     for i, interaction in enumerate(self.interactionArray):
+    #         print('interaction = ', i, '\tisBall =', interaction.isBall, '\tnumber =', interaction.number)
+    #         print('\taccelerationX =', interaction.accelerationX, '\taccelerationY =', interaction.accelerationY)
+    #         print('\tjerkX =', interaction.jerkX, '\tjerkY =', interaction.jerkY)
+    #     print()
+

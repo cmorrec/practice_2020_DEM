@@ -9,18 +9,9 @@ def isCrossForce(i, j):
     return False
 
 
-# def rotationBallCS(ball, velocityYLocal, dampeningTangentVelocity):
-#     ball.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
-#         ball.mass * abs(dampeningTangentVelocity ** 2 / ball.momentInertial))
-
-
 def rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ):
     i.rotationCS(velocity1YLocal, dampeningTangentI)
     j.rotationCS(velocity2YLocal, dampeningTangentJ)
-    # i.velocityTheta += - velocity1YLocal / abs(velocity1YLocal + eps) * sqrt(
-    #     i.mass * abs(dampeningTangentI ** 2 / i.momentInertial))
-    # j.velocityTheta += - velocity2YLocal / abs(velocity2YLocal + eps) * sqrt(
-    #     j.mass * abs(dampeningTangentJ ** 2 / j.momentInertial))
 
 
 def methodForce(i, j, numberOfI, numberOfJ):
