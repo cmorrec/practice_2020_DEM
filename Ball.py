@@ -102,7 +102,7 @@ class Ball:
 
                     velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
                     # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
-                    velocityYLocalNew = velocityYLocal - sqrt(self.momentInertial * self.velocityTheta ** 2 / self.mass)
+                    velocityYLocalNew = velocityYLocal - sqrt(self.mass * self.velocityTheta ** 2 / self.momentInertial)
                     self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
 

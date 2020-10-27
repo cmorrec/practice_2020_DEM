@@ -138,6 +138,10 @@ class Elements:
         energyCount = 0
         for ball in self.balls:
             energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
+            if isForce:
+                for interaction in ball.interactionArray:
+                    energyCount += kn * interaction.entryNormal ** 2 / 2
+
         potentialPlot.append(energyCount / 1e5)
         return energyCount
 

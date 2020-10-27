@@ -69,8 +69,8 @@ def methodForce(i, j, numberOfI, numberOfJ):
     jerkJ = getJerk(velocity2XLocal, accelerationNormal2, kn, j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
-    i.saveAccelerationLength(gama, accelerationNormal1, jerkI, isBall=True, number=numberOfJ)
-    j.saveAccelerationLength(gama, accelerationNormal2, jerkJ, isBall=True, number=numberOfI)
+    i.saveAccelerationLength(gama, accelerationNormal1, jerkI, entryNormal, isBall=True, number=numberOfJ)
+    j.saveAccelerationLength(gama, accelerationNormal2, jerkJ, entryNormal, isBall=True, number=numberOfI)
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных

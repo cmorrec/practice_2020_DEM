@@ -1,8 +1,6 @@
 from BallForce import BallForce
 from ElementsForce import *
 
-isForce = True
-
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
 ballStartFileName2Ball = './ball_sets/2_ball.txt'
 ballStartFileName4Ball = './ball_sets/4_ball.txt'
@@ -21,8 +19,8 @@ coordinatesFileNameSquare = './walls_dynamic/square.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
-coordinatesFileName = coordinatesFileNameCircle
-ballStartFileName = ballStartFileName2Ball
+coordinatesFileName = coordinatesFileNameRhombus
+ballStartFileName = ballStartFileName4Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []

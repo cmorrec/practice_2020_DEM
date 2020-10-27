@@ -19,8 +19,9 @@ def getJerk(velocity, acceleration, k, mass):
 
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
-        midInteractionNum = 5
+        midInteractionNum = 9400
         cnForce = 1 - (1 - cn) ** (1 / midInteractionNum)
+        print(cnForce)
         csForce = 1 - (1 - cs) ** (1 / midInteractionNum)
         Ball.__init__(self, x, y, radius, alpha, velocity, cnForce, csForce, density, color, canvas)
         self.accelerationInteractionX = 0
@@ -115,7 +116,7 @@ class BallForce(Ball):
         jerk = getJerk(velocityXLocal, accelerationNormal, kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
 
-        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, isBall=False, number=numberOfLine)
+        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, entryNormal, isBall=False, number=numberOfLine)
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
@@ -146,17 +147,17 @@ class BallForce(Ball):
         self.jerkX = 0
         self.jerkY = 0
 
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal, isBall, number):
+    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal,  entryNormal, isBall, number):
         accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal)
         accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal)
         jerkX = jerkNormal * cos(alphaRadianLocal)
         jerkY = jerkNormal * sin(alphaRadianLocal)
         for interaction in self.interactionArray:
             if interaction.number == number and interaction.isBall == isBall:
-                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY)
+                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, entryNormal)
                 return
         self.addInteraction(
-            Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY))
+            Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, entryNormal))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)
