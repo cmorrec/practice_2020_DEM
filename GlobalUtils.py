@@ -6,6 +6,13 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from PIL import ImageTk
 
+midInteractionNum = 600
+
+
+def getForceDamping(c):
+    return 1 - (1 - c) ** (1 / midInteractionNum)
+
+
 isForce = True
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 10
@@ -14,11 +21,15 @@ eps = 1e-11
 inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
-frequency = 0.001  # Это частота приятная глазу, ее лучше не менять
+frequency = 0.01  # Это частота приятная глазу, ее лучше не менять
 deltaTime = 0.0001  # Не может быть больше чем frequency
 # Шаг по времени
-cn_wall = 0.0008
-cs_wall = 0.0008
+cn_wall = 0.01
+cs_wall = 0.01
+if isForce:
+    cn_wall = getForceDamping(cn_wall)
+    cs_wall = getForceDamping(cs_wall)
+
 # коэффициенты демпфирования для стенок
 accelerationX = 0
 accelerationY = 10000
@@ -29,6 +40,7 @@ kineticPlot = []
 potentialPlot = []
 summaryPlot = []
 stepCount = [0]
+
 
 def Buttons():
     but_1 = Button(text='Start',

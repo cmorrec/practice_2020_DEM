@@ -76,7 +76,7 @@ class Ball:
                 return True
         return False
 
-    def expand(self, velocityYLocalNew=None):
+    def expand(self):
         # Находим линию, которую пересекает шарик и изменяем угол шарика по известной формуле:
         # alpha = 2 * beta - alpha
         wall = MoveWall.getInstance()
@@ -97,14 +97,15 @@ class Ball:
                         velocityYLocalWall = 0
                     velocityXLocal += velocityXLocalWall
                     dampeningNormal = velocityXLocal * cn_wall
-                    dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall  # убрать скорость стенки
+                    # dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall  # убрать скорость стенки
+
                     # self.rotationHerzWall(velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall)
 
                     velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
                     # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
-                    velocityYLocalNew = velocityYLocal - sqrt(self.mass * self.velocityTheta ** 2 / self.momentInertial)
-                    self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
-                                        sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
+
+                    self.changeVelocity(atan2(velocityYLocal, velocityXLocalNew + eps) + line.alphaNorm,
+                                        sqrt(velocityXLocalNew ** 2 + velocityYLocal ** 2))
 
     def rotationHerzWall(self, velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall):
         n = sqrt((16 * self.radius) / (9 * pi ** 2 * kn ** 2 * self.radius))

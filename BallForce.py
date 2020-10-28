@@ -19,10 +19,8 @@ def getJerk(velocity, acceleration, k, mass):
 
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
-        midInteractionNum = 9400
-        cnForce = 1 - (1 - cn) ** (1 / midInteractionNum)
-        print(cnForce)
-        csForce = 1 - (1 - cs) ** (1 / midInteractionNum)
+        cnForce = getForceDamping(cn)
+        csForce = getForceDamping(cs)
         Ball.__init__(self, x, y, radius, alpha, velocity, cnForce, csForce, density, color, canvas)
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
@@ -73,10 +71,6 @@ class BallForce(Ball):
             (self.accelerationY + self.accelerationInteractionY - self.jerkY * deltaTime / 2))
 
     def expandForce(self, line, numberOfLine):
-        wall = MoveWall.getInstance()
-
-        isToLine = self.resetForLine(line)
-
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
@@ -88,23 +82,9 @@ class BallForce(Ball):
         velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
         velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
 
-        if wall.flagMove:
-            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocal)
-            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocal)
-            if velocityXLocalWall * velocityXLocal >= 0:
-                velocityXLocalWall *= 0
-            if velocityYLocalWall * velocityYLocal >= 0:
-                velocityYLocalWall *= 0
-        else:
-            velocityXLocalWall = 0
-            velocityYLocalWall = 0
-
         self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
                             sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
         # self.rotationCSWall(velocityYLocal, dampeningTangent)
-        if not isToLine:
-            velocityXLocal *= -1
-            velocityYLocal *= -1
 
         k = 1
         if not self.isInsidePolygon():
@@ -131,6 +111,7 @@ class BallForce(Ball):
     def deleteInteractionLine(self, numberOfLine):
         for interaction in self.interactionArray:
             if (not interaction.isBall) and interaction.number == numberOfLine:
+                # print('wall', interaction.n)
                 self.interactionArray.remove(interaction)
                 break
 

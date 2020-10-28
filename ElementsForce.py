@@ -87,6 +87,14 @@ def deleteInteraction(i, numberOfJ):
             break
 
 
+def deleteInteractionAndPRINT(i, numberOfJ):
+    for interaction in i.interactionArray:
+        if interaction.isBall and interaction.number == numberOfJ:
+            print('ball', interaction.n)
+            i.interactionArray.remove(interaction)
+            break
+
+
 class ElementsForce(Elements):
     def __init__(self, balls, canvas):
         Elements.__init__(self, balls, canvas)

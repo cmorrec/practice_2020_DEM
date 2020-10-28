@@ -7,6 +7,7 @@ class Interaction:
         self.accelerationY = accelerationY
         self.jerkX = jerkX
         self.jerkY = jerkY
+        self.n = 1
 
     def changeAcceleration(self, accelerationX, accelerationY, jerkX, jerkY,  entryNormal):
         self.accelerationX = accelerationX
@@ -14,3 +15,4 @@ class Interaction:
         self.jerkX = jerkX
         self.jerkY = jerkY
         self.entryNormal = entryNormal
+        self.n += 1
