@@ -102,6 +102,7 @@ class BallForce(Ball):
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
         forceNormal = (1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
+        print(accelerationNormal)
         jerk = getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
 

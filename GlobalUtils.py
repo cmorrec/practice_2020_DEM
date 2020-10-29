@@ -16,14 +16,14 @@ def getForceDamping(c):
 
 isForce = True
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
-epsVelocity = 10
-epsAcceleration = 0.1
+epsVelocity = 0.01
+epsAcceleration = 0.01
 eps = 1e-11
 inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
 frequency = 0.01  # Это частота приятная глазу, ее лучше не менять
-deltaTime = 0.0001  # Не может быть больше чем frequency
+deltaTime = 0.0000005  # Не может быть больше чем frequency
 # Шаг по времени
 cn_wall = 0.1
 cs_wall = 0.1
@@ -34,8 +34,8 @@ if isForce:
 # коэффициенты демпфирования для стенок
 accelerationX = 0
 accelerationY = 9.81
-kn = 2 * 1e4
-ks = 1
+kn = 2*10e4
+ks = 0
 # Энергия
 kineticPlot = []
 potentialPlot = []
@@ -88,8 +88,8 @@ def plotter():
     ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
     ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * (stepCount[-1] // 100 * 10)))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1] // 100) * (stepCount[-1] // 100 * 20)))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1]) * (stepCount[-1] // 10 * 10)))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1]) * (stepCount[-1] // 10 * 20)))
     ax.tick_params(axis='both',
                    which='major',
                    direction='inout',
@@ -128,7 +128,7 @@ def plotter():
     ax.grid(which='minor',
             color='gray',
             linestyle=':')
-    ax.set_ylabel('Energy, 10e5 J')
+    ax.set_ylabel('Energy, J')
     ax.set_xlabel('Steps')
     # ax.set_xlim(xmin=nrg[0], xmax=nrg[-1])
     fig.tight_layout()
