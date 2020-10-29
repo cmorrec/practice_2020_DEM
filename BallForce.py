@@ -17,6 +17,14 @@ def getJerk(velocity, acceleration, k, mass):
     return jerk
 
 
+def getAccelerationFieldNormal(alpha):
+    alphaAccelerationXRadianLocal = -alpha
+    alphaAccelerationYRadianLocal = pi / 2 - alpha
+    accelerationFieldNormal = MoveWall.getInstance().accelerationX * cos(
+        alphaAccelerationXRadianLocal) + MoveWall.getInstance().accelerationY * cos(alphaAccelerationYRadianLocal)
+    return accelerationFieldNormal
+
+
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
         cnForce = getForceDamping(cn)
@@ -93,10 +101,11 @@ class BallForce(Ball):
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
         forceNormal = (1) * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
-        jerk = getJerk(velocityXLocal, accelerationNormal, kn, self.mass)
+        jerk = getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
 
-        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, entryNormal, isBall=False, number=numberOfLine)
+        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, entryNormal, isBall=False,
+                                    number=numberOfLine)
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
@@ -128,14 +137,15 @@ class BallForce(Ball):
         self.jerkX = 0
         self.jerkY = 0
 
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal,  entryNormal, isBall, number):
+    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal, entryNormal, isBall, number):
         accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal)
         accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal)
         jerkX = jerkNormal * cos(alphaRadianLocal)
         jerkY = jerkNormal * sin(alphaRadianLocal)
         for interaction in self.interactionArray:
             if interaction.number == number and interaction.isBall == isBall:
-                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, entryNormal)
+                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
+                                               entryNormal)
                 return
         self.addInteraction(
             Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, entryNormal))

@@ -1,4 +1,4 @@
-from BallForce import getJerk
+from BallForce import *
 from Elements import *
 
 
@@ -64,9 +64,9 @@ def methodForce(i, j, numberOfI, numberOfJ):
     # accelerationTangent2 = forceTangent2 / j.mass
 
     # rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
-    jerkI = getJerk(velocity1XLocal, accelerationNormal1, kn, i.mass)
+    jerkI = getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), kn, i.mass)
     accelerationNormal1 += jerkI * deltaTime
-    jerkJ = getJerk(velocity2XLocal, accelerationNormal2, kn, j.mass)
+    jerkJ = getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), kn, j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
     i.saveAccelerationLength(gama, accelerationNormal1, jerkI, entryNormal, isBall=True, number=numberOfJ)
