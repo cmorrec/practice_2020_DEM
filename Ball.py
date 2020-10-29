@@ -27,17 +27,19 @@ class Ball:
         self.velocityY = velocity * sin(self.alphaRadian)
         self.velocityTheta = 0
         self.canvas = canvas
-        self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
-        self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,
-                                      fill="black")
+        self.id = canvas.create_oval(displayRatio * (x - radius), displayRatio * (y - radius),
+                                     displayRatio * (x + radius), displayRatio * (y + radius), fill=color)
+        self.id2 = canvas.create_line(displayRatio * x, displayRatio * y, displayRatio * (x + radius * cos(self.theta)),
+                                      displayRatio * (y + radius * sin(self.theta)), width=2, fill="black")
         self.isCrossAnything = False
 
     def canvasMove(self):
-        self.canvas.move(self.id, self.x - self.xLastDraw, self.y - self.yLastDraw)
+        self.canvas.move(self.id, displayRatio * (self.x - self.xLastDraw), displayRatio * (self.y - self.yLastDraw))
 
     def rotationIndicator(self):
-        self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
-                           self.y + self.radius * sin(self.theta))
+        self.canvas.coords(self.id2, displayRatio * self.x, displayRatio * self.y,
+                           displayRatio * (self.x + self.radius * cos(self.theta)),
+                           displayRatio * (self.y + self.radius * sin(self.theta)))
 
     def draw(self):
         self.canvasMove()  # прорисовка движения

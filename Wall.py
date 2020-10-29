@@ -36,7 +36,8 @@ class Wall:
         self.lines = np.array(lines)
         self.canvas = canvas
         for line in self.lines:
-            line.setID(canvas.create_line(line.startX1, line.startY1, line.startX2, line.startY2, fill=color))
+            line.setID(canvas.create_line(displayRatio * line.startX1, displayRatio * line.startY1,
+                                          displayRatio * line.startX2, displayRatio * line.startY2, fill=color))
         Wall.__instance = self
 
         def __new__(cls):

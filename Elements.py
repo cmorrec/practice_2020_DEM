@@ -123,7 +123,7 @@ class Elements:
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
-        summaryPlot.append(energyCount / 1e5)
+        summaryPlot.append(energyCount)
         return energyCount
 
     def energyKinetic(self):
@@ -131,7 +131,7 @@ class Elements:
         for ball in self.balls:
             energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
                     ball.velocityTheta ** 2)
-        kineticPlot.append(energyCount / 1e5)
+        kineticPlot.append(energyCount)
         return energyCount
 
     def energyPotential(self):
@@ -140,9 +140,9 @@ class Elements:
             energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
             if isForce:
                 for interaction in ball.interactionArray:
-                    energyCount += kn * interaction.entryNormal ** 2 / 2
+                    energyCount += (kn * interaction.entryNormal ** 2) / 2
 
-        potentialPlot.append(energyCount / 1e5)
+        potentialPlot.append(energyCount)
         return energyCount
 
     def draw(self):

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from PIL import ImageTk
 
+displayRatio = 1000
 midInteractionNum = 600
 
 
@@ -32,9 +33,9 @@ if isForce:
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 10000
-kn = 2 * 1e7
-ks = 1 * 1e1
+accelerationY = 9.81
+kn = 2 * 1e4
+ks = 1
 # Энергия
 kineticPlot = []
 potentialPlot = []

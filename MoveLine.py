@@ -10,8 +10,8 @@ class MoveLine(Line):
         self.startY2 = coordinate2.y
         self.id = 0
 
-    def setID(self, id):
-        self.id = id
+    def setID(self, idx):
+        self.id = idx
 
     def setCoordinates(self, coordinate1, coordinate2):
         self.x1 = coordinate1.x

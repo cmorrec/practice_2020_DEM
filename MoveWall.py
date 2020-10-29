@@ -36,7 +36,7 @@ class MoveWall(Wall):
 
     def draw(self):
         for i in range(len(self.lines)):
-            self.canvas.move(self.lines[i].id, self.deltaX, self.deltaY)
+            self.canvas.move(self.lines[i].id, displayRatio * self.deltaX, displayRatio * self.deltaY)
             # прорисовка движения стенки
         self.deltaX = 0
         self.deltaY = 0
@@ -67,27 +67,27 @@ class MoveWall(Wall):
 
     def upVelocity(self, event):
         if self.velocityY >= 0:
-            self.changeVelocityY(10)
+            self.changeVelocityY(0.010)
         else:
-            self.changeVelocityY(-10)
+            self.changeVelocityY(-0.010)
 
     def downVelocity(self, event):
         if self.velocityY >= 0:
-            self.changeVelocityY(-10)
+            self.changeVelocityY(-0.010)
         else:
-            self.changeVelocityY(10)
+            self.changeVelocityY(0.010)
 
     def rightVelocity(self, event):
         if self.velocityX >= 0:
-            self.changeVelocityX(10)
+            self.changeVelocityX(0.010)
         else:
-            self.changeVelocityX(-10)
+            self.changeVelocityX(-0.010)
 
     def leftVelocity(self, event):
         if self.velocityX >= 0:
-            self.changeVelocityX(-10)
+            self.changeVelocityX(-0.010)
         else:
-            self.changeVelocityX(10)
+            self.changeVelocityX(0.010)
 
     def changeVelocityX(self, decrement):
         self.velocityX += decrement

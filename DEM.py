@@ -54,8 +54,8 @@ yCoordinates = []
 for coordinate in coordinatesFromFile:
     xCoordinates.append(coordinate.x)
     yCoordinates.append(coordinate.y)
-mWidth = max(xCoordinates) - min(xCoordinates) + absXWall
-mHeight = max(yCoordinates) - min(yCoordinates) + absYWall
+mWidth = displayRatio * (max(xCoordinates) - min(xCoordinates) + absXWall)
+mHeight = displayRatio * (max(yCoordinates) - min(yCoordinates) + absYWall)
 
 tk = Tk()
 tk.title('DEM')
