@@ -28,6 +28,7 @@ def getAccelerationFieldNormal(alpha):
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
         cnForce = getForceDamping(cn)
+        # print(cnForce)
         csForce = getForceDamping(cs)
         Ball.__init__(self, x, y, radius, alpha, velocity, cnForce, csForce, density, color, canvas)
         self.accelerationInteractionX = 0

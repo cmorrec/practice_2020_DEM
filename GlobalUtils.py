@@ -7,10 +7,10 @@ import matplotlib.ticker as ticker
 from PIL import ImageTk
 
 displayRatio = 1000
-midInteractionNum = 600
 
 
 def getForceDamping(c):
+    midInteractionNum = 1000
     return 1 - (1 - c) ** (1 / midInteractionNum)
 
 
@@ -25,8 +25,8 @@ inf = 1e11
 frequency = 0.01  # Это частота приятная глазу, ее лучше не менять
 deltaTime = 0.0001  # Не может быть больше чем frequency
 # Шаг по времени
-cn_wall = 0.01
-cs_wall = 0.01
+cn_wall = 0.1
+cs_wall = 0.1
 if isForce:
     cn_wall = getForceDamping(cn_wall)
     cs_wall = getForceDamping(cs_wall)
