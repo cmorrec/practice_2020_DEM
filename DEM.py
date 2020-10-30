@@ -112,17 +112,16 @@ buttons[2].grid(row=1, column=2, padx=3)
 tk.update_idletasks()
 tk.update()
 
-step = max(int(frequency / deltaTime), 1)
-i = 0
+steps = 0
 elements.begin()
-while not elements.starts:
+while True:
+    start_time = time.time()
     if elements.started:
-        elements.move()
-        if abs(i - step) < eps:
-            elements.draw()
-    if abs(i - step) < eps:
-        tk.update_idletasks()
-        tk.update()
-    i = (i % step) + 1
-
-saveResults(elements)
+        for i in range(step):
+            elements.move()
+        print("--- %s seconds ---" % (time.time() - start_time))
+    steps += step
+    elements.draw()
+    tk.update_idletasks()
+    tk.update()
+    print("+++ %s seconds +++" % (time.time() - start_time))
