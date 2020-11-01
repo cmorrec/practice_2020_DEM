@@ -115,13 +115,13 @@ tk.update()
 steps = 0
 elements.begin()
 while True:
-    start_time = time.time()
+    # start_time = time.time()
     if elements.started:
         for i in range(step):
             elements.move()
-        print("--- %s seconds ---" % (time.time() - start_time))
+        # print("--- %s seconds ---" % (time.time() - start_time))
     steps += step
     elements.draw()
     tk.update_idletasks()
     tk.update()
-    print("+++ %s seconds +++" % (time.time() - start_time))
+    # print("+++ %s seconds +++" % (time.time() - start_time))

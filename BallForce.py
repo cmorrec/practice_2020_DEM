@@ -122,7 +122,7 @@ class BallForce(Ball):
     def deleteInteractionLine(self, numberOfLine):
         for interaction in self.interactionArray:
             if (not interaction.isBall) and interaction.number == numberOfLine:
-                # print('wall', interaction.n)
+                wallInteraction.append(interaction.n)
                 self.interactionArray.remove(interaction)
                 break
 

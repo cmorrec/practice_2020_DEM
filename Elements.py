@@ -90,7 +90,6 @@ def method(i, j):
 class Elements:
     def __init__(self, balls, canvas):
         self.balls = balls
-        self.starts = False
         self.started = False
         self.canvas = canvas
         self.startEnergy = self.energy()

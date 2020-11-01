@@ -7,10 +7,10 @@ import matplotlib.ticker as ticker
 from PIL import ImageTk
 
 displayRatio = 1000
+midInteractionNum = 1000
 
 
 def getForceDamping(c):
-    midInteractionNum = 1000
     return 1 - (1 - c) ** (1 / midInteractionNum)
 
 
@@ -23,7 +23,7 @@ inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
 step = 100
-deltaTime = 1*1e-5  # 5*1e-7
+deltaTime = 1 * 1e-5  # 5*1e-7
 # Шаг по времени
 cn_wall = 0.1
 cs_wall = 0.1
@@ -34,12 +34,14 @@ if isForce:
 # коэффициенты демпфирования для стенок
 accelerationX = 0
 accelerationY = 9.81
-kn = 2*1e5
+kn = 2 * 1e5
 ks = 0
 # Энергия
 kineticPlot = []
 potentialPlot = []
 summaryPlot = []
+wallInteraction = []
+ballInteraction = []
 stepCount = [0]
 
 
@@ -62,8 +64,32 @@ def Buttons():
     return buttons
 
 
+def saveInteraction():
+    linesEndFile = ['middle num of interaction = ' + str(midInteractionNum)]
+    if len(wallInteraction) > 0:
+        linesEndFile.append(
+            'wall\tmin = ' + str(min(wallInteraction)) + '\tmax = ' + str(max(wallInteraction)) + '\tmiddle = ' + str(
+                sum(wallInteraction) / len(wallInteraction)) + '\tlen = ' + str(len(wallInteraction)))
+    if len(ballInteraction) > 0:
+        linesEndFile.append(
+            'ball\tmin = ' + str(min(ballInteraction)) + '\tmax = ' + str(max(ballInteraction)) + '\tmiddle = ' + str(
+                sum(ballInteraction) / len(ballInteraction)) + '\tlen = ' + str(len(ballInteraction)))
+    if len(wallInteraction) > 0 and len(ballInteraction) > 0:
+        linesEndFile.append('all\tmin = ' + str(min(min(wallInteraction), min(ballInteraction))) + '\tmax = ' + str(
+            max(max(wallInteraction), max(ballInteraction))) + '\tmiddle = ' + str(
+            (sum(ballInteraction) + sum(wallInteraction)) / (
+                        len(ballInteraction) + len(wallInteraction))) + '\tlen = ' + str(
+            len(ballInteraction) + len(wallInteraction)))
+    ballsInteractionFile = open('balls_end_interaction.txt', 'w')
+    for line in linesEndFile:
+        ballsInteractionFile.write(line + '\n')
+    ballsInteractionFile.close()
+
+
 def saveResults(elements):
     # Запись результатов в файл
+    if isForce:
+        saveInteraction()
     ballsEndFile = open('balls_end.txt', 'w')
     linesEndFile = ['\t\tx\t\t\t\t\ty\t\tradius\t\talpha\t\t\tvelocity\t\tacceleration']
     for ball in elements.balls:

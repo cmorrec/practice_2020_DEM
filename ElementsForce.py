@@ -83,14 +83,11 @@ def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить �
 def deleteInteraction(i, numberOfJ):
     for interaction in i.interactionArray:
         if interaction.isBall and interaction.number == numberOfJ:
-            i.interactionArray.remove(interaction)
-            break
-
-
-def deleteInteractionAndPRINT(i, numberOfJ):
-    for interaction in i.interactionArray:
-        if interaction.isBall and interaction.number == numberOfJ:
-            print('ball', interaction.n)
+            if len(ballInteraction) > 0:
+                if ballInteraction[len(ballInteraction) - 1] != interaction.n:
+                    ballInteraction.append(interaction.n)
+            else:
+                ballInteraction.append(interaction.n)
             i.interactionArray.remove(interaction)
             break
 
