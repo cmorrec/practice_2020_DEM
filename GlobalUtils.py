@@ -69,17 +69,16 @@ def saveInteraction():
     if len(wallInteraction) > 0:
         linesEndFile.append(
             'wall\tmin = ' + str(min(wallInteraction)) + '\tmax = ' + str(max(wallInteraction)) + '\tmiddle = ' + str(
-                sum(wallInteraction) / len(wallInteraction)) + '\tlen = ' + str(len(wallInteraction)))
+                round(sum(wallInteraction) / len(wallInteraction), 1)) + '\tlen = ' + str(len(wallInteraction)))
     if len(ballInteraction) > 0:
         linesEndFile.append(
             'ball\tmin = ' + str(min(ballInteraction)) + '\tmax = ' + str(max(ballInteraction)) + '\tmiddle = ' + str(
-                sum(ballInteraction) / len(ballInteraction)) + '\tlen = ' + str(len(ballInteraction)))
+                round(sum(ballInteraction) / len(ballInteraction), 1)) + '\tlen = ' + str(len(ballInteraction)))
     if len(wallInteraction) > 0 and len(ballInteraction) > 0:
-        linesEndFile.append('all\tmin = ' + str(min(min(wallInteraction), min(ballInteraction))) + '\tmax = ' + str(
+        linesEndFile.append('all \tmin = ' + str(min(min(wallInteraction), min(ballInteraction))) + '\tmax = ' + str(
             max(max(wallInteraction), max(ballInteraction))) + '\tmiddle = ' + str(
-            (sum(ballInteraction) + sum(wallInteraction)) / (
-                        len(ballInteraction) + len(wallInteraction))) + '\tlen = ' + str(
-            len(ballInteraction) + len(wallInteraction)))
+            round((sum(ballInteraction) + sum(wallInteraction)) / (len(ballInteraction) + len(wallInteraction)),
+                  1)) + '\tlen = ' + str(len(ballInteraction) + len(wallInteraction)))
     ballsInteractionFile = open('balls_end_interaction.txt', 'w')
     for line in linesEndFile:
         ballsInteractionFile.write(line + '\n')
