@@ -58,8 +58,8 @@ class Ball:
             self.comeBack()
         # Обновление направлений скоростей
         self.addVelocityMethod()
-        self.x += self.velocityX * deltaTime + 0.5 * self.accelerationX * (deltaTime ** 2)
-        self.y += self.velocityY * deltaTime + 0.5 * self.accelerationY * (deltaTime ** 2)
+        self.x += self.velocityX * deltaTime - 0.5 * self.accelerationX * (deltaTime ** 2)
+        self.y += self.velocityY * deltaTime - 0.5 * self.accelerationY * (deltaTime ** 2)
         self.theta += self.velocityTheta % (2 * pi)
 
     def addVelocityMethod(self):
