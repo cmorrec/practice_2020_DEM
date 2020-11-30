@@ -1,5 +1,5 @@
 class Interaction:
-    def __init__(self, isBall, number, accelerationX, accelerationY, jerkX, jerkY, entryNormal):
+    def __init__(self, isBall, number, accelerationX, accelerationY, jerkX, jerkY, entryNormal, accelerationAngular):
         self.isBall = isBall
         self.number = number
         self.entryNormal = entryNormal
@@ -7,12 +7,14 @@ class Interaction:
         self.accelerationY = accelerationY
         self.jerkX = jerkX
         self.jerkY = jerkY
+        self.accelerationAngular = accelerationAngular
         self.n = 1
 
-    def changeAcceleration(self, accelerationX, accelerationY, jerkX, jerkY,  entryNormal):
+    def changeAcceleration(self, accelerationX, accelerationY, jerkX, jerkY, entryNormal, accelerationAngular):
         self.accelerationX = accelerationX
         self.accelerationY = accelerationY
         self.jerkX = jerkX
         self.jerkY = jerkY
         self.entryNormal = entryNormal
+        self.accelerationAngular = accelerationAngular
         self.n += 1

@@ -26,6 +26,7 @@ class Ball:
         self.velocityX = velocity * cos(self.alphaRadian)
         self.velocityY = velocity * sin(self.alphaRadian)
         self.velocityTheta = 0
+        self.accelerationTheta = 0
         self.canvas = canvas
         self.id = canvas.create_oval(displayRatio * (x - radius), displayRatio * (y - radius),
                                      displayRatio * (x + radius), displayRatio * (y + radius), fill=color)
@@ -60,7 +61,7 @@ class Ball:
         self.addVelocityMethod()
         self.x += self.velocityX * deltaTime - 0.5 * self.accelerationX * (deltaTime ** 2)
         self.y += self.velocityY * deltaTime - 0.5 * self.accelerationY * (deltaTime ** 2)
-        self.theta += self.velocityTheta % (2 * pi)
+        self.theta = (self.theta + self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (deltaTime ** 2)) % (2 * pi)
 
     def addVelocityMethod(self):
         self.addVelocity(self.accelerationX, self.accelerationY)
@@ -211,3 +212,7 @@ class Ball:
         self.velocityY += accelerationY * deltaTime
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
                             sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
+
+    def addVelocityAngular(self, accelerationTheta):
+        self.velocityTheta += accelerationTheta * deltaTime
+        # print('self.velocityTheta, accelerationTheta', self.velocityTheta, accelerationTheta)

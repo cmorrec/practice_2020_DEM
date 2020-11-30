@@ -23,13 +23,16 @@ inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
 step = 100
-deltaTime = 1 * 1e-5  # 5*1e-7
+deltaTime = 1 * 1e-5
 # Шаг по времени
 cn_wall = 0.1
 cs_wall = 0.1
 if isForce:
     cn_wall = getForceDamping(cn_wall)
     cs_wall = getForceDamping(cs_wall)
+
+coefficientOfFrictionSliding = deltaTime / 10
+coefficientOfFrictionRolling = deltaTime / 10
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0

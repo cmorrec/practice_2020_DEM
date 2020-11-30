@@ -79,6 +79,11 @@ class BallForce(Ball):
             (self.accelerationX + self.accelerationInteractionX - self.jerkX * deltaTime / 2),
             (self.accelerationY + self.accelerationInteractionY - self.jerkY * deltaTime / 2))
 
+        self.accelerationTheta = 0
+        for interaction in self.interactionArray:
+            self.accelerationTheta += interaction.accelerationAngular
+        self.addVelocityAngular(self.accelerationTheta)
+
     def expandForce(self, line, numberOfLine):
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
 
@@ -106,7 +111,7 @@ class BallForce(Ball):
         jerk = getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
 
-        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, entryNormal, isBall=False,
+        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, entryNormal, 0, isBall=False,
                                     number=numberOfLine)
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
@@ -126,20 +131,23 @@ class BallForce(Ball):
                 self.interactionArray.remove(interaction)
                 break
 
-    def setAcceleration(self):
-        # В силовом методе мы не отключаем поле ускорений, в этом нет необходимости
-        # Но необходимо отключать ускорение от взаимодействия в тот момент,
-        # когда шар ни с кем не пересекается и находится внутри стенки
-        if (not self.isCrossAnything) and self.isInsidePolygon():
-            self.removeAccelerationBall()
+    # Пока не понял, но кажется эти методы лишние
+    #
+    # def setAcceleration(self):
+    #     # В силовом методе мы не отключаем поле ускорений, в этом нет необходимости
+    #     # Но необходимо отключать ускорение от взаимодействия в тот момент,
+    #     # когда шар ни с кем не пересекается и находится внутри стенки
+    #     if (not self.isCrossAnything) and self.isInsidePolygon():
+    #         self.removeAccelerationBall()
+    #
+    # def removeAccelerationBall(self):
+    #     self.accelerationInteractionX = 0
+    #     self.accelerationInteractionY = 0
+    #     self.jerkX = 0
+    #     self.jerkY = 0
 
-    def removeAccelerationBall(self):
-        self.accelerationInteractionX = 0
-        self.accelerationInteractionY = 0
-        self.jerkX = 0
-        self.jerkY = 0
-
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal, entryNormal, isBall, number):
+    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal, entryNormal, accelerationAngular,
+                               isBall, number):
         accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal)
         accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal)
         jerkX = jerkNormal * cos(alphaRadianLocal)
@@ -147,10 +155,11 @@ class BallForce(Ball):
         for interaction in self.interactionArray:
             if interaction.number == number and interaction.isBall == isBall:
                 interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
-                                               entryNormal)
+                                               entryNormal, accelerationAngular)
                 return
         self.addInteraction(
-            Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, entryNormal))
+            Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, entryNormal,
+                        accelerationAngular))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)
