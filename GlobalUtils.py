@@ -31,8 +31,8 @@ if isForce:
     cn_wall = getForceDamping(cn_wall)
     cs_wall = getForceDamping(cs_wall)
 
-coefficientOfFrictionSliding = deltaTime / 10
-coefficientOfFrictionRolling = deltaTime / 10
+coefficientOfFrictionSliding = 0.1 * deltaTime / 5
+coefficientOfFrictionRolling = 0.1 * deltaTime / 10
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0

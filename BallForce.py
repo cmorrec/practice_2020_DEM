@@ -110,9 +110,35 @@ class BallForce(Ball):
         # print(accelerationNormal)
         jerk = getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
+        if velocityYLocal > 0:
+            signVelocityTangent = 1
+        else:
+            signVelocityTangent = -1
+        if self.velocityTheta > 0:
+            signVelocityAngular = 1
+        else:
+            signVelocityAngular = -1
+        accelerationAngular, forceSliding = self.findAccelerationAngularWall(signVelocityTangent, forceNormal,
+                               self.radius, signVelocityAngular)
+        accelerationTangent = forceSliding / self.mass
 
-        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, jerk, entryNormal, 0, isBall=False,
+        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal, accelerationAngular, isBall=False,
                                     number=numberOfLine)
+
+    def findAccelerationAngularWall(self, signVelocityRelativeTangent, forceNormal,
+                                radiusEffective, signVelocityRelativeAngular):
+        forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent * (-1)
+        momentSliding = forceSliding * self.radius
+        if self.velocityTheta == 0:
+            momentRolling = 0
+        else:
+            momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular
+        accelerationAngular = (momentRolling + momentSliding) / self.momentInertial
+        # print('forceSliding', forceSliding)
+        # print('momentSliding', momentSliding)
+        # print('momentRolling', momentRolling)
+        # print('accelerationAngular',accelerationAngular, '\n')
+        return accelerationAngular, forceSliding
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
@@ -146,10 +172,10 @@ class BallForce(Ball):
     #     self.jerkX = 0
     #     self.jerkY = 0
 
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, jerkNormal, entryNormal, accelerationAngular,
+    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal, accelerationAngular,
                                isBall, number):
-        accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal)
-        accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal)
+        accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(alphaRadianLocal)
+        accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(alphaRadianLocal)
         jerkX = jerkNormal * cos(alphaRadianLocal)
         jerkY = jerkNormal * sin(alphaRadianLocal)
         for interaction in self.interactionArray:
