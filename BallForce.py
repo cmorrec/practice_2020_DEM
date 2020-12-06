@@ -119,14 +119,14 @@ class BallForce(Ball):
         else:
             signVelocityAngular = -1
         accelerationAngular, forceSliding = self.findAccelerationAngularWall(signVelocityTangent, forceNormal,
-                               self.radius, signVelocityAngular)
+                                                                             self.radius, signVelocityAngular)
         accelerationTangent = forceSliding / self.mass
 
-        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal, accelerationAngular, isBall=False,
-                                    number=numberOfLine)
+        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
+                                    accelerationAngular, isBall=False, number=numberOfLine)
 
     def findAccelerationAngularWall(self, signVelocityRelativeTangent, forceNormal,
-                                radiusEffective, signVelocityRelativeAngular):
+                                    radiusEffective, signVelocityRelativeAngular):
         forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent * (-1)
         momentSliding = forceSliding * self.radius
         if self.velocityTheta == 0:
@@ -138,6 +138,7 @@ class BallForce(Ball):
         # print('momentSliding', momentSliding)
         # print('momentRolling', momentRolling)
         # print('accelerationAngular',accelerationAngular, '\n')
+        return 0, 0
         return accelerationAngular, forceSliding
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
@@ -172,10 +173,13 @@ class BallForce(Ball):
     #     self.jerkX = 0
     #     self.jerkY = 0
 
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal, accelerationAngular,
+    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal,
+                               accelerationAngular,
                                isBall, number):
-        accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(alphaRadianLocal)
-        accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(alphaRadianLocal)
+        accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
+            alphaRadianLocal)
+        accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(
+            alphaRadianLocal)
         jerkX = jerkNormal * cos(alphaRadianLocal)
         jerkY = jerkNormal * sin(alphaRadianLocal)
         for interaction in self.interactionArray:
