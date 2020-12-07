@@ -36,7 +36,7 @@ coefficientOfFrictionRolling = 0.1 * deltaTime / 10
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 9.81
+accelerationY = 0
 kn = 2 * 1e5
 ks = 0
 # Энергия
@@ -168,4 +168,4 @@ def dampeningVelocity(dampening, velocity):
     if abs(velocity) - abs(dampening) > 0:
         return velocity - dampening
     else:
-        return 0
+         return 0

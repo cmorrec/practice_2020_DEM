@@ -78,15 +78,15 @@ def methodForce(i, j, numberOfI, numberOfJ):
     radiusEffective = ((1 / i.radius) + (1 / j.radius)) ** (-1)
 
     # print(numberOfI)
-    accelerationAngular1, forceSliding1 = findAccelerationAngular(signVelocityRelativeTangent, abs(forceNormal1), 1, i,
+    accelerationAngular1, forceSliding1, momentRolling1 = findAccelerationAngular(signVelocityRelativeTangent, abs(forceNormal1), 1, i,
                                                                   radiusEffective,
                                                                   signVelocityRelativeAngular)
     # print(numberOfJ)
-    accelerationAngular2, forceSliding2 = findAccelerationAngular(-1 * signVelocityRelativeTangent, abs(forceNormal2),
+    accelerationAngular2, forceSliding2, momentRolling2 = findAccelerationAngular(-1 * signVelocityRelativeTangent, abs(forceNormal2),
                                                                   1, j, radiusEffective,
                                                                   -1 * signVelocityRelativeAngular)
-    accelerationTangent1 = forceSliding1 / i.mass
-    accelerationTangent2 = forceSliding2 / j.mass
+    accelerationTangent1 = (forceSliding1 + momentRolling1 / i.radius) / i.mass
+    accelerationTangent2 = (forceSliding2 + momentRolling2 / j.radius) / j.mass
 
     i.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkI, entryNormal, accelerationAngular1,
                              isBall=True, number=numberOfJ)
@@ -105,7 +105,7 @@ def findAccelerationAngular(signVelocityRelativeTangent, forceNormal, signVeloci
     # print('momentRolling', momentRolling)
     # print()
     # print('accelerationAngular',accelerationAngular, '\n')
-    return accelerationAngular, forceSliding
+    return accelerationAngular, forceSliding, momentRolling
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
