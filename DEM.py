@@ -9,7 +9,8 @@ ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
 ballStartFileName4Plate = './ball_sets/4_plate.txt'
 ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
 ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
-ballStartFileNameTest2 = './ball_sets/test2.txt'
+ballStartFileNameTest1 = './ball_sets/test1_1.txt'
+ballStartFileNameTest2 = './ball_sets/test2_1.txt'
 
 coordinatesFileNameCircle = './walls_dynamic/circle.txt'
 coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
@@ -21,7 +22,7 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileNameTest2
+ballStartFileName = ballStartFileNameTest1
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -72,7 +73,8 @@ canvas.grid(row=0, columnspan=3)
 buttons = Buttons()
 tk.update()
 
-wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, velocityXWall, velocityYWall,
+wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, velocityXWall,
+                velocityYWall,
                 absXWall, absYWall)
 
 ballsStartFile = open(ballStartFileName, 'r')
@@ -92,10 +94,11 @@ for line in ballsStartFile:
     if len(data) > 0:
         if isForce:
             ballsFromFile.append(
-                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
+                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], color,
+                          canvas))
         else:
             ballsFromFile.append(
-                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], color, canvas))
+                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], color, canvas))
 
 ballsStartFile.close()
 

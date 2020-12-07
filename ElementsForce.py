@@ -78,15 +78,13 @@ def methodForce(i, j, numberOfI, numberOfJ):
     radiusEffective = ((1 / i.radius) + (1 / j.radius)) ** (-1)
 
     # print(numberOfI)
-    accelerationAngular1, forceSliding1, momentRolling1 = findAccelerationAngular(signVelocityRelativeTangent, abs(forceNormal1), 1, i,
-                                                                  radiusEffective,
-                                                                  signVelocityRelativeAngular)
+    accelerationAngular1, accelerationTangent1 = findAccelerationAngular(signVelocityRelativeTangent, abs(forceNormal1),
+                                                                         1, i, radiusEffective,
+                                                                         signVelocityRelativeAngular)
     # print(numberOfJ)
-    accelerationAngular2, forceSliding2, momentRolling2 = findAccelerationAngular(-1 * signVelocityRelativeTangent, abs(forceNormal2),
-                                                                  1, j, radiusEffective,
-                                                                  -1 * signVelocityRelativeAngular)
-    accelerationTangent1 = (forceSliding1 + momentRolling1 / i.radius) / i.mass
-    accelerationTangent2 = (forceSliding2 + momentRolling2 / j.radius) / j.mass
+    accelerationAngular2, accelerationTangent2 = findAccelerationAngular(-1 * signVelocityRelativeTangent,
+                                                                         abs(forceNormal2), 1, j, radiusEffective,
+                                                                         -1 * signVelocityRelativeAngular)
 
     i.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkI, entryNormal, accelerationAngular1,
                              isBall=True, number=numberOfJ)
@@ -98,14 +96,18 @@ def findAccelerationAngular(signVelocityRelativeTangent, forceNormal, signVeloci
                             radiusEffective, signVelocityRelativeAngular):
     forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent
     momentSliding = forceSliding * ball.radius * signVelocityTangentRelativeAngular
+
     momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular
-    accelerationAngular = (momentSliding) / ball.momentInertial
+    forceRolling = momentRolling / ball.radius
+
+    accelerationAngular = (momentSliding + momentRolling) / ball.momentInertial
+    accelerationTangent = (forceSliding + forceRolling) / ball.mass
     # print('forceSliding', forceSliding)
     # print('momentSliding', momentSliding)
     # print('momentRolling', momentRolling)
     # print()
     # print('accelerationAngular',accelerationAngular, '\n')
-    return accelerationAngular, forceSliding, momentRolling
+    return accelerationAngular, accelerationTangent
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных

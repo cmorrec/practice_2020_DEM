@@ -5,7 +5,7 @@ from MoveWall import *
 
 
 class Ball:
-    def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
+    def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas):
         self.x = x
         self.y = y
         self.xLastDraw = x
@@ -25,7 +25,7 @@ class Ball:
         self.alphaRadian = alpha * pi / 180
         self.velocityX = velocity * cos(self.alphaRadian)
         self.velocityY = velocity * sin(self.alphaRadian)
-        self.velocityTheta = 0.0001
+        self.velocityTheta = velocityTheta
         self.accelerationTheta = 0
         self.canvas = canvas
         self.id = canvas.create_oval(displayRatio * (x - radius), displayRatio * (y - radius),
@@ -215,5 +215,5 @@ class Ball:
 
     def addVelocityAngular(self, accelerationTheta):
         self.velocityTheta += accelerationTheta * deltaTime
-        self.velocityTheta = dampeningVelocity(0.00001*self.velocityTheta, self.velocityTheta)
+        # self.velocityTheta = dampeningVelocity(0.00001*self.velocityTheta, self.velocityTheta)
         # print('self.velocityTheta, accelerationTheta', self.velocityTheta, accelerationTheta)

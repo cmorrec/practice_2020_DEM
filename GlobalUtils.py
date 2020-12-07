@@ -168,4 +168,4 @@ def dampeningVelocity(dampening, velocity):
     if abs(velocity) - abs(dampening) > 0:
         return velocity - dampening
     else:
-         return 0
+        return 0

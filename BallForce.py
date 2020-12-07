@@ -26,15 +26,15 @@ def getAccelerationFieldNormal(alpha):
 
 
 class BallForce(Ball):
-    def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
+    def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas):
         cnForce = getForceDamping(cn)
         # print(cnForce)
         csForce = getForceDamping(cs)
-        Ball.__init__(self, x, y, radius, alpha, velocity, cnForce, csForce, density, color, canvas)
+        Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cnForce, csForce, density, color, canvas)
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
-        self.coefficientOfFrictionRolling = 0
-        self.coefficientOfFrictionSliding = 0
+        # self.coefficientOfFrictionRolling = 0
+        # self.coefficientOfFrictionSliding = 0
         self.jerkX = 0
         self.jerkY = 0
         self.interactionArray = []
@@ -120,33 +120,39 @@ class BallForce(Ball):
             signVelocityAngular = 1
         else:
             signVelocityAngular = -1
-        accelerationAngular, forceSliding, momentRolling = self.findAccelerationAngularWall(velocityYLocal, signVelocityTangent, forceNormal,
-                                                                             self.radius, signVelocityAngular)
-        accelerationTangent = (forceSliding + momentRolling/self.radius) / self.mass
-        print('accelerationTangent', accelerationTangent)
-        self.findFrictionCoefficients(velocityYLocal)
+        accelerationAngular, accelerationTangent = self.findAccelerationAngularWall(velocityYLocal, signVelocityTangent,
+                                                                                    forceNormal, self.radius,
+                                                                                    signVelocityAngular)
+
+        # print('accelerationTangent', accelerationTangent)
+        # self.findFrictionCoefficients(velocityYLocal)
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
                                     accelerationAngular, isBall=False, number=numberOfLine)
 
-    def findFrictionCoefficients(self, velocityYLocal):
-        if abs(velocityYLocal - self.velocityTheta * self.radius) > 0.00000001:
-            self.coefficientOfFrictionSliding = 0.1 * deltaTime / 5
-            self.coefficientOfFrictionRolling = 0.1 * deltaTime / 10
-        else:
-            self.coefficientOfFrictionRolling = 0
-            self.coefficientOfFrictionSliding = 0
+    # def findFrictionCoefficients(self, velocityYLocal):
+    #     if abs(velocityYLocal - self.velocityTheta * self.radius) > 0.00000001:
+    #         self.coefficientOfFrictionSliding = 0.1 * deltaTime / 5
+    #         self.coefficientOfFrictionRolling = 0.1 * deltaTime / 10
+    #     else:
+    #         self.coefficientOfFrictionRolling = 0
+    #         self.coefficientOfFrictionSliding = 0
 
     def findAccelerationAngularWall(self, velocityYLocal, signVelocityRelativeTangent, forceNormal,
                                     radiusEffective, signVelocityRelativeAngular):
 
-        forceSliding = self.coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent * (-1)
+        forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent * (-1)
         momentSliding = forceSliding * self.radius
-        momentRolling = self.coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular
+
+        momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular
+        forceRolling = momentRolling / self.radius
+
         accelerationAngular = (momentRolling + momentSliding) / self.momentInertial
-        print('forceSliding',velocityYLocal - self.velocityTheta * self.radius)
-        print('momentRolling', self.coefficientOfFrictionRolling)
+        accelerationTangent = (forceSliding + forceRolling) / self.mass
+        # print('forceSliding', velocityYLocal - self.velocityTheta * self.radius)
+        # print('momentRolling', self.coefficientOfFrictionRolling)
         # print('accelerationAngular',accelerationAngular, '\n')
-        return accelerationAngular, forceSliding, momentRolling
+        return 0, 0
+        return accelerationAngular, accelerationTangent
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
