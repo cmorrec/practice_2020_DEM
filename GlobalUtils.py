@@ -165,7 +165,7 @@ def plotter():
 
 
 def dampeningVelocity(dampening, velocity):
-    if abs(velocity) - abs(dampening) > 0:
+    if abs(velocity) - abs(dampening) > 0 and abs(velocity) > eps:
         return velocity - dampening
     else:
         return 0

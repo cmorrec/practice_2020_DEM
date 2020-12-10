@@ -69,10 +69,14 @@ def methodForce(i, j, numberOfI, numberOfJ):
 
     if velocity1YLocal - velocity2YLocal > 0:
         signVelocityRelativeTangent = 1
+    elif abs(velocity1YLocal - velocity2YLocal) < eps:
+        signVelocityRelativeTangent = 0
     else:
         signVelocityRelativeTangent = -1
     if i.velocityTheta - j.velocityTheta > 0:
         signVelocityRelativeAngular = 1
+    elif abs(i.velocityTheta - j.velocityTheta) < eps:
+        signVelocityRelativeAngular = 0
     else:
         signVelocityRelativeAngular = -1
     radiusEffective = ((1 / i.radius) + (1 / j.radius)) ** (-1)
@@ -102,6 +106,7 @@ def findAccelerationAngular(signVelocityRelativeTangent, forceNormal, signVeloci
 
     accelerationAngular = (momentSliding + momentRolling) / ball.momentInertial
     accelerationTangent = (forceSliding + forceRolling) / ball.mass
+    print(momentRolling, forceSliding, accelerationAngular, accelerationTangent)
     # print('forceSliding', forceSliding)
     # print('momentSliding', momentSliding)
     # print('momentRolling', momentRolling)

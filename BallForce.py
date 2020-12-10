@@ -189,10 +189,23 @@ class BallForce(Ball):
     def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal,
                                accelerationAngular,
                                isBall, number):
-        accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
-            alphaRadianLocal)
-        accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(
-            alphaRadianLocal)
+        if abs(alphaRadianLocal - 3.141592653589793) < 1e-8:
+            accelerationInteractionX = - accelerationNormal
+            accelerationInteractionY = accelerationTangent
+        elif abs(alphaRadianLocal - 2 * 3.141592653589793) < 1e-8:
+            accelerationInteractionX = accelerationNormal
+            accelerationInteractionY = - accelerationTangent
+        elif abs(alphaRadianLocal - 3.141592653589793/2) < 1e-8:
+            accelerationInteractionX = accelerationTangent
+            accelerationInteractionY = accelerationNormal
+        elif abs(alphaRadianLocal + 3.141592653589793 / 2) < 1e-8:
+            accelerationInteractionX = - accelerationTangent
+            accelerationInteractionY = - accelerationNormal
+        else:
+            accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
+                alphaRadianLocal)
+            accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(
+                alphaRadianLocal)
         jerkX = jerkNormal * cos(alphaRadianLocal)
         jerkY = jerkNormal * sin(alphaRadianLocal)
         for interaction in self.interactionArray:
