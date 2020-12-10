@@ -33,8 +33,6 @@ class BallForce(Ball):
         Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cnForce, csForce, density, color, canvas)
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
-        # self.coefficientOfFrictionRolling = 0
-        # self.coefficientOfFrictionSliding = 0
         self.jerkX = 0
         self.jerkY = 0
         self.interactionArray = []
@@ -125,17 +123,8 @@ class BallForce(Ball):
                                                                                     signVelocityAngular)
 
         # print('accelerationTangent', accelerationTangent)
-        # self.findFrictionCoefficients(velocityYLocal)
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
                                     accelerationAngular, isBall=False, number=numberOfLine)
-
-    # def findFrictionCoefficients(self, velocityYLocal):
-    #     if abs(velocityYLocal - self.velocityTheta * self.radius) > 0.00000001:
-    #         self.coefficientOfFrictionSliding = 0.1 * deltaTime / 5
-    #         self.coefficientOfFrictionRolling = 0.1 * deltaTime / 10
-    #     else:
-    #         self.coefficientOfFrictionRolling = 0
-    #         self.coefficientOfFrictionSliding = 0
 
     def findAccelerationAngularWall(self, velocityYLocal, signVelocityRelativeTangent, forceNormal,
                                     radiusEffective, signVelocityRelativeAngular):
@@ -189,23 +178,12 @@ class BallForce(Ball):
     def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal,
                                accelerationAngular,
                                isBall, number):
-        if abs(alphaRadianLocal - 3.141592653589793) < 1e-8:
-            accelerationInteractionX = - accelerationNormal
-            accelerationInteractionY = accelerationTangent
-        elif abs(alphaRadianLocal - 2 * 3.141592653589793) < 1e-8:
-            accelerationInteractionX = accelerationNormal
-            accelerationInteractionY = - accelerationTangent
-        elif abs(alphaRadianLocal - 3.141592653589793/2) < 1e-8:
-            accelerationInteractionX = accelerationTangent
-            accelerationInteractionY = accelerationNormal
-        elif abs(alphaRadianLocal + 3.141592653589793 / 2) < 1e-8:
-            accelerationInteractionX = - accelerationTangent
-            accelerationInteractionY = - accelerationNormal
-        else:
-            accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
-                alphaRadianLocal)
-            accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(
-                alphaRadianLocal)
+        accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
+            alphaRadianLocal)
+        accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(
+            alphaRadianLocal)
+        accelerationInteractionX = zeroToZero(accelerationInteractionX)
+        accelerationInteractionY = zeroToZero(accelerationInteractionY)
         jerkX = jerkNormal * cos(alphaRadianLocal)
         jerkY = jerkNormal * sin(alphaRadianLocal)
         for interaction in self.interactionArray:
@@ -213,9 +191,8 @@ class BallForce(Ball):
                 interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
                                                entryNormal, accelerationAngular)
                 return
-        self.addInteraction(
-            Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, entryNormal,
-                        accelerationAngular))
+        self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY,
+                                        jerkX, jerkY, entryNormal, accelerationAngular))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)

@@ -73,6 +73,7 @@ def methodForce(i, j, numberOfI, numberOfJ):
         signVelocityRelativeTangent = 0
     else:
         signVelocityRelativeTangent = -1
+
     if i.velocityTheta - j.velocityTheta > 0:
         signVelocityRelativeAngular = 1
     elif abs(i.velocityTheta - j.velocityTheta) < eps:
@@ -81,11 +82,11 @@ def methodForce(i, j, numberOfI, numberOfJ):
         signVelocityRelativeAngular = -1
     radiusEffective = ((1 / i.radius) + (1 / j.radius)) ** (-1)
 
-    # print(numberOfI)
+    print(numberOfI)
     accelerationAngular1, accelerationTangent1 = findAccelerationAngular(signVelocityRelativeTangent, abs(forceNormal1),
                                                                          1, i, radiusEffective,
                                                                          signVelocityRelativeAngular)
-    # print(numberOfJ)
+    print(numberOfJ)
     accelerationAngular2, accelerationTangent2 = findAccelerationAngular(-1 * signVelocityRelativeTangent,
                                                                          abs(forceNormal2), 1, j, radiusEffective,
                                                                          -1 * signVelocityRelativeAngular)
@@ -102,16 +103,19 @@ def findAccelerationAngular(signVelocityRelativeTangent, forceNormal, signVeloci
     momentSliding = forceSliding * ball.radius * signVelocityTangentRelativeAngular
 
     momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular
-    forceRolling = momentRolling / ball.radius
+    forceRolling = 0  # momentRolling / ball.radius
 
     accelerationAngular = (momentSliding + momentRolling) / ball.momentInertial
     accelerationTangent = (forceSliding + forceRolling) / ball.mass
-    print(momentRolling, forceSliding, accelerationAngular, accelerationTangent)
-    # print('forceSliding', forceSliding)
-    # print('momentSliding', momentSliding)
+
+    accelerationAngular = zeroToZero(accelerationAngular)
+    accelerationTangent = zeroToZero(accelerationTangent)
+    # print(momentRolling, forceSliding, accelerationAngular, accelerationTangent)
+    print('forceSliding', forceSliding)
+    print('momentSliding', momentSliding)
     # print('momentRolling', momentRolling)
-    # print()
-    # print('accelerationAngular',accelerationAngular, '\n')
+    print('accelerationAngular', accelerationAngular)
+    print('accelerationTangent', accelerationTangent, '\n')
     return accelerationAngular, accelerationTangent
 
 

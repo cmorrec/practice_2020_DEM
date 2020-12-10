@@ -9,10 +9,15 @@ ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
 ballStartFileName4Plate = './ball_sets/4_plate.txt'
 ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
 ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
-ballStartFileNameTest1_1 = './ball_sets/test1_1.txt'
-ballStartFileNameTest2_1 = './ball_sets/test2_1.txt'
-ballStartFileNameTest2_2 = './ball_sets/test2_2.txt'
-ballStartFileNameTest2_3 = './ball_sets/test2_3.txt'
+
+ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
+ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
+ballStartFileNameTest1_3 = './ball_sets/tests/ball-ball/tests1/test1_3.txt'
+ballStartFileNameTest1_4 = './ball_sets/tests/ball-ball/tests1/test1_4.txt'
+ballStartFileNameTest2_1 = './ball_sets/tests/ball-ball/tests2/test2_1.txt'
+ballStartFileNameTest2_2 = './ball_sets/tests/ball-ball/tests2/test2_2.txt'
+ballStartFileNameTest2_3 = './ball_sets/tests/ball-ball/tests2/test2_3.txt'
+ballStartFileNameTest2_4 = './ball_sets/tests/ball-ball/tests2/test2_4.txt'
 
 coordinatesFileNameCircle = './walls_dynamic/circle.txt'
 coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
@@ -24,7 +29,7 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileNameTest2_3
+ballStartFileName = ballStartFileNameTest1_4
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []

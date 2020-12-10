@@ -31,8 +31,8 @@ if isForce:
     cn_wall = getForceDamping(cn_wall)
     cs_wall = getForceDamping(cs_wall)
 
-coefficientOfFrictionSliding = 0.1 * deltaTime / 5
-coefficientOfFrictionRolling = 0.1 * deltaTime / 10
+coefficientOfFrictionSliding = 0
+coefficientOfFrictionRolling = 0.00001
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
@@ -169,3 +169,10 @@ def dampeningVelocity(dampening, velocity):
         return velocity - dampening
     else:
         return 0
+
+
+def zeroToZero(number):
+    if abs(number) < eps:
+        return 0
+    else:
+        return number
