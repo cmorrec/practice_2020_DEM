@@ -121,9 +121,7 @@ class BallForce(Ball):
         accelerationAngular, accelerationTangent = self.findAccelerationAngularWall(velocityYLocal, signVelocityTangent,
                                                                                     forceNormal, self.radius,
                                                                                     signVelocityAngular)
-        print(accelerationAngular,accelerationTangent)
 
-        # print('accelerationTangent', accelerationTangent)
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
                                     accelerationAngular, isBall=False, number=numberOfLine)
 
@@ -138,9 +136,12 @@ class BallForce(Ball):
 
         accelerationAngular = (momentRolling + momentSliding) / self.momentInertial
         accelerationTangent = (forceSliding + forceRolling) / self.mass
-        # print('forceSliding', velocityYLocal - self.velocityTheta * self.radius)
-        # print('momentRolling', self.coefficientOfFrictionRolling)
-        # print('accelerationAngular',accelerationAngular, '\n')
+        # print('forceSliding', forceSliding)
+        # print('momentSliding', momentSliding)
+        # print('momentRolling', momentRolling)
+        # print('accelerationTangent', accelerationTangent)
+        # print('accelerationAngular', accelerationAngular, '\n')
+        return 0, 0
         return accelerationAngular, accelerationTangent
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
@@ -159,21 +160,6 @@ class BallForce(Ball):
                 wallInteraction.append(interaction.n)
                 self.interactionArray.remove(interaction)
                 break
-
-    # Пока не понял, но кажется эти методы лишние
-    #
-    # def setAcceleration(self):
-    #     # В силовом методе мы не отключаем поле ускорений, в этом нет необходимости
-    #     # Но необходимо отключать ускорение от взаимодействия в тот момент,
-    #     # когда шар ни с кем не пересекается и находится внутри стенки
-    #     if (not self.isCrossAnything) and self.isInsidePolygon():
-    #         self.removeAccelerationBall()
-    #
-    # def removeAccelerationBall(self):
-    #     self.accelerationInteractionX = 0
-    #     self.accelerationInteractionY = 0
-    #     self.jerkX = 0
-    #     self.jerkY = 0
 
     def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal,
                                accelerationAngular,

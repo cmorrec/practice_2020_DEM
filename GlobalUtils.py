@@ -18,7 +18,7 @@ isForce = True
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 0.01
 epsAcceleration = 0.01
-eps = 1e-11
+eps = 1e-9
 inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
@@ -36,7 +36,7 @@ coefficientOfFrictionRolling = 0
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 9.81
+accelerationY = 0
 kn = 2 * 1e5
 ks = 0
 # Энергия
@@ -176,3 +176,12 @@ def zeroToZero(number):
         return 0
     else:
         return number
+
+
+def customSign(number):
+    if abs(number) < eps:
+        return 0
+    elif number > 0:
+        return 1
+    else:
+        return -1
