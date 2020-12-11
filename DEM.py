@@ -14,16 +14,23 @@ ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
 ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
 ballStartFileNameTest1_3 = './ball_sets/tests/ball-ball/tests1/test1_3.txt'
 ballStartFileNameTest1_4 = './ball_sets/tests/ball-ball/tests1/test1_4.txt'
+
 ballStartFileNameTest2_1 = './ball_sets/tests/ball-ball/tests2/test2_1.txt'
 ballStartFileNameTest2_2 = './ball_sets/tests/ball-ball/tests2/test2_2.txt'
 ballStartFileNameTest2_3 = './ball_sets/tests/ball-ball/tests2/test2_3.txt'
 ballStartFileNameTest2_4 = './ball_sets/tests/ball-ball/tests2/test2_4.txt'
+
 ballStartFileNameTest3_1 = './ball_sets/tests/ball-wall/tests3/test3_1.txt'
 ballStartFileNameTest3_2 = './ball_sets/tests/ball-wall/tests3/test3_2.txt'
 ballStartFileNameTest3_3 = './ball_sets/tests/ball-wall/tests3/test3_3.txt'
+ballStartFileNameTest3_4 = './ball_sets/tests/ball-wall/tests3/test3_4.txt'
+ballStartFileNameTest3_5 = './ball_sets/tests/ball-wall/tests3/test3_5.txt'
+
 ballStartFileNameTest4_1 = './ball_sets/tests/ball-wall/tests4/test4_1.txt'
 ballStartFileNameTest4_2 = './ball_sets/tests/ball-wall/tests4/test4_2.txt'
 ballStartFileNameTest4_3 = './ball_sets/tests/ball-wall/tests4/test4_3.txt'
+ballStartFileNameTest4_4 = './ball_sets/tests/ball-wall/tests4/test4_4.txt'
+ballStartFileNameTest4_5 = './ball_sets/tests/ball-wall/tests4/test4_5.txt'
 
 coordinatesFileNameCircle = './walls_dynamic/circle.txt'
 coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
@@ -35,7 +42,7 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileNameTest3_1
+ballStartFileName = ballStartFileNameTest3_2
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []

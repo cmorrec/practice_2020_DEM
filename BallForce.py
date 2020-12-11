@@ -121,6 +121,7 @@ class BallForce(Ball):
         accelerationAngular, accelerationTangent = self.findAccelerationAngularWall(velocityYLocal, signVelocityTangent,
                                                                                     forceNormal, self.radius,
                                                                                     signVelocityAngular)
+        print(accelerationAngular,accelerationTangent)
 
         # print('accelerationTangent', accelerationTangent)
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
@@ -140,7 +141,6 @@ class BallForce(Ball):
         # print('forceSliding', velocityYLocal - self.velocityTheta * self.radius)
         # print('momentRolling', self.coefficientOfFrictionRolling)
         # print('accelerationAngular',accelerationAngular, '\n')
-        return 0, 0
         return accelerationAngular, accelerationTangent
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
