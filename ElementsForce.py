@@ -50,41 +50,40 @@ def methodForce(i, j, numberOfI, numberOfJ):
 
     # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
     entryNormal = (i.radius + j.radius - sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2))
-    # entryTangent1 = (2 * sqrt(abs(2 * i.radius * entryNormal1 - entryNormal1 ** 2)))
-    # entryTangent2 = (2 * sqrt(abs(2 * j.radius * entryNormal2 - entryNormal2 ** 2)))
 
     forceNormal1 = (1) * kn * entryNormal
     forceNormal2 = (-1) * kn * entryNormal
-    # forceTangent1 = ks * entryTangent1
-    # forceTangent2 = ks * entryTangent2
 
     accelerationNormal1 = forceNormal1 / i.mass
     accelerationNormal2 = forceNormal2 / j.mass
 
-    # rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ)
     jerkI = getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), kn, i.mass)
     accelerationNormal1 += jerkI * deltaTime
     jerkJ = getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), kn, j.mass)
     accelerationNormal2 += jerkJ * deltaTime
 
-    velocityYRelative1 = velocity1YLocal - velocity2YLocal - ((i.velocityTheta * i.radius) + (j.velocityTheta * j.radius))
-    velocityYRelative2 = velocity2YLocal - velocity1YLocal - ((i.velocityTheta * i.radius) + (j.velocityTheta * j.radius))
+    print('velocity1YLocal', velocity1YLocal)
+    print('velocity2YLocal', velocity2YLocal)
+    velocityYRelative1 = velocity1YLocal - velocity2YLocal - (
+                (i.velocityTheta * i.radius) + (j.velocityTheta * j.radius))
+    velocityYRelative2 = velocity2YLocal - velocity1YLocal + (
+                (i.velocityTheta * i.radius) + (j.velocityTheta * j.radius))
     signVelocityRelativeTangent1 = customSign(velocityYRelative1)
     signVelocityRelativeTangent2 = customSign(velocityYRelative2)
 
     velocityThetaRelative = i.velocityTheta + j.velocityTheta
-    signVelocityRelativeAngular = customSign(velocityThetaRelative) * (-1)
+    signVelocityRelativeAngular = customSign(velocityThetaRelative)
 
     radiusEffective = ((1 / i.radius) + (1 / j.radius)) ** (-1)
 
     print(numberOfI)
-    accelerationAngular1, accelerationTangent1 = findAccelerationAngular(signVelocityRelativeTangent1, abs(forceNormal1),
-                                                                         1, i, radiusEffective,
-                                                                         signVelocityRelativeAngular, 1)
+    accelerationAngular1, accelerationTangent1 = findAccelerationAngular(signVelocityRelativeTangent1,
+                                                                         abs(forceNormal1), 1, i, radiusEffective,
+                                                                         signVelocityRelativeAngular)
     print(numberOfJ)
     accelerationAngular2, accelerationTangent2 = findAccelerationAngular(signVelocityRelativeTangent2,
                                                                          abs(forceNormal2), -1, j, radiusEffective,
-                                                                         signVelocityRelativeAngular, 1)
+                                                                         signVelocityRelativeAngular)
 
     i.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkI, entryNormal, accelerationAngular1,
                              isBall=True, number=numberOfJ)
@@ -93,15 +92,14 @@ def methodForce(i, j, numberOfI, numberOfJ):
 
 
 def findAccelerationAngular(signVelocityRelativeTangent, forceNormal, signVelocityTangentRelativeAngular, ball,
-                            radiusEffective, signVelocityRelativeAngular, numOfBallSign):
-    forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent * numOfBallSign
+                            radiusEffective, signVelocityRelativeAngular):
+    forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent
     momentSliding = forceSliding * ball.radius * signVelocityTangentRelativeAngular
 
-    momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular * signVelocityTangentRelativeAngular
-    forceRolling = 0  # momentRolling / ball.radius
+    momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular * (-1)
 
     accelerationAngular = (momentSliding + momentRolling) / ball.momentInertial
-    accelerationTangent = (forceSliding + forceRolling) / ball.mass
+    accelerationTangent = forceSliding / ball.mass
 
     accelerationAngular = zeroToZero(accelerationAngular)
     accelerationTangent = zeroToZero(accelerationTangent)

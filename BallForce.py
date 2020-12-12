@@ -87,6 +87,18 @@ class BallForce(Ball):
     def expandForce(self, line, numberOfLine):
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
 
+        wall = MoveWall.getInstance()
+        alphaRadianLocalWall = wall.velocityAlpha - line.alphaNorm
+
+        if wall.flagMove:
+            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocalWall)
+        else:
+            velocityYLocalWall = 0
+        print('alphaRadianLocal', alphaRadianLocal)
+        print('line.alphaNorm', line.alphaNorm)
+        print('wall.velocityAbsolute', wall.velocityAbsolute)
+        print('velocityYLocalWall', velocityYLocalWall)
+
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
 
@@ -98,7 +110,6 @@ class BallForce(Ball):
 
         self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
                             sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
-        # self.rotationCSWall(velocityYLocal, dampeningTangent)
 
         k = 1
         if not self.isInsidePolygon():
@@ -110,38 +121,32 @@ class BallForce(Ball):
         # print(accelerationNormal)
         jerk = getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn, self.mass)
         accelerationNormal += self.jerk * deltaTime
-        if velocityYLocal > 0:
-            signVelocityTangent = 1
-        else:
-            signVelocityTangent = -1
-        if self.velocityTheta > 0:
-            signVelocityAngular = 1
-        else:
-            signVelocityAngular = -1
-        accelerationAngular, accelerationTangent = self.findAccelerationAngularWall(velocityYLocal, signVelocityTangent,
-                                                                                    forceNormal, self.radius,
+
+        velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
+        print('velocityRelativeTangent', velocityRelativeTangent)
+        signVelocityTangent = customSign(velocityRelativeTangent)
+        signVelocityAngular = customSign(self.velocityTheta)
+
+        # если вылетит из коробки могут быть проблемы со знаками forceNormal
+        accelerationAngular, accelerationTangent = self.findAccelerationAngularWall(signVelocityTangent, forceNormal,
                                                                                     signVelocityAngular)
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
                                     accelerationAngular, isBall=False, number=numberOfLine)
 
-    def findAccelerationAngularWall(self, velocityYLocal, signVelocityRelativeTangent, forceNormal,
-                                    radiusEffective, signVelocityRelativeAngular):
-
-        forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent * (-1)
+    def findAccelerationAngularWall(self, signVelocityRelativeTangent, forceNormal, signVelocityRelativeAngular, sign):
+        forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent
         momentSliding = forceSliding * self.radius
 
-        momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular
-        forceRolling = momentRolling / self.radius
+        momentRolling = coefficientOfFrictionRolling * forceNormal * self.radius * signVelocityRelativeAngular * (-1)
 
         accelerationAngular = (momentRolling + momentSliding) / self.momentInertial
-        accelerationTangent = (forceSliding + forceRolling) / self.mass
+        accelerationTangent = forceSliding / self.mass
         # print('forceSliding', forceSliding)
         # print('momentSliding', momentSliding)
         # print('momentRolling', momentRolling)
         # print('accelerationTangent', accelerationTangent)
         # print('accelerationAngular', accelerationAngular, '\n')
-        return 0, 0
         return accelerationAngular, accelerationTangent
 
     def rotationCSWall(self, velocityYLocal, dampeningTangent):
@@ -166,8 +171,11 @@ class BallForce(Ball):
                                isBall, number):
         accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
             alphaRadianLocal)
+
         accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(
             alphaRadianLocal)
+        print('accelerationInteractionX', accelerationInteractionX)
+        print('accelerationInteractionY', accelerationInteractionY, '\n')
         accelerationInteractionX = zeroToZero(accelerationInteractionX)
         accelerationInteractionY = zeroToZero(accelerationInteractionY)
         jerkX = jerkNormal * cos(alphaRadianLocal)

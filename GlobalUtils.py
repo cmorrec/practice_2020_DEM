@@ -5,40 +5,9 @@ from tkinter import *
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from PIL import ImageTk
-
-displayRatio = 1000
-midInteractionNum = 1000
+from GlobalConstants import *
 
 
-def getForceDamping(c):
-    return 1 - (1 - c) ** (1 / midInteractionNum)
-
-
-isForce = True
-# Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
-epsVelocity = 0.01
-epsAcceleration = 0.01
-eps = 1e-9
-inf = 1e11
-# Критически малая величина, необходимая для сравнения вещественных чисел
-
-step = 100
-deltaTime = 1 * 1e-5
-# Шаг по времени
-cn_wall = 0.1
-cs_wall = 0.1
-if isForce:
-    cn_wall = getForceDamping(cn_wall)
-    cs_wall = getForceDamping(cs_wall)
-
-coefficientOfFrictionSliding = deltaTime
-coefficientOfFrictionRolling = 0
-
-# коэффициенты демпфирования для стенок
-accelerationX = 0
-accelerationY = 0
-kn = 2 * 1e5
-ks = 0
 # Энергия
 kineticPlot = []
 potentialPlot = []

@@ -11,8 +11,8 @@ class MoveWall(Wall):
         self.deltaY = 0
         self.velocityX = velocityX
         self.velocityY = velocityY
-        self.velocityAbsolute = sqrt((velocityX ** 2) + (velocityY ** 2))
-        self.velocityAlpha = atan2(velocityY, velocityX + eps)
+        self.velocityAbsolute = sqrt((self.velocityX ** 2) + (self.velocityY ** 2))
+        self.velocityAlpha = atan2(self.velocityY, self.velocityX + eps)
         self.absX = absX
         self.absY = absY
         MoveWall.__instance = self
