@@ -60,7 +60,7 @@ class BallForce(Ball):
                 deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3
         self.y += self.velocityY * deltaTime - 0.5 * (self.accelerationY + self.accelerationInteractionY) * (
                 deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3
-        self.theta += self.velocityTheta % (2 * pi)
+        self.theta += (self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (deltaTime ** 2)) % (2 * pi)
 
     def addVelocityMethod(self):
         self.accelerationInteractionX = 0
@@ -134,7 +134,7 @@ class BallForce(Ball):
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
                                     accelerationAngular, isBall=False, number=numberOfLine)
 
-    def findAccelerationAngularWall(self, signVelocityRelativeTangent, forceNormal, signVelocityRelativeAngular, sign):
+    def findAccelerationAngularWall(self, signVelocityRelativeTangent, forceNormal, signVelocityRelativeAngular):
         forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent
         momentSliding = forceSliding * self.radius
 
