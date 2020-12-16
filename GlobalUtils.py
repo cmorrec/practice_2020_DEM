@@ -7,7 +7,6 @@ import matplotlib.ticker as ticker
 from PIL import ImageTk
 from GlobalConstants import *
 
-
 # Энергия
 kineticPlot = []
 potentialPlot = []
@@ -154,3 +153,8 @@ def customSign(number):
         return 1
     else:
         return -1
+
+
+def distanceNow(i, j):
+    # Расстояние между двумя шарами в данный момент времени
+    return sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2)

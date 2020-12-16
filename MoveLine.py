@@ -18,3 +18,6 @@ class MoveLine(Line):
         self.x2 = coordinate2.x
         self.y1 = coordinate1.y
         self.y2 = coordinate2.y
+        self.abs = self.findAbs()
+        self.alphaTau = self.findTau()
+        self.alphaNorm = self.alphaTau + (pi / 2)

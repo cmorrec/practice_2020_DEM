@@ -94,10 +94,10 @@ class BallForce(Ball):
             velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocalWall)
         else:
             velocityYLocalWall = 0
-        print('alphaRadianLocal', alphaRadianLocal)
-        print('line.alphaNorm', line.alphaNorm)
-        print('wall.velocityAbsolute', wall.velocityAbsolute)
-        print('velocityYLocalWall', velocityYLocalWall)
+        # print('alphaRadianLocal', alphaRadianLocal)
+        # print('line.alphaNorm', line.alphaNorm)
+        # print('wall.velocityAbsolute', wall.velocityAbsolute)
+        # print('velocityYLocalWall', velocityYLocalWall)
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
@@ -123,7 +123,7 @@ class BallForce(Ball):
         accelerationNormal += self.jerk * deltaTime
 
         velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
-        print('velocityRelativeTangent', velocityRelativeTangent)
+        # print('velocityRelativeTangent', velocityRelativeTangent)
         signVelocityTangent = customSign(velocityRelativeTangent)
         signVelocityAngular = customSign(self.velocityTheta)
 
@@ -174,8 +174,8 @@ class BallForce(Ball):
 
         accelerationInteractionY = accelerationNormal * sin(alphaRadianLocal) - accelerationTangent * cos(
             alphaRadianLocal)
-        print('accelerationInteractionX', accelerationInteractionX)
-        print('accelerationInteractionY', accelerationInteractionY, '\n')
+        # print('accelerationInteractionX', accelerationInteractionX)
+        # print('accelerationInteractionY', accelerationInteractionY, '\n')
         accelerationInteractionX = zeroToZero(accelerationInteractionX)
         accelerationInteractionY = zeroToZero(accelerationInteractionY)
         jerkX = jerkNormal * cos(alphaRadianLocal)

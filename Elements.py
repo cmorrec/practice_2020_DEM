@@ -6,10 +6,6 @@ from Ball import *
 
 # В будущем нужно реализовать  проверку о ненакладывании мячей один на другой
 
-def distanceNow(i, j):
-    # Расстояние между двумя шарами в данный момент времени
-    return sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2)
-
 
 def distanceNext(i, j):
     # Расстояние между двумя шарами в следующий момент времени
@@ -117,7 +113,7 @@ class Elements:
         for ball in self.balls:
             energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
                     ball.velocityTheta ** 2) + ball.mass * MoveWall.getInstance().accelerationY * (
-                                       MoveWall.getInstance().maxY - ball.y)
+                                   MoveWall.getInstance().maxY - ball.y)
         return energyCount
 
     def energy(self):

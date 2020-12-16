@@ -4,6 +4,7 @@ from ElementsForce import *
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
 ballStartFileName2Ball = './ball_sets/2_ball.txt'
 ballStartFileName4Ball = './ball_sets/4_ball.txt'
+ballStartFileName4BallBig = './ball_sets/4_ball_big.txt'
 ballStartFileName2PlateVol = './ball_sets/2_plate_volume.txt'
 ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
 ballStartFileName4Plate = './ball_sets/4_plate.txt'
@@ -38,11 +39,12 @@ coordinatesFileNameCylinderCone = './walls_dynamic/cylinder_cone.txt'
 coordinatesFileNamePolygon = './walls_dynamic/polygon.txt'
 coordinatesFileNameRhombus = './walls_dynamic/rhombus.txt'
 coordinatesFileNameSquare = './walls_dynamic/square.txt'
+coordinatesFileNameSquareBig = './walls_dynamic/square_big.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileNameTest1_2
+ballStartFileName = ballStartFileName2Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -53,6 +55,7 @@ velocityXWall = float(0)
 velocityYWall = float(0)
 absXWall = float(0)
 absYWall = float(0)
+velocityThetaWall = float(0)
 
 for line in coordinatesFile:
     words = line.split()
@@ -62,6 +65,7 @@ for line in coordinatesFile:
         velocityYWall = float(words[1])
         absXWall = float(words[2])
         absYWall = float(words[3])
+        velocityThetaWall = float(words[4])
         isFirstLine = False
     else:
         for word in words:
@@ -76,8 +80,12 @@ yCoordinates = []
 for coordinate in coordinatesFromFile:
     xCoordinates.append(coordinate.x)
     yCoordinates.append(coordinate.y)
-mWidth = displayRatio * (max(xCoordinates) - min(xCoordinates) + absXWall)
-mHeight = displayRatio * (max(yCoordinates) - min(yCoordinates) + absYWall)
+width = max(xCoordinates) - min(xCoordinates)
+height = max(yCoordinates) - min(yCoordinates)
+centerX = width / 2 + min(xCoordinates)
+centerY = height / 2 + min(yCoordinates)
+canvasWidth = displayRatio * (width + absXWall)
+canvasHeight = displayRatio * (height + absYWall)
 
 tk = Tk()
 tk.title('DEM')
@@ -88,14 +96,13 @@ tk.columnconfigure(1)
 tk.columnconfigure(2)
 tk.rowconfigure(0)
 tk.rowconfigure(1)
-canvas = Canvas(tk, width=int(mWidth), height=int(mHeight), highlightthickness=0)
+canvas = Canvas(tk, width=int(canvasWidth), height=int(canvasHeight), highlightthickness=0)
 canvas.grid(row=0, columnspan=3)
 buttons = Buttons()
 tk.update()
 
 wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, velocityXWall,
-                velocityYWall,
-                absXWall, absYWall)
+                velocityYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY)
 
 ballsStartFile = open(ballStartFileName, 'r')
 ballsFromFile = []
