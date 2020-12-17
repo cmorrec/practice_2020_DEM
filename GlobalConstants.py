@@ -1,5 +1,5 @@
 displayRatio = 1000
-midInteractionNum = 1000
+midInteractionNum = 32
 
 
 def getForceDamping(c):
@@ -31,3 +31,10 @@ accelerationX = 0
 accelerationY = 9.81
 kn = 2 * 1e5
 # ks = 0
+
+E_1 = 2 * 1e11
+E_2 = 2 * 1e11
+nu_1 = 0.3
+nu_2 = 0.3
+E_eff = ((1 - (nu_1 ** 2))/E_1 + (1 - (nu_2 ** 2))/E_2) ** (-1)
+print(E_eff)

@@ -64,16 +64,18 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
     # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
     entryNormal = (ball_1.radius + ball_2.radius - sqrt((ball_1.x - ball_2.x) ** 2 + (ball_1.y - ball_2.y) ** 2))
+    radiusEffective = ((1 / ball_1.radius) + (1 / ball_2.radius)) ** (-1)
 
-    forceNormal1 = kn * entryNormal
-    forceNormal2 = -1 * kn * entryNormal
+    stiffness = getStiffness(radiusEffective, entryNormal)
+    forceNormal1 = stiffness * entryNormal
+    forceNormal2 = -1 * stiffness * entryNormal
 
     accelerationNormal1 = forceNormal1 / ball_1.mass
     accelerationNormal2 = forceNormal2 / ball_2.mass
 
-    jerk1 = getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), kn, ball_1.mass)
+    jerk1 = 0  # ball_1.getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), stiffness)
     accelerationNormal1 += jerk1 * deltaTime
-    jerk2 = getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), kn, ball_2.mass)
+    jerk2 = 0  # ball_2.getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), stiffness)
     accelerationNormal2 += jerk2 * deltaTime
 
     # print('velocity1YLocal', velocity1YLocal)
@@ -86,8 +88,6 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
     velocityThetaRelative = ball_1.velocityTheta + ball_2.velocityTheta
     signVelocityRelativeAngular = customSign(velocityThetaRelative)
-
-    radiusEffective = ((1 / ball_1.radius) + (1 / ball_2.radius)) ** (-1)
 
     # print(numberOfI)
     accelerationAngular1, accelerationTangent1 = ball_1.findAccelerationAngular(signVelocityRelativeTangent1,

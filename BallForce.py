@@ -2,21 +2,6 @@ from Ball import *
 from Interaction import *
 
 
-def getJerk(velocity, acceleration, k, mass):
-    accelerationFirst = acceleration
-    deltaEntry = velocity * deltaTime + acceleration / 2 * deltaTime ** 2
-    deltaForce = k * deltaEntry
-    accelerationNext = acceleration + deltaForce / mass
-    jerk = (accelerationNext - accelerationFirst) / deltaTime
-    while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
-        acceleration = accelerationNext
-        deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
-        deltaForce = k * deltaEntry
-        accelerationNext = acceleration + deltaForce / mass
-        jerk = (accelerationNext - accelerationFirst) / deltaTime
-    return jerk
-
-
 def getAccelerationFieldNormal(alpha):
     alphaAccelerationXRadianLocal = -alpha
     alphaAccelerationYRadianLocal = pi / 2 - alpha
@@ -116,10 +101,11 @@ class BallForce(Ball):
             k = -1
 
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
-        forceNormal = 1 * kn * entryNormal
+        stiffness = getStiffness(self.radius, abs(entryNormal))
+        forceNormal = stiffness * entryNormal
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
-        jerk = getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn, self.mass)
+        jerk = 0  # self.getJerk(velocityXLocal,accelerationNormal+getAccelerationFieldNormal(line.alphaNorm),stiffness)
         accelerationNormal += self.jerk * deltaTime
 
         velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
@@ -201,6 +187,24 @@ class BallForce(Ball):
     def rotationCS(self, velocityYLocal, dampeningTangentVelocity):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
             self.mass * abs(dampeningTangentVelocity ** 2 / self.momentInertial))
+
+    def iterJerk(self, velocity, acceleration, stiffness, accelerationFirst, accelerationNext, jerk):
+        deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
+        deltaForce = stiffness * deltaEntry
+        accelerationNext = acceleration + deltaForce / self.mass
+        jerk = (accelerationNext - accelerationFirst) / deltaTime
+        return jerk, accelerationNext
+
+    def getJerk(self, velocity, acceleration, stiffness):
+        accelerationFirst = acceleration
+        jerk, accelerationNext = self.iterJerk(velocity, acceleration, stiffness, accelerationFirst, acceleration, 0)
+        while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
+            acceleration = accelerationNext
+            jerk, accelerationNext = self.iterJerk(velocity, acceleration, stiffness, accelerationFirst,
+                                                   accelerationNext, jerk)
+            print(accelerationNext, acceleration, abs((accelerationNext - acceleration) / (acceleration + eps)))
+
+        return jerk
 
     # def info(self):
     #     print('velocityAlpha', self.alphaRadian, 'velocityAbs', self.velocityAbsolute)

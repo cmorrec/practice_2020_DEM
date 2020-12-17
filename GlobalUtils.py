@@ -15,7 +15,7 @@ wallInteraction = []
 ballInteraction = []
 stepCount = [0]
 
-
+#--------------- Функции для отображения и результатов --------------
 def Buttons():
     but_1 = Button(text='Start',
                    width=17, height=2,
@@ -132,6 +132,7 @@ def plotter():
     plt.show()
 
 
+#--------------- Функции для численного рассчета --------------
 def dampeningVelocity(dampening, velocity):
     if abs(velocity) - abs(dampening) > 0 and abs(velocity) > eps:
         return velocity - dampening
@@ -158,3 +159,7 @@ def customSign(number):
 def distanceNow(i, j):
     # Расстояние между двумя шарами в данный момент времени
     return sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2)
+
+
+def getStiffness(radius, entry):
+    return (4/3) * E_eff * sqrt(radius * entry)

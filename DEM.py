@@ -44,7 +44,7 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 
 coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileName2Ball
+ballStartFileName = ballStartFileName4Ball
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
