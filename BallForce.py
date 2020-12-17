@@ -116,7 +116,7 @@ class BallForce(Ball):
             k = -1
 
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
-        forceNormal = (1) * kn * entryNormal
+        forceNormal = 1 * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
         jerk = getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn, self.mass)
@@ -128,20 +128,27 @@ class BallForce(Ball):
         signVelocityAngular = customSign(self.velocityTheta)
 
         # если вылетит из коробки могут быть проблемы со знаками forceNormal
-        accelerationAngular, accelerationTangent = self.findAccelerationAngularWall(signVelocityTangent, forceNormal,
-                                                                                    signVelocityAngular)
+        accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
+                                                                                self.radius, signVelocityAngular)
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
                                     accelerationAngular, isBall=False, number=numberOfLine)
 
-    def findAccelerationAngularWall(self, signVelocityRelativeTangent, forceNormal, signVelocityRelativeAngular):
+    def findAccelerationAngular(self, signVelocityRelativeTangent, forceNormal, signVelocityTangentRelativeAngular,
+                                radiusEffective, signVelocityRelativeAngular):
         forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent
-        momentSliding = forceSliding * self.radius
+        momentSliding = forceSliding * self.radius * signVelocityTangentRelativeAngular
 
-        momentRolling = coefficientOfFrictionRolling * forceNormal * self.radius * signVelocityRelativeAngular * (-1)
+        momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular * (
+            -1)
 
-        accelerationAngular = (momentRolling + momentSliding) / self.momentInertial
+        accelerationAngular = (momentSliding + momentRolling) / self.momentInertial
         accelerationTangent = forceSliding / self.mass
+
+        accelerationAngular = zeroToZero(accelerationAngular)
+        accelerationTangent = zeroToZero(accelerationTangent)
+
+        # print(momentRolling, forceSliding, accelerationAngular, accelerationTangent)
         # print('forceSliding', forceSliding)
         # print('momentSliding', momentSliding)
         # print('momentRolling', momentRolling)
@@ -199,7 +206,8 @@ class BallForce(Ball):
     #     print('velocityAlpha', self.alphaRadian, 'velocityAbs', self.velocityAbsolute)
     #     print('velocityX', self.velocityX, 'velocityY', self.velocityY)
     #     print('accelerationX =', self.accelerationX, 'accelerationY =', self.accelerationY)
-    #     print('accelerationInteractionX =', self.accelerationInteractionX, '\taccelerationInteractionY =', self.accelerationInteractionY)
+    #     print('accelerationInteractionX =', self.accelerationInteractionX, '\taccelerationInteractionY =',
+    #     self.accelerationInteractionY)
     #     print('jerkX =', self.jerkX, 'jerkY =', self.jerkY)
     #     for i, interaction in enumerate(self.interactionArray):
     #         print('interaction = ', i, '\tisBall =', interaction.isBall, '\tnumber =', interaction.number)
