@@ -136,9 +136,9 @@ class Elements:
             if isForce:
                 for interaction in ball.interactionArray:
                     if interaction.isBall:
-                        energyCount += (kn * interaction.entryNormal ** 2) / 4
+                        energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 4
                     else:
-                        energyCount += (kn * interaction.entryNormal ** 2) / 2
+                        energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 2
 
         potentialPlot.append(energyCount)
         return energyCount

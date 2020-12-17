@@ -118,7 +118,7 @@ class BallForce(Ball):
                                                                                 self.radius, signVelocityAngular)
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
-                                    accelerationAngular, isBall=False, number=numberOfLine)
+                                    accelerationAngular, isBall=False, number=numberOfLine, stiffness=stiffness)
 
     def findAccelerationAngular(self, signVelocityRelativeTangent, forceNormal, signVelocityTangentRelativeAngular,
                                 radiusEffective, signVelocityRelativeAngular):
@@ -160,8 +160,7 @@ class BallForce(Ball):
                 break
 
     def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal,
-                               accelerationAngular,
-                               isBall, number):
+                               accelerationAngular, isBall, number, stiffness):
         accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
             alphaRadianLocal)
 
@@ -176,10 +175,10 @@ class BallForce(Ball):
         for interaction in self.interactionArray:
             if interaction.number == number and interaction.isBall == isBall:
                 interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
-                                               entryNormal, accelerationAngular)
+                                               entryNormal, accelerationAngular, stiffness)
                 return
         self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY,
-                                        jerkX, jerkY, entryNormal, accelerationAngular))
+                                        jerkX, jerkY, entryNormal, accelerationAngular, stiffness))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)
@@ -202,7 +201,7 @@ class BallForce(Ball):
             acceleration = accelerationNext
             jerk, accelerationNext = self.iterJerk(velocity, acceleration, stiffness, accelerationFirst,
                                                    accelerationNext, jerk)
-            print(accelerationNext, acceleration, abs((accelerationNext - acceleration) / (acceleration + eps)))
+            # print(accelerationNext, acceleration, abs((accelerationNext - acceleration) / (acceleration + eps)))
 
         return jerk
 

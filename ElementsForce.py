@@ -99,9 +99,9 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
                                                                                 signVelocityRelativeAngular)
 
     ball_1.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerk1, entryNormal,
-                                  accelerationAngular1, isBall=True, number=numberOf2)
+                                  accelerationAngular1, isBall=True, number=numberOf2, stiffness=stiffness)
     ball_2.saveAccelerationLength(gama, accelerationNormal2, accelerationTangent2, jerk2, entryNormal,
-                                  accelerationAngular2, isBall=True, number=numberOf1)
+                                  accelerationAngular2, isBall=True, number=numberOf1, stiffness=stiffness)
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
