@@ -105,7 +105,7 @@ class BallForce(Ball):
         forceNormal = stiffness * entryNormal
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
-        jerk = 0  # self.getJerk(velocityXLocal,accelerationNormal+getAccelerationFieldNormal(line.alphaNorm),stiffness)
+        jerk = self.getJerk(velocityXLocal,accelerationNormal+getAccelerationFieldNormal(line.alphaNorm), entryNormal, self.radius, forceNormal)
         accelerationNormal += self.jerk * deltaTime
 
         velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
@@ -187,21 +187,29 @@ class BallForce(Ball):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
             self.mass * abs(dampeningTangentVelocity ** 2 / self.momentInertial))
 
-    def iterJerk(self, velocity, acceleration, stiffness, accelerationFirst, accelerationNext, jerk):
+    def iterJerk(self, velocity, acceleration, entry, radiusEffective, forceFirst, accelerationFirst, accelerationNext, jerk):
         deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
-        deltaForce = stiffness * deltaEntry
+        entryNext = entry + deltaEntry
+        stiffness = getStiffness(radiusEffective, abs(entryNext))
+        forceNext = stiffness * entryNext
+        deltaForce = forceNext - forceFirst
         accelerationNext = acceleration + deltaForce / self.mass
         jerk = (accelerationNext - accelerationFirst) / deltaTime
         return jerk, accelerationNext
 
-    def getJerk(self, velocity, acceleration, stiffness):
+    def getJerk(self, velocity, acceleration, entry, radiusEffective, forceFirst):
         accelerationFirst = acceleration
-        jerk, accelerationNext = self.iterJerk(velocity, acceleration, stiffness, accelerationFirst, acceleration, 0)
+        jerk, accelerationNext = self.iterJerk(velocity, acceleration, entry, radiusEffective, forceFirst, accelerationFirst, acceleration, 0)
+        i = 0
         while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
             acceleration = accelerationNext
-            jerk, accelerationNext = self.iterJerk(velocity, acceleration, stiffness, accelerationFirst,
+            jerk, accelerationNext = self.iterJerk(velocity, acceleration, entry, radiusEffective, forceFirst, accelerationFirst,
                                                    accelerationNext, jerk)
             # print(accelerationNext, acceleration, abs((accelerationNext - acceleration) / (acceleration + eps)))
+            i += 1
+        print(i)
+        print(acceleration)
+        print(jerk, '\n')
 
         return jerk
 
