@@ -11,13 +11,15 @@ from GlobalConstants import *
 kineticPlot = []
 potentialPlot = []
 summaryPlot = []
-forcePlot = [0]
-velocityPlot = [0]
+forcePlot = []
+velocityPlot = []
 wallInteraction = []
 ballInteraction = []
 stepCount = [0]
+stepCountForce = []
 
-#--------------- Функции для отображения и результатов --------------
+
+# --------------- Функции для отображения и результатов --------------
 def Buttons():
     but_1 = Button(text='Start',
                    width=17, height=2,
@@ -132,20 +134,22 @@ def plotter():
     fig.tight_layout()
 
     plt.show()
+
+
 def plotterForce():
     plt.style.use('fivethirtyeight')
     fig = plt.figure(figsize=(8, 8))
     ax = plt.subplot(111)
-    ax.plot(stepCount, forcePlot, label='Сила')
-    ax.plot(stepCount, velocityPlot, label='Скорость')
+    ax.plot(stepCountForce, forcePlot, label='Сила')
+    ax.plot(stepCountForce, velocityPlot, label='Скорость')
     ax.set_title('')
     chartBox = ax.get_position()
     ax.set_position([chartBox.x0, chartBox.y0, chartBox.width * 0.7, chartBox.height])
     ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
-    ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
-    ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 10 * 10)))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 10 * 20)))
+    # ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCountForce[-1] // 100) * 10))
+    # ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCountForce[-1] // 100) * 2))
+    # ax.yaxis.set_major_locator(ticker.MultipleLocator((stepCountForce[-1] // 10 * 10)))
+    # ax.yaxis.set_minor_locator(ticker.MultipleLocator((stepCountForce[-1] // 10 * 20)))
     ax.tick_params(axis='both',
                    which='major',
                    direction='inout',
@@ -184,14 +188,14 @@ def plotterForce():
     ax.grid(which='minor',
             color='gray',
             linestyle=':')
-    ax.set_ylabel('Energy, J')
+    ax.set_ylabel('Force, N; Velocity, 10^(-5) * m/s ')
     ax.set_xlabel('Steps')
     # ax.set_xlim(xmin=nrg[0], xmax=nrg[-1])
     fig.tight_layout()
 
     plt.show()
 
-#--------------- Функции для численного рассчета --------------
+# --------------- Функции для численного рассчета --------------
 def dampeningVelocity(dampening, velocity):
     if abs(velocity) - abs(dampening) > 0 and abs(velocity) > eps:
         return velocity - dampening
@@ -221,4 +225,4 @@ def distanceNow(i, j):
 
 
 def getStiffness(radius, entry):
-    return (4/3) * E_eff * sqrt(radius * entry)
+    return (4 / 3) * E_eff * sqrt(radius * entry)

@@ -69,8 +69,14 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     stiffness = getStiffness(radiusEffective, entryNormal)
     forceNormal1 = stiffness * entryNormal
     forceNormal2 = -1 * stiffness * entryNormal
-    forcePlot.append(forceNormal1)
-    velocityPlot.append(velocity1XLocal)
+
+    forcePlot.append(abs(forceNormal1))
+    velocityPlot.append(velocity1XLocal * 10000)
+    if len(stepCountForce) == 0:
+        stepCountForce.append(0)
+    else:
+        stepCountForce.append(stepCountForce[len(stepCountForce) - 1] + 1)
+
     accelerationNormal1 = forceNormal1 / ball_1.mass
     accelerationNormal2 = forceNormal2 / ball_2.mass
 
