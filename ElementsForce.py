@@ -67,6 +67,12 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
     forceNormal1 = kn * entryNormal
     forceNormal2 = -1 * kn * entryNormal
+    forcePlot.append(abs(forceNormal1))
+    velocityPlot.append(velocity1XLocal * 1000)
+    if len(stepCountForce) == 0:
+        stepCountForce.append(0)
+    else:
+        stepCountForce.append(stepCountForce[len(stepCountForce) - 1] + 1)
 
     accelerationNormal1 = forceNormal1 / ball_1.mass
     accelerationNormal2 = forceNormal2 / ball_2.mass

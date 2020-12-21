@@ -4,15 +4,15 @@ from Interaction import *
 
 def getJerk(velocity, acceleration, k, mass):
     accelerationFirst = acceleration
-    deltaEntry = velocity * deltaTime + acceleration / 2 * deltaTime ** 2
+    deltaEntry = velocity * deltaTime + (acceleration * (deltaTime ** 2)) / 2
     deltaForce = k * deltaEntry
     accelerationNext = acceleration + deltaForce / mass
     jerk = (accelerationNext - accelerationFirst) / deltaTime
-    while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
+    while abs((accelerationNext - acceleration) / (acceleration)) > epsAcceleration:
         acceleration = accelerationNext
-        deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
+        deltaEntry = velocity * deltaTime + (accelerationFirst * (deltaTime ** 2)) / 2 + (jerk * (deltaTime ** 3)) / 6
         deltaForce = k * deltaEntry
-        accelerationNext = acceleration + deltaForce / mass
+        accelerationNext = accelerationFirst + deltaForce / mass
         jerk = (accelerationNext - accelerationFirst) / deltaTime
     return jerk
 
