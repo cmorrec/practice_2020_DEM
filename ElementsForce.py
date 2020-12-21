@@ -80,9 +80,9 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     accelerationNormal1 = forceNormal1 / ball_1.mass
     accelerationNormal2 = forceNormal2 / ball_2.mass
 
-    jerk1 = 0#ball_1.getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), entryNormal, radiusEffective, forceNormal1)
+    jerk1 = ball_1.getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), entryNormal, radiusEffective, forceNormal1)
     accelerationNormal1 += jerk1 * deltaTime
-    jerk2 = 0#ball_2.getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), entryNormal, radiusEffective, forceNormal2)
+    jerk2 = ball_2.getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), entryNormal, radiusEffective, forceNormal2)
     accelerationNormal2 += jerk2 * deltaTime
 
     # print('velocity1YLocal', velocity1YLocal)

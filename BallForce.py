@@ -188,12 +188,11 @@ class BallForce(Ball):
             self.mass * abs(dampeningTangentVelocity ** 2 / self.momentInertial))
 
     def iterJerk(self, velocity, acceleration, entry, radiusEffective, forceFirst, accelerationFirst, accelerationNext, jerk):
-        deltaEntry = velocity * deltaTime + accelerationNext / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
+        deltaEntry = velocity * deltaTime + (accelerationFirst * (deltaTime ** 2)) / 2 + (jerk * (deltaTime ** 3)) / 6
         entryNext = entry + deltaEntry
         stiffness = getStiffness(radiusEffective, abs(entryNext))
         forceNext = stiffness * entryNext
-        deltaForce = forceNext - forceFirst
-        accelerationNext = forceNext / self.mass #acceleration + deltaForce / self.mass
+        accelerationNext = forceNext / self.mass * customSign(accelerationFirst) #acceleration + deltaForce / self.mass
         jerk = (accelerationNext - accelerationFirst) / deltaTime
         return jerk, accelerationNext
 

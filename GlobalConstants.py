@@ -9,7 +9,7 @@ def getForceDamping(c):
 isForce = True
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 0.01
-epsAcceleration = 0.01
+epsAcceleration = 0.00001
 eps = 1e-9
 # inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
@@ -28,7 +28,7 @@ coefficientOfFrictionRolling = 0.05
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 9.81
+accelerationY = 0
 kn = 2 * 1e5
 # ks = 0
 
