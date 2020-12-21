@@ -105,7 +105,7 @@ class BallForce(Ball):
         forceNormal = stiffness * entryNormal
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
-        jerk = self.getJerk(velocityXLocal,accelerationNormal+getAccelerationFieldNormal(line.alphaNorm), entryNormal, self.radius, forceNormal)
+        jerk = 0#self.getJerk(velocityXLocal,accelerationNormal+getAccelerationFieldNormal(line.alphaNorm), entryNormal, self.radius, forceNormal)
         accelerationNormal += self.jerk * deltaTime
 
         velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
@@ -193,7 +193,7 @@ class BallForce(Ball):
         stiffness = getStiffness(radiusEffective, abs(entryNext))
         forceNext = stiffness * entryNext
         deltaForce = forceNext - forceFirst
-        accelerationNext = acceleration + deltaForce / self.mass
+        accelerationNext = forceNext / self.mass #acceleration + deltaForce / self.mass
         jerk = (accelerationNext - accelerationFirst) / deltaTime
         return jerk, accelerationNext
 
