@@ -11,6 +11,8 @@ from GlobalConstants import *
 kineticPlot = []
 potentialPlot = []
 summaryPlot = []
+forcePlot = [0]
+velocityPlot = [0]
 wallInteraction = []
 ballInteraction = []
 stepCount = [0]
@@ -130,7 +132,64 @@ def plotter():
     fig.tight_layout()
 
     plt.show()
+def plotterForce():
+    plt.style.use('fivethirtyeight')
+    fig = plt.figure(figsize=(8, 8))
+    ax = plt.subplot(111)
+    ax.plot(stepCount, forcePlot, label='Сила')
+    ax.plot(stepCount, velocityPlot, label='Скорость')
+    ax.set_title('')
+    chartBox = ax.get_position()
+    ax.set_position([chartBox.x0, chartBox.y0, chartBox.width * 0.7, chartBox.height])
+    ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
+    ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
+    ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 10 * 10)))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 10 * 20)))
+    ax.tick_params(axis='both',
+                   which='major',
+                   direction='inout',
+                   length=20,
+                   width=2,
+                   color='#e54747',
+                   pad=10,
+                   labelsize=10,
+                   labelcolor='#000',
+                   bottom=True,
+                   top=True,
+                   left=True,
+                   right=True,
+                   labelbottom=True,
+                   labeltop=True,
+                   labelleft=True,
+                   labelright=True,
+                   labelrotation=70)
 
+    ax.tick_params(axis='both',
+                   which='minor',
+                   direction='out',
+                   length=10,
+                   width=1,
+                   color='#e54747',
+                   pad=10,
+                   labelsize=15,
+                   labelcolor='#000',
+                   bottom=True,
+                   top=True,
+                   left=True,
+                   right=True)
+    ax.grid(which='major',
+            color='k')
+    ax.minorticks_on()
+    ax.grid(which='minor',
+            color='gray',
+            linestyle=':')
+    ax.set_ylabel('Energy, J')
+    ax.set_xlabel('Steps')
+    # ax.set_xlim(xmin=nrg[0], xmax=nrg[-1])
+    fig.tight_layout()
+
+    plt.show()
 
 #--------------- Функции для численного рассчета --------------
 def dampeningVelocity(dampening, velocity):
