@@ -20,6 +20,7 @@ class BallForce(Ball):
         self.accelerationInteractionY = 0
         self.jerkX = 0
         self.jerkY = 0
+        self.jerkTheta = 0
         self.interactionArray = []
 
     def move(self):
@@ -45,7 +46,7 @@ class BallForce(Ball):
                 deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3
         self.y += self.velocityY * deltaTime - 0.5 * (self.accelerationY + self.accelerationInteractionY) * (
                 deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3
-        self.theta += (self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (deltaTime ** 2)) % (2 * pi)
+        self.theta += (self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (deltaTime ** 2) - self.jerkTheta * (deltaTime ** 3) / 3) % (2 * pi)
 
     def addVelocityMethod(self):
         self.accelerationInteractionX = 0
@@ -56,9 +57,11 @@ class BallForce(Ball):
 
         self.jerkX = 0
         self.jerkY = 0
+        self.jerkTheta = 0
         for interaction in self.interactionArray:
             self.jerkX += interaction.jerkX
             self.jerkY += interaction.jerkY
+            self.jerkX += interaction.jerkTheta
 
         self.addVelocity(
             (self.accelerationX + self.accelerationInteractionX - self.jerkX * deltaTime / 2),
@@ -67,7 +70,7 @@ class BallForce(Ball):
         self.accelerationTheta = 0
         for interaction in self.interactionArray:
             self.accelerationTheta += interaction.accelerationAngular
-        self.addVelocityAngular(self.accelerationTheta)
+        self.addVelocityAngular(self.accelerationTheta - self.jerkTheta * deltaTime / 2)
 
     def expandForce(self, line, numberOfLine):
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
@@ -104,8 +107,6 @@ class BallForce(Ball):
         forceNormal = 1 * kn * entryNormal
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
-        jerk = self.getJerk(velocityXLocal, accelerationNormal + getAccelerationFieldNormal(line.alphaNorm), kn)
-        accelerationNormal += self.jerk * deltaTime
 
         velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
         # print('velocityRelativeTangent', velocityRelativeTangent)
@@ -116,11 +117,24 @@ class BallForce(Ball):
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 self.radius, signVelocityAngular)
 
-        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerk, entryNormal,
-                                    accelerationAngular, isBall=False, number=numberOfLine)
+        jerkNormal, jerkTangent, jerkAngular = self.getJerk(velocityXLocal,
+                                                            accelerationNormal + getAccelerationFieldNormal(
+                                                                line.alphaNorm), signVelocityTangent, 1, self.radius,
+                                                            signVelocityAngular, accelerationAngular,
+                                                            accelerationTangent)
+        accelerationNormal += jerkNormal * deltaTime
+        accelerationTangent += jerkTangent * deltaTime
+        accelerationAngular += jerkAngular * deltaTime
 
-    def findAccelerationAngular(self, signVelocityRelativeTangent, forceNormal, signVelocityTangentRelativeAngular,
-                                radiusEffective, signVelocityRelativeAngular):
+        self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerkNormal, jerkTangent,
+                                    jerkAngular, entryNormal, accelerationAngular, isBall=False, number=numberOfLine)
+
+    def findAccelerationAngular(self,
+                                signVelocityRelativeTangent,
+                                forceNormal,
+                                signVelocityTangentRelativeAngular,
+                                radiusEffective,
+                                signVelocityRelativeAngular):
         forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent
         momentSliding = forceSliding * self.radius * signVelocityTangentRelativeAngular
 
@@ -130,8 +144,8 @@ class BallForce(Ball):
         accelerationAngular = (momentSliding + momentRolling) / self.momentInertial
         accelerationTangent = forceSliding / self.mass
 
-        accelerationAngular = zeroToZero(accelerationAngular)
-        accelerationTangent = zeroToZero(accelerationTangent)
+        # accelerationAngular = zeroToZero(accelerationAngular)
+        # accelerationTangent = zeroToZero(accelerationTangent)
 
         # print(momentRolling, forceSliding, accelerationAngular, accelerationTangent)
         # print('forceSliding', forceSliding)
@@ -158,9 +172,17 @@ class BallForce(Ball):
                 self.interactionArray.remove(interaction)
                 break
 
-    def saveAccelerationLength(self, alphaRadianLocal, accelerationNormal, accelerationTangent, jerkNormal, entryNormal,
+    def saveAccelerationLength(self,
+                               alphaRadianLocal,
+                               accelerationNormal,
+                               accelerationTangent,
+                               jerkNormal,
+                               jerkTangent,
+                               jerkAngular,
+                               entryNormal,
                                accelerationAngular,
-                               isBall, number):
+                               isBall,
+                               number):
         accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
             alphaRadianLocal)
 
@@ -168,17 +190,18 @@ class BallForce(Ball):
             alphaRadianLocal)
         # print('accelerationInteractionX', accelerationInteractionX)
         # print('accelerationInteractionY', accelerationInteractionY, '\n')
-        accelerationInteractionX = zeroToZero(accelerationInteractionX)
-        accelerationInteractionY = zeroToZero(accelerationInteractionY)
-        jerkX = jerkNormal * cos(alphaRadianLocal)
-        jerkY = jerkNormal * sin(alphaRadianLocal)
+        # accelerationInteractionX = zeroToZero(accelerationInteractionX)
+        # accelerationInteractionY = zeroToZero(accelerationInteractionY)
+        jerkX = jerkNormal * cos(alphaRadianLocal) + jerkTangent * sin(alphaRadianLocal)
+        jerkY = jerkNormal * sin(alphaRadianLocal) - jerkTangent * cos(alphaRadianLocal)
         for interaction in self.interactionArray:
             if interaction.number == number and interaction.isBall == isBall:
                 interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
+                                               jerkAngular,
                                                entryNormal, accelerationAngular)
                 return
         self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY,
-                                        jerkX, jerkY, entryNormal, accelerationAngular))
+                                        jerkX, jerkY, jerkAngular, entryNormal, accelerationAngular))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)
@@ -187,23 +210,86 @@ class BallForce(Ball):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
             self.mass * abs(dampeningTangentVelocity ** 2 / self.momentInertial))
 
-    def iterJerk(self, velocity, k, accelerationFirst, jerk):
-        deltaEntry = velocity * deltaTime + accelerationFirst / 2 * deltaTime ** 2 + jerk / 6 * deltaTime ** 3
-        deltaForce = k * deltaEntry
-        accelerationNext = accelerationFirst + deltaForce / self.mass
-        jerk = (accelerationNext - accelerationFirst) / deltaTime
-        return jerk, accelerationNext
+    def iterJerk(self,
+                 velocityNormal,
+                 accelerationFirstNormal,
+                 jerkNormal,
+                 signVelocityRelativeTangent,
+                 signVelocityTangentRelativeAngular,
+                 radiusEffective,
+                 signVelocityRelativeAngular,
+                 accelerationFirstAngular,
+                 jerkAngular,
+                 accelerationFirstTangent,
+                 jerkTangent):
+        deltaEntry = velocityNormal * deltaTime + accelerationFirstNormal / 2 * deltaTime ** 2 + jerkNormal / 6 * deltaTime ** 3
+        deltaForceNormal = kn * deltaEntry
+        accelerationNextNormal = accelerationFirstNormal + deltaForceNormal / self.mass
+        jerkNormal = (accelerationNextNormal - accelerationFirstNormal) / deltaTime
 
-    def getJerk(self, velocity, acceleration, k):
-        accelerationFirst = acceleration
-        jerk, accelerationNext = self.iterJerk(velocity, k, accelerationFirst, 0)
+        #######################################################################
+
+        deltaForceSliding = coefficientOfFrictionSliding * deltaForceNormal * signVelocityRelativeTangent
+        deltaMomentSliding = deltaForceSliding * self.radius * signVelocityTangentRelativeAngular
+        deltaMomentRolling = coefficientOfFrictionRolling * deltaForceNormal * radiusEffective * \
+                             signVelocityRelativeAngular * (-1)
+
+        accelerationNextAngular = accelerationFirstAngular + (deltaMomentSliding + deltaMomentRolling) / self.momentInertial + jerkAngular * deltaTime
+        accelerationNextTangent = accelerationFirstTangent + deltaForceSliding / self.mass + jerkTangent * deltaTime
+
+        jerkAngular = (accelerationNextAngular - accelerationFirstAngular) / deltaTime
+        jerkTangent = (accelerationNextTangent - accelerationFirstTangent) / deltaTime
+
+        #######################################################################
+
+        return jerkNormal, \
+               accelerationNextNormal, \
+               jerkTangent, \
+               accelerationNextTangent, \
+               jerkAngular, \
+               accelerationNextAngular
+
+    def getJerk(self,
+                velocityNormal,
+                accelerationNormal,
+                signVelocityRelativeTangent,
+                signVelocityTangentRelativeAngular,
+                radiusEffective,
+                signVelocityRelativeAngular,
+                accelerationAngular,
+                accelerationTangent):
+        accelerationFirstNormal = accelerationNormal
+        accelerationFirstAngular = accelerationAngular
+        accelerationFirstTangent = accelerationTangent
+        jerkNormal, accelerationNextNormal, \
+        jerkTangent, accelerationNextTangent, \
+        jerkAngular, accelerationNextAngular = self.iterJerk(velocityNormal, accelerationFirstNormal, 0,
+                                                             signVelocityRelativeTangent,
+                                                             signVelocityTangentRelativeAngular,
+                                                             radiusEffective,
+                                                             signVelocityRelativeAngular,
+                                                             accelerationFirstAngular, 0,
+                                                             accelerationFirstTangent, 0)
         i = 1
-        while abs((accelerationNext - acceleration) / (acceleration + eps)) > epsAcceleration:
-            acceleration = accelerationNext
-            jerk, accelerationNext = self.iterJerk(velocity, k, accelerationFirst, jerk)
+        while abs((accelerationNextNormal - accelerationNormal) / (accelerationNormal + eps)) > epsAcceleration and \
+                abs((accelerationNextAngular - accelerationAngular) / (accelerationAngular + eps)) > epsAcceleration and \
+                abs((accelerationNextTangent - accelerationTangent) / (accelerationTangent + eps)) > epsAcceleration:
+            accelerationNormal = accelerationNextNormal
+            accelerationAngular = accelerationNextAngular
+            accelerationTangent = accelerationNextTangent
+
+            jerkNormal, accelerationNextNormal, \
+            jerkTangent, accelerationNextTangent, \
+            jerkAngular, accelerationNextAngular = self.iterJerk(velocityNormal, accelerationFirstNormal, jerkNormal,
+                                                                 signVelocityRelativeTangent,
+                                                                 signVelocityTangentRelativeAngular,
+                                                                 radiusEffective,
+                                                                 signVelocityRelativeAngular,
+                                                                 accelerationFirstAngular, jerkAngular,
+                                                                 accelerationFirstTangent, jerkTangent)
             i += 1
         print(i)
-        return jerk
+        return jerkNormal, jerkTangent, jerkAngular
 
     # def info(self):
     #     print('velocityAlpha', self.alphaRadian, 'velocityAbs', self.velocityAbsolute)

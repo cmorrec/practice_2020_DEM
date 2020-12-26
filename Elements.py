@@ -106,7 +106,7 @@ class Elements:
         self.started = False
         saveResults(self)
         self.energyMonitoring()
-        plotterForce()
+        plotter()
 
     def energyToSee(self):
         energyCount = 0
