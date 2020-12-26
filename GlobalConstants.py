@@ -28,7 +28,7 @@ coefficientOfFrictionRolling = 0.05
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 0
+accelerationY = 9.81
 kn = 2 * 1e5
 # ks = 0
 
