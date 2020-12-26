@@ -61,7 +61,7 @@ class BallForce(Ball):
         for interaction in self.interactionArray:
             self.jerkX += interaction.jerkX
             self.jerkY += interaction.jerkY
-            self.jerkX += interaction.jerkTheta
+            self.jerkTheta += interaction.jerkTheta
 
         self.addVelocity(
             (self.accelerationX + self.accelerationInteractionX - self.jerkX * deltaTime / 2),
