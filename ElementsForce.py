@@ -67,19 +67,13 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
     forceNormal1 = kn * entryNormal
     forceNormal2 = -1 * kn * entryNormal
-    forcePlot.append(abs(forceNormal1))
-    velocityPlot.append(velocity1XLocal * 1000)
-    if len(stepCountForce) == 0:
-        stepCountForce.append(0)
-    else:
-        stepCountForce.append(stepCountForce[len(stepCountForce) - 1] + 1)
 
     accelerationNormal1 = forceNormal1 / ball_1.mass
     accelerationNormal2 = forceNormal2 / ball_2.mass
 
-    jerk1 = getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), kn, ball_1.mass)
+    jerk1 = ball_1.getJerk(velocity1XLocal, accelerationNormal1 + getAccelerationFieldNormal(gama), kn)
     accelerationNormal1 += jerk1 * deltaTime
-    jerk2 = getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), kn, ball_2.mass)
+    jerk2 = ball_2.getJerk(velocity2XLocal, accelerationNormal2 + getAccelerationFieldNormal(gama), kn)
     accelerationNormal2 += jerk2 * deltaTime
 
     # print('velocity1YLocal', velocity1YLocal)
