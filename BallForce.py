@@ -12,10 +12,7 @@ def getAccelerationFieldNormal(alpha):
 
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas):
-        cnForce = getForceDamping(cn)
-        # print(cnForce)
-        csForce = getForceDamping(cs)
-        Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cnForce, csForce, density, color, canvas)
+        Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas)
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
         self.jerkX = 0
@@ -123,8 +120,6 @@ class BallForce(Ball):
         # ----------------------------- Damping part -----------------------------
         accelerationDampeningNormal = velocityXLocal * cn_wall / self.mass * (-1)
         accelerationDampeningTangent = velocityYLocal * cs_wall / self.mass * (-1)
-        print('normal dampening', accelerationDampeningNormal, 'normal', accelerationNormal)
-        print('tangent dampening', accelerationDampeningTangent, 'tangent', accelerationTangent)
 
         accelerationNormal += accelerationDampeningNormal
         accelerationTangent += accelerationDampeningTangent
@@ -301,7 +296,7 @@ class BallForce(Ball):
                                                                  accelerationFirstAngular, jerkAngular,
                                                                  accelerationFirstTangent, jerkTangent)
             i += 1
-        print(i)
+        # print(i)
         return jerkNormal, jerkTangent, jerkAngular
 
     # def info(self):
