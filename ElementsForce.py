@@ -100,24 +100,29 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
                                                                                 abs(forceNormal2), -1, radiusEffective,
                                                                                 signVelocityRelativeAngular)
 
-    jerkNormal1, jerkTangent1, jerkAngular1 =0,0,0# ball_1.getJerk(entryNormal, velocity1XLocal,  accelerationNormal1 + getAccelerationFieldNormal(gama),
-                                                  #           signVelocityRelativeTangent1, 1, radiusEffective, signVelocityRelativeAngular, accelerationAngular1, accelerationTangent1)
+    jerkNormal1, jerkTangent1, jerkAngular1 = ball_1.getJerk(entryNormal, velocity1XLocal,
+                                                             accelerationNormal1 + getAccelerationFieldNormal(gama),
+                                                             signVelocityRelativeTangent1, 1, radiusEffective,
+                                                             signVelocityRelativeAngular, accelerationAngular1,
+                                                             accelerationTangent1)
     accelerationNormal1 += jerkNormal1 * deltaTime
     accelerationTangent1 += jerkTangent1 * deltaTime
     accelerationAngular1 += jerkAngular1 * deltaTime
-    jerkNormal2, jerkTangent2, jerkAngular2 =0,0,0# ball_2.getJerk(entryNormal, velocity2XLocal,
-                                                             # accelerationNormal2 + getAccelerationFieldNormal(gama),
-                                                             # signVelocityRelativeTangent2,
-                                                             # -1, radiusEffective, signVelocityRelativeAngular,
-                                                             # accelerationAngular2, accelerationTangent2)
+    jerkNormal2, jerkTangent2, jerkAngular2 = ball_2.getJerk(entryNormal, velocity2XLocal,
+                                                             accelerationNormal2 + getAccelerationFieldNormal(gama),
+                                                             signVelocityRelativeTangent2,
+                                                             -1, radiusEffective, signVelocityRelativeAngular,
+                                                             accelerationAngular2, accelerationTangent2)
     accelerationNormal2 += jerkNormal2 * deltaTime
     accelerationTangent2 += jerkTangent2 * deltaTime
     accelerationAngular2 += jerkAngular2 * deltaTime
 
     ball_1.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkNormal1, jerkTangent1,
-                                  jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=numberOf2, stiffness=stiffness)
+                                  jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=numberOf2,
+                                  stiffness=stiffness)
     ball_2.saveAccelerationLength(gama, accelerationNormal2, accelerationTangent2, jerkNormal2, jerkTangent2,
-                                  jerkAngular2, entryNormal, accelerationAngular2, isBall=True, number=numberOf1, stiffness=stiffness)
+                                  jerkAngular2, entryNormal, accelerationAngular2, isBall=True, number=numberOf1,
+                                  stiffness=stiffness)
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
@@ -153,4 +158,3 @@ class ElementsForce(Elements):
                 elif isCrossBefore(self.balls[i], j):
                     deleteInteraction(self.balls[i], j)
                     deleteInteraction(self.balls[j], i)
-

@@ -80,8 +80,10 @@ class BallForce(Ball):
         alphaRadianLocalWall = wall.velocityAlpha - line.alphaNorm
 
         if wall.flagMove:
+            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocalWall)
             velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocalWall)
         else:
+            velocityXLocalWall = 0
             velocityYLocalWall = 0
         # print('alphaRadianLocal', alphaRadianLocal)
         # print('line.alphaNorm', line.alphaNorm)
@@ -110,6 +112,7 @@ class BallForce(Ball):
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
 
+        velocityRelativeNormal = velocityXLocal - velocityXLocalWall
         velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
         # print('velocityRelativeTangent', velocityRelativeTangent)
         signVelocityTangent = customSign(velocityRelativeTangent)
@@ -119,11 +122,23 @@ class BallForce(Ball):
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 self.radius, signVelocityAngular)
 
-        jerkNormal, jerkTangent, jerkAngular = 0,0,0#self.getJerk(entryNormal, velocityXLocal,
-                                                            # accelerationNormal + getAccelerationFieldNormal(
-                                                            #     line.alphaNorm), signVelocityTangent, 1, self.radius,
-                                                            # signVelocityAngular, accelerationAngular,
-                                                            # accelerationTangent)
+        # ----------------------------- Damping part -----------------------------
+        accelerationDampeningNormal = velocityXLocal * cn_wall / self.mass * (-1)
+        accelerationDampeningTangent = velocityYLocal * cs_wall / self.mass * (-1)
+
+        print('normal dampening', accelerationDampeningNormal, 'normal', accelerationNormal)
+        print('tangent dampening', accelerationDampeningTangent, 'tangent', accelerationTangent)
+
+        accelerationNormal += accelerationDampeningNormal
+        accelerationTangent += accelerationDampeningTangent
+        # ----------------------------- End damping part -----------------------------
+
+
+        jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityXLocal,
+                                                            accelerationNormal + getAccelerationFieldNormal(
+                                                                line.alphaNorm), signVelocityTangent, 1, self.radius,
+                                                            signVelocityAngular, accelerationAngular,
+                                                            accelerationTangent)
         accelerationNormal += jerkNormal * deltaTime
         accelerationTangent += jerkTangent * deltaTime
         accelerationAngular += jerkAngular * deltaTime

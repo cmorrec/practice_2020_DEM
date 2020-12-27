@@ -17,11 +17,11 @@ eps = 1e-9
 step = 100
 deltaTime = 1 * 1e-5
 # Шаг по времени
-cn_wall = 0.1
-cs_wall = 0.1
-if isForce:
-    cn_wall = getForceDamping(cn_wall)
-    cs_wall = getForceDamping(cs_wall)
+cn_wall = 1e2
+cs_wall = 1e2
+# if isForce:
+#     cn_wall = getForceDamping(cn_wall)
+#     cs_wall = getForceDamping(cs_wall)
 
 coefficientOfFrictionSliding = 0.1
 coefficientOfFrictionRolling = 0.05
