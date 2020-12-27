@@ -79,8 +79,10 @@ class BallForce(Ball):
         alphaRadianLocalWall = wall.velocityAlpha - line.alphaNorm
 
         if wall.flagMove:
+            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocalWall)
             velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocalWall)
         else:
+            velocityXLocalWall = 0
             velocityYLocalWall = 0
         # print('alphaRadianLocal', alphaRadianLocal)
         # print('line.alphaNorm', line.alphaNorm)
@@ -90,14 +92,14 @@ class BallForce(Ball):
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
 
-        dampeningNormal = velocityXLocal * cn_wall
-        dampeningTangent = velocityYLocal * cs_wall
-
-        velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
-        velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
-
-        self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
-                            sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
+        # dampeningNormal = velocityXLocal * cn_wall
+        # dampeningTangent = velocityYLocal * cs_wall
+        #
+        # velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
+        # velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+        #
+        # self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
+        #                     sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
 
         k = 1
         if not self.isInsidePolygon():
@@ -108,6 +110,7 @@ class BallForce(Ball):
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
 
+        velocityRelativeNormal = velocityXLocal - velocityXLocalWall
         velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
         # print('velocityRelativeTangent', velocityRelativeTangent)
         signVelocityTangent = customSign(velocityRelativeTangent)
@@ -116,6 +119,16 @@ class BallForce(Ball):
         # если вылетит из коробки могут быть проблемы со знаками forceNormal
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 self.radius, signVelocityAngular)
+
+        # ----------------------------- Damping part -----------------------------
+        accelerationDampeningNormal = velocityXLocal * cn_wall / self.mass * (-1)
+        accelerationDampeningTangent = velocityYLocal * cs_wall / self.mass * (-1)
+        print('normal dampening', accelerationDampeningNormal, 'normal', accelerationNormal)
+        print('tangent dampening', accelerationDampeningTangent, 'tangent', accelerationTangent)
+
+        accelerationNormal += accelerationDampeningNormal
+        accelerationTangent += accelerationDampeningTangent
+        # ----------------------------- End damping part -----------------------------
 
         jerkNormal, jerkTangent, jerkAngular = self.getJerk(velocityXLocal,
                                                             accelerationNormal + getAccelerationFieldNormal(
