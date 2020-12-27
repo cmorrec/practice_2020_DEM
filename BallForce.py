@@ -91,14 +91,14 @@ class BallForce(Ball):
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
 
-        dampeningNormal = velocityXLocal * cn_wall
-        dampeningTangent = velocityYLocal * cs_wall
-
-        velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
-        velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
-
-        self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
-                            sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
+        # dampeningNormal = velocityXLocal * cn_wall
+        # dampeningTangent = velocityYLocal * cs_wall
+        # 
+        # velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
+        # velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
+        #
+        # self.changeVelocity(atan2(velocityYLocal, velocityXLocal + eps) + line.alphaNorm,
+        #                     sqrt(velocityXLocal ** 2 + velocityYLocal ** 2))
 
         k = 1
         if not self.isInsidePolygon():

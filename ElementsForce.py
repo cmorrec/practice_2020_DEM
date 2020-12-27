@@ -53,14 +53,14 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     velocity2YRelative = -1 * velocity1YRelative
 
     # Демпфирование
-    velocity1XLocal = dampingLocalVelocity(velocity1XLocal, velocity1XRelative, ball_1.cn)
-    velocity2XLocal = dampingLocalVelocity(velocity2XLocal, velocity2XRelative, ball_2.cn)
-    velocity1YLocal = dampingLocalVelocity(velocity1YLocal, velocity1YRelative, ball_1.cs)
-    velocity2YLocal = dampingLocalVelocity(velocity2YLocal, velocity2YRelative, ball_2.cs)
-    ball_1.changeVelocity(atan2(velocity1YLocal, velocity1XLocal + eps) + gama,
-                          sqrt(velocity1XLocal ** 2 + velocity1YLocal ** 2))
-    ball_2.changeVelocity(atan2(velocity2YLocal, velocity2XLocal + eps) + gama,
-                          sqrt(velocity2XLocal ** 2 + velocity2YLocal ** 2))
+    # velocity1XLocal = dampingLocalVelocity(velocity1XLocal, velocity1XRelative, ball_1.cn)
+    # velocity2XLocal = dampingLocalVelocity(velocity2XLocal, velocity2XRelative, ball_2.cn)
+    # velocity1YLocal = dampingLocalVelocity(velocity1YLocal, velocity1YRelative, ball_1.cs)
+    # velocity2YLocal = dampingLocalVelocity(velocity2YLocal, velocity2YRelative, ball_2.cs)
+    # ball_1.changeVelocity(atan2(velocity1YLocal, velocity1XLocal + eps) + gama,
+    #                       sqrt(velocity1XLocal ** 2 + velocity1YLocal ** 2))
+    # ball_2.changeVelocity(atan2(velocity2YLocal, velocity2XLocal + eps) + gama,
+    #                       sqrt(velocity2XLocal ** 2 + velocity2YLocal ** 2))
 
     # Непосредственно решение задачи о нецентральном упругом ударе двух дисков
     entryNormal = (ball_1.radius + ball_2.radius - sqrt((ball_1.x - ball_2.x) ** 2 + (ball_1.y - ball_2.y) ** 2))
