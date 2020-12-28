@@ -100,6 +100,21 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
                                                                                 abs(forceNormal2), -1, radiusEffective,
                                                                                 signVelocityRelativeAngular)
 
+    # ----------------------------- Damping part -----------------------------
+    accelerationDampeningNormal1 = velocity1XLocal * getDampingNormal(radiusEffective, entryNormal,
+                                                                      ball_1.mass, ball_1.cn) / ball_1.mass * (-1)
+    accelerationDampeningTangent1 = velocity1YLocal * getDampingTangent(radiusEffective, entryNormal,
+                                                                        ball_1.mass, ball_1.cs) / ball_1.mass
+    accelerationNormal1 += accelerationDampeningNormal1
+    accelerationTangent1 += accelerationDampeningTangent1
+
+    accelerationDampeningNormal2 = velocity2XLocal * getDampingNormal(radiusEffective, entryNormal,
+                                                                      ball_2.mass, ball_2.cn) / ball_2.mass * (-1)
+    accelerationDampeningTangent2 = velocity2YLocal * getDampingTangent(radiusEffective, entryNormal,
+                                                                        ball_2.mass, ball_2.cs) / ball_2.mass
+    accelerationNormal2 += accelerationDampeningNormal2
+    accelerationTangent2 += accelerationDampeningTangent2
+    # ----------------------------- End damping part -----------------------------
     jerkNormal1, jerkTangent1, jerkAngular1 = ball_1.getJerk(entryNormal, velocity1XLocal,
                                                              accelerationNormal1 + getAccelerationFieldNormal(gama),
                                                              signVelocityRelativeTangent1, 1, radiusEffective,

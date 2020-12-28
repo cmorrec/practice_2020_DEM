@@ -12,10 +12,7 @@ def getAccelerationFieldNormal(alpha):
 
 class BallForce(Ball):
     def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas):
-        cnForce = getForceDamping(cn)
-        # print(cnForce)
-        csForce = getForceDamping(cs)
-        Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cnForce, csForce, density, color, canvas)
+        Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas)
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
         self.jerkX = 0
@@ -122,17 +119,21 @@ class BallForce(Ball):
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 self.radius, signVelocityAngular)
 
-        # ----------------------------- Damping part -----------------------------
-        accelerationDampeningNormal = velocityXLocal * cn_wall / self.mass * (-1)
-        accelerationDampeningTangent = velocityYLocal * cs_wall / self.mass * (-1)
+        # print(accelerationAngular, accelerationTangent)
+        # accelerationAngular = 0
+        # entryTangent = sqrt(self.radius ** 2 - (self.radius * entryNormal) ** 2)
+        # accelerationTangent = 8 * G_eff * stiffness * entryTangent / self.mass
+        # print(accelerationAngular, accelerationTangent)
 
-        print('normal dampening', accelerationDampeningNormal, 'normal', accelerationNormal)
-        print('tangent dampening', accelerationDampeningTangent, 'tangent', accelerationTangent)
+        # ----------------------------- Damping part -----------------------------
+        accelerationDampeningNormal = velocityXLocal * getDampingNormal(self.radius, entryNormal,
+                                                                        self.mass, cn_wall) / self.mass * (-1)
+        accelerationDampeningTangent = velocityYLocal * getDampingTangent(self.radius, entryNormal,
+                                                                          self.mass, cs_wall) / self.mass
 
         accelerationNormal += accelerationDampeningNormal
         accelerationTangent += accelerationDampeningTangent
         # ----------------------------- End damping part -----------------------------
-
 
         jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityXLocal,
                                                             accelerationNormal + getAccelerationFieldNormal(
@@ -190,7 +191,7 @@ class BallForce(Ball):
                 self.interactionArray.remove(interaction)
                 break
 
-    def saveAccelerationLength(self,alphaRadianLocal,
+    def saveAccelerationLength(self, alphaRadianLocal,
                                accelerationNormal,
                                accelerationTangent,
                                jerkNormal,
@@ -212,7 +213,8 @@ class BallForce(Ball):
         jerkY = jerkNormal * sin(alphaRadianLocal) - jerkTangent * cos(alphaRadianLocal)
         for interaction in self.interactionArray:
             if interaction.number == number and interaction.isBall == isBall:
-                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY, jerkAngular,
+                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
+                                               jerkAngular,
                                                entryNormal, accelerationAngular, stiffness)
                 return
         self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY,

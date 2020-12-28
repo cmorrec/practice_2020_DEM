@@ -17,8 +17,8 @@ eps = 1e-9
 step = 100
 deltaTime = 1 * 1e-5
 # Шаг по времени
-cn_wall = 1e2
-cs_wall = 1e2
+cn_wall = 1
+cs_wall = 1
 # if isForce:
 #     cn_wall = getForceDamping(cn_wall)
 #     cs_wall = getForceDamping(cs_wall)
@@ -28,7 +28,7 @@ coefficientOfFrictionRolling = 0.05
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 9.81
+accelerationY = 0
 kn = 2 * 1e5
 # ks = 0
 
@@ -37,3 +37,6 @@ E_2 = 2 * 1e11
 nu_1 = 0.3
 nu_2 = 0.3
 E_eff = ((1 - (nu_1 ** 2))/E_1 + (1 - (nu_2 ** 2))/E_2) ** (-1)
+G_1 = 8 * 1e10
+G_2 = 8 * 1e10
+G_eff = ((2 - nu_1)/G_1 + (2 - nu_2)/G_2) ** (-1)
