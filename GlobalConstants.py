@@ -19,6 +19,7 @@ deltaTime = 1 * 1e-5
 # Шаг по времени
 cn_wall = 1
 cs_wall = 1
+coefficientOfDampingTheta = 0
 # if isForce:
 #     cn_wall = getForceDamping(cn_wall)
 #     cs_wall = getForceDamping(cs_wall)
@@ -28,7 +29,7 @@ coefficientOfFrictionRolling = 0.05
 
 # коэффициенты демпфирования для стенок
 accelerationX = 0
-accelerationY = 0
+accelerationY = 9.81
 kn = 2 * 1e5
 # ks = 0
 

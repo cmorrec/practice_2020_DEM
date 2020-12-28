@@ -155,7 +155,7 @@ class BallForce(Ball):
                                 radiusEffective,
                                 signVelocityRelativeAngular):
         forceSliding = coefficientOfFrictionSliding * forceNormal * signVelocityRelativeTangent
-        momentSliding = forceSliding * self.radius * signVelocityTangentRelativeAngular
+        momentSliding = forceSliding * radiusEffective * signVelocityTangentRelativeAngular
 
         momentRolling = coefficientOfFrictionRolling * forceNormal * radiusEffective * signVelocityRelativeAngular * (
             -1)
