@@ -109,8 +109,11 @@ class BallForce(Ball):
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
 
+        radiusOfWallInContactDot = distanceNow(Coordinate(self.x, self.y),
+                                               Coordinate(wall.centerX, wall.centerY)) + self.radius - entryNormal
         velocityRelativeNormal = velocityXLocal - velocityXLocalWall
-        velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
+        velocityRelativeTangent = velocityYLocal - velocityYLocalWall + (
+                self.velocityTheta * self.radius + wall.velocityTheta * radiusOfWallInContactDot)
         # print('velocityRelativeTangent', velocityRelativeTangent)
         signVelocityTangent = customSign(velocityRelativeTangent)
         signVelocityAngular = customSign(self.velocityTheta)
@@ -126,10 +129,10 @@ class BallForce(Ball):
         # print(accelerationAngular, accelerationTangent)
 
         # ----------------------------- Damping part -----------------------------
-        accelerationDampeningNormal = velocityXLocal * getDampingNormal(self.radius, entryNormal,
-                                                                        self.mass, cn_wall) / self.mass * (-1)
-        accelerationDampeningTangent = velocityYLocal * getDampingTangent(self.radius, entryNormal,
-                                                                          self.mass, cs_wall) / self.mass
+        accelerationDampeningNormal = velocityRelativeNormal * getDampingNormal(self.radius, entryNormal,
+                                                                                self.mass, cn_wall) / self.mass * (-1)
+        accelerationDampeningTangent = velocityRelativeTangent * getDampingTangent(self.radius, entryNormal,
+                                                                                   self.mass, cs_wall) / self.mass
 
         accelerationNormal += accelerationDampeningNormal
         accelerationTangent += accelerationDampeningTangent

@@ -10,6 +10,7 @@ ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
 ballStartFileName4Plate = './ball_sets/4_plate.txt'
 ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
 ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
+ballStartFileNameBallMill = './ball_sets/ball_mill.txt'
 
 ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
 ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
@@ -42,9 +43,10 @@ coordinatesFileNameSquare = './walls_dynamic/square.txt'
 coordinatesFileNameSquareBig = './walls_dynamic/square_big.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
+coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
 
-coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileName2Ball
+coordinatesFileName = coordinatesFileNameMill
+ballStartFileName = ballStartFileNameBallMill
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []

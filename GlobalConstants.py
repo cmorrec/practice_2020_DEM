@@ -1,4 +1,4 @@
-displayRatio = 1000
+displayRatio = 100
 midInteractionNum = 32
 
 
