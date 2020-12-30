@@ -135,9 +135,8 @@ class BallForce(Ball):
         accelerationTangent += accelerationDampeningTangent
         # ----------------------------- End damping part -----------------------------
 
-        jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityXLocal,
-                                                            accelerationNormal + getAccelerationFieldNormal(
-                                                                line.alphaNorm), signVelocityTangent, 1, self.radius,
+        jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityRelativeNormal,
+                                                            accelerationNormal, signVelocityTangent, 1, self.radius,
                                                             signVelocityAngular, accelerationAngular,
                                                             accelerationTangent)
         accelerationNormal += jerkNormal * deltaTime
