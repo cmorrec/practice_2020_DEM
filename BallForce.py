@@ -89,6 +89,9 @@ class BallForce(Ball):
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
 
+        velocityXLocalRelative = velocityXLocal - velocityXLocalWall
+        velocityYLocalRelative = velocityYLocal - velocityYLocalWall
+
         # dampeningNormal = velocityXLocal * cn_wall
         # dampeningTangent = velocityYLocal * cs_wall
         #
@@ -118,16 +121,15 @@ class BallForce(Ball):
                                                                                 self.radius, signVelocityAngular)
 
         # ----------------------------- Damping part -----------------------------
-        accelerationDampeningNormal = velocityXLocal * cn_wall / self.mass * (-1)
-        accelerationDampeningTangent = velocityYLocal * cs_wall / self.mass * (-1)
+        accelerationDampeningNormal = velocityXLocalRelative * cn_wall / self.mass * (-1)
+        accelerationDampeningTangent = velocityYLocalRelative * cs_wall / self.mass * (-1)
 
         accelerationNormal += accelerationDampeningNormal
         accelerationTangent += accelerationDampeningTangent
         # ----------------------------- End damping part -----------------------------
 
-        jerkNormal, jerkTangent, jerkAngular = self.getJerk(velocityXLocal,
-                                                            accelerationNormal + getAccelerationFieldNormal(
-                                                                line.alphaNorm), signVelocityTangent, 1, self.radius,
+        jerkNormal, jerkTangent, jerkAngular = self.getJerk(velocityXLocalRelative,
+                                                            accelerationNormal, signVelocityTangent, 1, self.radius,
                                                             signVelocityAngular, accelerationAngular,
                                                             accelerationTangent)
         accelerationNormal += jerkNormal * deltaTime
