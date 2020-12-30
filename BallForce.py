@@ -43,7 +43,8 @@ class BallForce(Ball):
                 deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3
         self.y += self.velocityY * deltaTime - 0.5 * (self.accelerationY + self.accelerationInteractionY) * (
                 deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3
-        self.theta += (self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (deltaTime ** 2) - self.jerkTheta * (deltaTime ** 3) / 3) % (2 * pi)
+        self.theta += (self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (
+                deltaTime ** 2) - self.jerkTheta * (deltaTime ** 3) / 3) % (2 * pi)
 
     def addVelocityMethod(self):
         self.accelerationInteractionX = 0
@@ -89,9 +90,6 @@ class BallForce(Ball):
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
 
-        velocityXLocalRelative = velocityXLocal - velocityXLocalWall
-        velocityYLocalRelative = velocityYLocal - velocityYLocalWall
-
         # dampeningNormal = velocityXLocal * cn_wall
         # dampeningTangent = velocityYLocal * cs_wall
         #
@@ -110,8 +108,11 @@ class BallForce(Ball):
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
 
+        radiusOfWallInContactDot = distanceNow(Coordinate(self.x, self.y),
+                                               Coordinate(wall.centerX, wall.centerY)) + self.radius - entryNormal
         velocityRelativeNormal = velocityXLocal - velocityXLocalWall
-        velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)
+        velocityRelativeTangent = velocityYLocal - velocityYLocalWall + (
+                self.velocityTheta * self.radius + wall.velocityTheta * radiusOfWallInContactDot)
         # print('velocityRelativeTangent', velocityRelativeTangent)
         signVelocityTangent = customSign(velocityRelativeTangent)
         signVelocityAngular = customSign(self.velocityTheta)
@@ -120,15 +121,17 @@ class BallForce(Ball):
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 self.radius, signVelocityAngular)
 
+
+
         # ----------------------------- Damping part -----------------------------
-        accelerationDampeningNormal = velocityXLocalRelative * cn_wall / self.mass * (-1)
-        accelerationDampeningTangent = velocityYLocalRelative * cs_wall / self.mass * (-1)
+        accelerationDampeningNormal = velocityRelativeNormal * cn_wall / self.mass * (-1)
+        accelerationDampeningTangent = velocityRelativeTangent * cs_wall / self.mass * (-1)
 
         accelerationNormal += accelerationDampeningNormal
         accelerationTangent += accelerationDampeningTangent
         # ----------------------------- End damping part -----------------------------
 
-        jerkNormal, jerkTangent, jerkAngular = self.getJerk(velocityXLocalRelative,
+        jerkNormal, jerkTangent, jerkAngular = self.getJerk(velocityRelativeNormal,
                                                             accelerationNormal, signVelocityTangent, 1, self.radius,
                                                             signVelocityAngular, accelerationAngular,
                                                             accelerationTangent)
@@ -244,7 +247,8 @@ class BallForce(Ball):
         deltaMomentRolling = coefficientOfFrictionRolling * deltaForceNormal * radiusEffective * \
                              signVelocityRelativeAngular * (-1)
 
-        accelerationNextAngular = accelerationFirstAngular + (deltaMomentSliding + deltaMomentRolling) / self.momentInertial + jerkAngular * deltaTime
+        accelerationNextAngular = accelerationFirstAngular + (
+                deltaMomentSliding + deltaMomentRolling) / self.momentInertial + jerkAngular * deltaTime
         accelerationNextTangent = accelerationFirstTangent + deltaForceSliding / self.mass + jerkTangent * deltaTime
 
         jerkAngular = (accelerationNextAngular - accelerationFirstAngular) / deltaTime

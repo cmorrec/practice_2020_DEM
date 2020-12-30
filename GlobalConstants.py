@@ -1,4 +1,4 @@
-displayRatio = 1000
+displayRatio = 100
 midInteractionNum = 1000
 
 
@@ -17,8 +17,8 @@ eps = 1e-9
 step = 100
 deltaTime = 1 * 1e-5
 # Шаг по времени
-cn_wall = 10
-cs_wall = 10
+cn_wall = 2 * 1e1
+cs_wall = 1 * 1e1
 # if isForce:
 #     cn_wall = getForceDamping(cn_wall)
 #     cs_wall = getForceDamping(cs_wall)
@@ -29,5 +29,5 @@ coefficientOfFrictionRolling = 0.05
 # коэффициенты демпфирования для стенок
 accelerationX = 0
 accelerationY = 9.81
-kn = 2 * 1e5
+kn = 2 * 1e6
 # ks = 0
