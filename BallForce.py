@@ -116,7 +116,7 @@ class BallForce(Ball):
                 self.velocityTheta * self.radius + wall.velocityTheta * radiusOfWallInContactDot)
         # print('velocityRelativeTangent', velocityRelativeTangent)
         signVelocityTangent = customSign(velocityRelativeTangent)
-        signVelocityAngular = customSign(self.velocityTheta + wall.velocityTheta)
+        signVelocityAngular = customSign(self.velocityTheta - wall.velocityTheta)
 
         # если вылетит из коробки могут быть проблемы со знаками forceNormal
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
