@@ -293,7 +293,7 @@ class BallForce(Ball):
                                                              signVelocityRelativeAngular,
                                                              accelerationFirstAngular, 0,
                                                              accelerationFirstTangent, 0)
-        i = 1
+        # i = 1
         while abs((accelerationNextNormal - accelerationNormal) / (accelerationNormal + eps)) > epsAcceleration and \
                 abs((accelerationNextAngular - accelerationAngular) / (accelerationAngular + eps)) > epsAcceleration and \
                 abs((accelerationNextTangent - accelerationTangent) / (accelerationTangent + eps)) > epsAcceleration:
@@ -311,8 +311,8 @@ class BallForce(Ball):
                                                                  signVelocityRelativeAngular,
                                                                  accelerationFirstAngular, jerkAngular,
                                                                  accelerationFirstTangent, jerkTangent)
-            i += 1
-        print(i)
+            # i += 1
+        # print(i)
         return jerkNormal, jerkTangent, jerkAngular
 
     # def info(self):
