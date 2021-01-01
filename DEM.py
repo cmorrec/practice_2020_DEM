@@ -11,6 +11,7 @@ ballStartFileName4Plate = './ball_sets/4_plate.txt'
 ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
 ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
 ballStartFileNameBallMill = './ball_sets/ball_mill.txt'
+ballStartFileNameBallMillBig = './ball_sets/ball_mill_big.txt'
 
 ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
 ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
@@ -46,7 +47,7 @@ coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
 
 coordinatesFileName = coordinatesFileNameMill
-ballStartFileName = ballStartFileNameBallMill
+ballStartFileName = ballStartFileNameBallMillBig
 
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -147,7 +148,7 @@ tk.update()
 
 steps = 0
 elements.begin()
-while True:
+while len(stepCount) < 2 * 1e6:
     # start_time = time.time()
     if elements.started:
         for i in range(step):
@@ -158,3 +159,5 @@ while True:
     tk.update_idletasks()
     tk.update()
     # print("+++ %s seconds +++" % (time.time() - start_time))
+elements.energyMonitoring()
+elements.exit(None)
