@@ -16,6 +16,10 @@ class MoveWall(Wall):
         self.velocityTheta = velocityTheta
         self.absX = absX
         self.absY = absY
+        self.freqX = 0
+        self.freqY = 70 * pi
+        self.ArgX = 0
+        self.ArgY = 0
         MoveWall.__instance = self
         self.flagMove = True
 
@@ -48,6 +52,29 @@ class MoveWall(Wall):
                                displayRatio * line.x2,
                                displayRatio * line.y2)
 
+    def getVelocityAlpha(self):
+        return atan2(self.getVelocityY(), self.getVelocityX() + eps)
+
+    def getVelocityX(self):
+        if not self.flagMove:
+            return 0
+        return self.absX * self.freqX * cos(self.ArgX)
+
+    def getVelocityY(self):
+        if not self.flagMove:
+            return 0
+        return self.absY * self.freqY * cos(self.ArgY)
+
+    def getAccelerationX(self):
+        if not self.flagMove:
+            return 0
+        return - self.absX * self.freqX**2 * sin(self.ArgX)
+
+    def getAccelerationY(self):
+        if not self.flagMove:
+            return 0
+        return - self.absY * self.freqY**2 * sin(self.ArgY)
+
     def thetaMove(self):
         if abs(self.velocityTheta) < eps:
             return
@@ -72,11 +99,34 @@ class MoveWall(Wall):
             # Сохраняем
             line.setCoordinates(Coordinate(x_1, y_1), Coordinate(x_2, y_2))
 
+    # def linearMove(self):
+    #     if abs(self.velocityX) < eps and abs(self.velocityY) < eps:
+    #         return
+    #     littleX = self.velocityX * deltaTime
+    #     littleY = self.velocityY * deltaTime
+    #     # Перемещение центра
+    #     self.centerX += littleX
+    #     self.centerY += littleY
+    #
+    #     for i, line in enumerate(self.lines):
+    #         # Нахождение новых координат
+    #         x_1 = line.x1 + littleX
+    #         x_2 = line.x2 + littleX
+    #         y_1 = line.y1 + littleY
+    #         y_2 = line.y2 + littleY
+    #
+    #         # Сохраняем
+    #         line.setCoordinates(Coordinate(x_1, y_1), Coordinate(x_2, y_2))
+
     def linearMove(self):
-        if abs(self.velocityX) < eps and abs(self.velocityY) < eps:
+        if abs(self.freqX) < eps and abs(self.freqY) < eps:
             return
-        littleX = self.velocityX * deltaTime
-        littleY = self.velocityY * deltaTime
+        NextArgX = self.ArgX + self.freqX * deltaTime
+        NextArgY = self.ArgY + self.freqY * deltaTime
+        littleX = self.absX * (sin(NextArgX) - sin(self.ArgX))
+        littleY = self.absY * (sin(NextArgY) - sin(self.ArgY))
+        self.ArgX = NextArgX
+        self.ArgY = NextArgY
         # Перемещение центра
         self.centerX += littleX
         self.centerY += littleY

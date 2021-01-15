@@ -5,9 +5,11 @@ from MoveWall import *
 
 
 class Ball:
-    def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas):
+    def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas):
         self.x = x
         self.y = y
+        self.Emod = Emod
+        self.nu = nu
         self.xLastDraw = x
         self.yLastDraw = y
         self.theta = 0

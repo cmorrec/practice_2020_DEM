@@ -11,10 +11,13 @@ def getAccelerationFieldNormal(alpha):
 
 
 class BallForce(Ball):
-    def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas):
-        Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, color, canvas)
+    def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas):
+        Ball.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas)
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
+        self.Gmod = self.Emod / (2 * (1 + self.nu))
+        # self.cn = getForceDamping(cn)
+        # self.cs = getForceDamping(cs)
         self.jerkX = 0
         self.jerkY = 0
         self.jerkTheta = 0
@@ -74,14 +77,23 @@ class BallForce(Ball):
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
 
         wall = MoveWall.getInstance()
-        alphaRadianLocalWall = wall.velocityAlpha - line.alphaNorm
-
-        if wall.flagMove:
-            velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocalWall)
-            velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocalWall)
-        else:
-            velocityXLocalWall = 0
-            velocityYLocalWall = 0
+        alphaRadianLocalWall = wall.getVelocityAlpha() - line.alphaNorm
+        E_eff = ((1 - (self.nu ** 2)) / self.Emod + (1 - (nu_wall ** 2)) / Emod_wall) ** (-1)
+        G_eff = ((2 - self.nu) / self.Gmod + (2 - nu_wall) / Gmod_wall) ** (-1)
+        # if wall.flagMove:
+        #     velocityXLocalWall = wall.velocityAbsolute * cos(alphaRadianLocalWall)
+        #     velocityYLocalWall = wall.velocityAbsolute * sin(alphaRadianLocalWall)
+        # else:
+        #     velocityXLocalWall = 0
+        #     velocityYLocalWall = 0
+        velocityXLocalWall = wall.getVelocityX() * cos(alphaRadianLocalWall) + wall.getVelocityY() * sin(
+            alphaRadianLocalWall)
+        velocityYLocalWall = wall.getVelocityX() * cos(alphaRadianLocalWall) - wall.getVelocityY() * sin(
+            alphaRadianLocalWall)
+        accelerationXLocalWall = wall.getAccelerationX() * cos(alphaRadianLocalWall) + wall.getAccelerationY() * sin(
+            alphaRadianLocalWall)
+        accelerationYLocalWall = wall.getAccelerationX() * cos(alphaRadianLocalWall) - wall.getAccelerationY() * sin(
+            alphaRadianLocalWall)
         # print('alphaRadianLocal', alphaRadianLocal)
         # print('line.alphaNorm', line.alphaNorm)
         # print('wall.velocityAbsolute', wall.velocityAbsolute)
@@ -89,10 +101,9 @@ class BallForce(Ball):
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
-
         # dampeningNormal = velocityXLocal * cn_wall
         # dampeningTangent = velocityYLocal * cs_wall
-        # 
+        #
         # velocityXLocal = dampeningVelocity(dampeningNormal, velocityXLocal)
         # velocityYLocal = dampeningVelocity(dampeningTangent, velocityYLocal)
         #
@@ -104,7 +115,7 @@ class BallForce(Ball):
             k = -1
 
         entryNormal = self.radius - k * line.distanceToLine(self.x, self.y)
-        stiffness = getStiffness(self.radius, abs(entryNormal))
+        stiffness = getStiffness(self.radius, abs(entryNormal), E_eff)
         forceNormal = stiffness * entryNormal
         accelerationNormal = forceNormal / self.mass
         # print(accelerationNormal)
@@ -112,8 +123,9 @@ class BallForce(Ball):
         radiusOfWallInContactDot = distanceNow(Coordinate(self.x, self.y),
                                                Coordinate(wall.centerX, wall.centerY)) + self.radius - entryNormal
         velocityRelativeNormal = velocityXLocal - velocityXLocalWall
-        velocityRelativeTangent = velocityYLocal - velocityYLocalWall + (
-                self.velocityTheta * self.radius + wall.velocityTheta * radiusOfWallInContactDot)
+
+        velocityRelativeTangent = velocityYLocal - velocityYLocalWall - (
+                self.velocityTheta * self.radius - wall.velocityTheta * radiusOfWallInContactDot)
         # print('velocityRelativeTangent', velocityRelativeTangent)
         signVelocityTangent = customSign(velocityRelativeTangent)
         signVelocityAngular = customSign(self.velocityTheta - wall.velocityTheta)
@@ -121,6 +133,7 @@ class BallForce(Ball):
         # если вылетит из коробки могут быть проблемы со знаками forceNormal
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 self.radius, signVelocityAngular)
+
 
         # print(accelerationAngular, accelerationTangent)
         # accelerationAngular = 0
@@ -130,18 +143,23 @@ class BallForce(Ball):
 
         # ----------------------------- Damping part -----------------------------
         accelerationDampeningNormal = velocityRelativeNormal * getDampingNormal(self.radius, entryNormal,
-                                                                                self.mass, cn_wall) / self.mass * (-1)
+                                                                                self.mass, cn_wall,
+                                                                                E_eff) / self.mass * (-1)
         accelerationDampeningTangent = velocityRelativeTangent * getDampingTangent(self.radius, entryNormal,
-                                                                                   self.mass, cs_wall) / self.mass
+                                                                                   self.mass, cs_wall,
+                                                                                   G_eff) / self.mass
 
         accelerationNormal += accelerationDampeningNormal
         accelerationTangent += accelerationDampeningTangent
         # ----------------------------- End damping part -----------------------------
 
+        accelerationRelativeNormal = accelerationNormal - accelerationXLocalWall
+        accelerationRelativeTangent = accelerationTangent - accelerationYLocalWall
+
         jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityRelativeNormal,
-                                                            accelerationNormal, signVelocityTangent, 1, self.radius,
+                                                            accelerationRelativeNormal, signVelocityTangent, 1, self.radius,
                                                             signVelocityAngular, accelerationAngular,
-                                                            accelerationTangent)
+                                                            accelerationRelativeTangent, E_eff)
         accelerationNormal += jerkNormal * deltaTime
         accelerationTangent += jerkTangent * deltaTime
         accelerationAngular += jerkAngular * deltaTime
@@ -241,11 +259,11 @@ class BallForce(Ball):
                  accelerationFirstAngular,
                  jerkAngular,
                  accelerationFirstTangent,
-                 jerkTangent):
+                 jerkTangent, E_eff):
         deltaEntryNormal = velocityNormal * deltaTime + (accelerationFirstNormal * (deltaTime ** 2)) / 2 + (
                 jerkNormal * (deltaTime ** 3)) / 6
         entryNextNormal = entryNormal + deltaEntryNormal
-        stiffness = getStiffness(radiusEffective, abs(entryNextNormal))
+        stiffness = getStiffness(radiusEffective, abs(entryNextNormal), E_eff)
         forceNextNormal = stiffness * entryNextNormal * customSign(accelerationFirstNormal)
         deltaForceNormal = forceNextNormal - (accelerationFirstNormal * self.mass)
         accelerationNextNormal = forceNextNormal / self.mass
@@ -280,7 +298,7 @@ class BallForce(Ball):
                 radiusEffective,
                 signVelocityRelativeAngular,
                 accelerationAngular,
-                accelerationTangent):
+                accelerationTangent, E_eff):
         accelerationFirstNormal = accelerationNormal
         accelerationFirstAngular = accelerationAngular
         accelerationFirstTangent = accelerationTangent
@@ -292,7 +310,7 @@ class BallForce(Ball):
                                                              radiusEffective,
                                                              signVelocityRelativeAngular,
                                                              accelerationFirstAngular, 0,
-                                                             accelerationFirstTangent, 0)
+                                                             accelerationFirstTangent, 0, E_eff)
         # i = 1
         while abs((accelerationNextNormal - accelerationNormal) / (accelerationNormal + eps)) > epsAcceleration and \
                 abs((accelerationNextAngular - accelerationAngular) / (accelerationAngular + eps)) > epsAcceleration and \
@@ -310,7 +328,7 @@ class BallForce(Ball):
                                                                  radiusEffective,
                                                                  signVelocityRelativeAngular,
                                                                  accelerationFirstAngular, jerkAngular,
-                                                                 accelerationFirstTangent, jerkTangent)
+                                                                 accelerationFirstTangent, jerkTangent, E_eff)
             # i += 1
         # print(i)
         return jerkNormal, jerkTangent, jerkAngular

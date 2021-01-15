@@ -44,6 +44,9 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
     gama = atan2((ball_1.y - ball_2.y), (ball_1.x - ball_2.x))
 
+    E_eff = ((1 - (ball_1.nu ** 2)) / ball_1.Emod + (1 - (ball_2.nu ** 2)) / ball_2.Emod) ** (-1)
+    G_eff = ((2 - ball_1.nu) / ball_1.Gmod + (2 - ball_2.nu) / ball_2.Gmod) ** (-1)
+
     velocity1XLocal, velocity1YLocal = findLocalVelocities(ball_1, gama)
     velocity2XLocal, velocity2YLocal = findLocalVelocities(ball_2, gama)
 
@@ -66,7 +69,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     entryNormal = (ball_1.radius + ball_2.radius - sqrt((ball_1.x - ball_2.x) ** 2 + (ball_1.y - ball_2.y) ** 2))
     radiusEffective = ((1 / ball_1.radius) + (1 / ball_2.radius)) ** (-1)
 
-    stiffness = getStiffness(radiusEffective, entryNormal)
+    stiffness = getStiffness(radiusEffective, entryNormal, E_eff)
     forceNormal1 = stiffness * entryNormal
     forceNormal2 = -1 * stiffness * entryNormal
 
@@ -102,16 +105,16 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
     # ----------------------------- Damping part -----------------------------
     accelerationDampeningNormal1 = velocity1XRelative * getDampingNormal(radiusEffective, entryNormal,
-                                                                         ball_1.mass, ball_1.cn) / ball_1.mass * (-1)
+                                                                         ball_1.mass, ball_1.cn, E_eff) / ball_1.mass * (-1)
     accelerationDampeningTangent1 = velocity1YRelative * getDampingTangent(radiusEffective, entryNormal,
-                                                                           ball_1.mass, ball_1.cs) / ball_1.mass
+                                                                           ball_1.mass, ball_1.cs, G_eff) / ball_1.mass
     accelerationNormal1 += accelerationDampeningNormal1
     accelerationTangent1 += accelerationDampeningTangent1
 
     accelerationDampeningNormal2 = velocity2XRelative * getDampingNormal(radiusEffective, entryNormal,
-                                                                         ball_2.mass, ball_2.cn) / ball_2.mass * (-1)
+                                                                         ball_2.mass, ball_2.cn, E_eff) / ball_2.mass * (-1)
     accelerationDampeningTangent2 = velocity2YRelative * getDampingTangent(radiusEffective, entryNormal,
-                                                                           ball_2.mass, ball_2.cs) / ball_2.mass
+                                                                           ball_2.mass, ball_2.cs, G_eff) / ball_2.mass
     accelerationNormal2 += accelerationDampeningNormal2
     accelerationTangent2 += accelerationDampeningTangent2
     # ----------------------------- End damping part -----------------------------
@@ -119,7 +122,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
                                                              accelerationNormal1 + getAccelerationFieldNormal(gama),
                                                              signVelocityRelativeTangent1, 1, radiusEffective,
                                                              signVelocityRelativeAngular, accelerationAngular1,
-                                                             accelerationTangent1)
+                                                             accelerationTangent1, E_eff)
     accelerationNormal1 += jerkNormal1 * deltaTime
     accelerationTangent1 += jerkTangent1 * deltaTime
     accelerationAngular1 += jerkAngular1 * deltaTime
@@ -127,7 +130,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
                                                              accelerationNormal2 + getAccelerationFieldNormal(gama),
                                                              signVelocityRelativeTangent2,
                                                              -1, radiusEffective, signVelocityRelativeAngular,
-                                                             accelerationAngular2, accelerationTangent2)
+                                                             accelerationAngular2, accelerationTangent2, E_eff)
     accelerationNormal2 += jerkNormal2 * deltaTime
     accelerationTangent2 += jerkTangent2 * deltaTime
     accelerationAngular2 += jerkAngular2 * deltaTime

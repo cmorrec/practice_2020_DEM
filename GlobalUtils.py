@@ -224,13 +224,13 @@ def distanceNow(i, j):
     return sqrt((i.x - j.x) ** 2 + (i.y - j.y) ** 2)
 
 
-def getStiffness(radius, entry):
+def getStiffness(radius, entry, E_eff):
     return (4 / 3) * E_eff * sqrt(radius * entry)
 
 
-def getDampingNormal(radius, entry, mass, c):
+def getDampingNormal(radius, entry, mass, c, E_eff):
     return 2 * sqrt(mass * 2 * E_eff * entry * sqrt(radius)) * c
 
 
-def getDampingTangent(radius, entry, mass, c):
+def getDampingTangent(radius, entry, mass, c, G_eff):
     return 4 * sqrt(mass * 2 * G_eff * entry * sqrt(radius)) * c

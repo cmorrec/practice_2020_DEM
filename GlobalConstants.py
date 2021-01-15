@@ -1,5 +1,5 @@
-displayRatio = 100
-midInteractionNum = 32
+displayRatio = 10000
+midInteractionNum = 100
 
 
 def getForceDamping(c):
@@ -15,11 +15,15 @@ eps = 1e-9
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
 step = 100
-deltaTime = 1 * 1e-5
+deltaTime = 1 * 1e-6
 # Шаг по времени
 cn_wall = 1
-cs_wall = 1
+cs_wall = 0.2
+Emod_wall = 2*1e11
+nu_wall = 0.3
+Gmod_wall = Emod_wall / (2 * (1 + nu_wall))
 coefficientOfDampingTheta = 0
+
 # if isForce:
 #     cn_wall = getForceDamping(cn_wall)
 #     cs_wall = getForceDamping(cs_wall)
@@ -33,11 +37,4 @@ accelerationY = 9.81
 kn = 2 * 1e5
 # ks = 0
 
-E_1 = 2 * 1e11
-E_2 = 2 * 1e11
-nu_1 = 0.3
-nu_2 = 0.3
-E_eff = ((1 - (nu_1 ** 2))/E_1 + (1 - (nu_2 ** 2))/E_2) ** (-1)
-G_1 = 8 * 1e10
-G_2 = 8 * 1e10
-G_eff = ((2 - nu_1)/G_1 + (2 - nu_2)/G_2) ** (-1)
+

@@ -12,6 +12,7 @@ ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
 ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
 ballStartFileNameBallMill = './ball_sets/ball_mill.txt'
 ballStartFileNameBallMillBig = './ball_sets/ball_mill_big.txt'
+ballStartFileNameVibro1 = './ball_sets/vibrotest_1.txt'
 
 ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
 ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
@@ -46,9 +47,8 @@ coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
 
-coordinatesFileName = coordinatesFileNameMill
-ballStartFileName = ballStartFileNameBallMillBig
-
+coordinatesFileName = coordinatesFileNameSquare
+ballStartFileName = ballStartFileNameVibro1
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 
@@ -124,11 +124,11 @@ for line in ballsStartFile:
     if len(data) > 0:
         if isForce:
             ballsFromFile.append(
-                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], color,
+                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], color,
                           canvas))
         else:
             ballsFromFile.append(
-                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], color, canvas))
+                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], color, canvas))
 
 ballsStartFile.close()
 
@@ -148,7 +148,7 @@ tk.update()
 
 steps = 0
 elements.begin()
-while len(stepCount) < 2 * 1e6:
+while len(stepCount) < 1 * 1e7:
     # start_time = time.time()
     if elements.started:
         for i in range(step):
