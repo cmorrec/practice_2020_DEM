@@ -5,6 +5,7 @@ from Ball import *
 # в частности отслеживает и регулирует столкновение шаров
 
 # В будущем нужно реализовать  проверку о ненакладывании мячей один на другой
+realSteps = 0
 
 
 def distanceNext(i, j):
@@ -89,7 +90,7 @@ class Elements:
         self.started = False
         self.canvas = canvas
         self.startEnergy = self.energy()
-        self.step = 0
+        # self.step = 0
 
     def energyMonitoring(self):
         print("Количество энергии", self.energyToSee(), "\n")
@@ -118,7 +119,7 @@ class Elements:
 
     def energy(self):
         energyCount = self.energyKinetic() + self.energyPotential()
-        summaryPlot.append(energyCount)
+        summaryPlot[realSteps] = energyCount
         return energyCount
 
     def energyKinetic(self):
@@ -126,7 +127,8 @@ class Elements:
         for ball in self.balls:
             energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
                     ball.velocityTheta ** 2)
-        kineticPlot.append(energyCount)
+
+        kineticPlot[realSteps] = energyCount
         return energyCount
 
     def energyPotential(self):
@@ -134,13 +136,13 @@ class Elements:
         for ball in self.balls:
             energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
             if isForce:
-                for interaction in ball.interactionArray:
-                    if interaction.isBall:
-                        energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 4
+                for i in range(ball.interactionArraySize):
+                    if ball.interactionArray[i].isBall:
+                        energyCount += (ball.interactionArray[i].stiffness * ball.interactionArray[i].entryNormal ** 2) / 4
                     else:
-                        energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 2
+                        energyCount += (ball.interactionArray[i].stiffness * ball.interactionArray[i].entryNormal ** 2) / 2
 
-        potentialPlot.append(energyCount)
+        potentialPlot[realSteps] = energyCount
         return energyCount
 
     def draw(self):
@@ -151,8 +153,10 @@ class Elements:
     def move(self):
         self.calculation()
         self.energy()
-        self.step += 1
-        stepCount.append(self.step)
+        # self.step += 1
+        global realSteps
+        stepCount[realSteps] = realSteps
+        realSteps += 1
         MoveWall.getInstance().move()
         for ball in self.balls:
             ball.move()

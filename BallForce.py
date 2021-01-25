@@ -19,7 +19,10 @@ class BallForce(Ball):
         self.jerkX = 0
         self.jerkY = 0
         self.jerkTheta = 0
-        self.interactionArray = []
+        self.interactionArray = np.empty(10, dtype=Interaction)
+        self.interactionArraySize = 0
+        # for interaction in self.interactionArray:
+        #     interaction = None
 
     def move(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
@@ -50,25 +53,25 @@ class BallForce(Ball):
     def addVelocityMethod(self):
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
-        for interaction in self.interactionArray:
-            self.accelerationInteractionX += interaction.accelerationX
-            self.accelerationInteractionY += interaction.accelerationY
+        for i in range(self.interactionArraySize):
+            self.accelerationInteractionX += self.interactionArray[i].accelerationX
+            self.accelerationInteractionY += self.interactionArray[i].accelerationY
 
         self.jerkX = 0
         self.jerkY = 0
         self.jerkTheta = 0
-        for interaction in self.interactionArray:
-            self.jerkX += interaction.jerkX
-            self.jerkY += interaction.jerkY
-            self.jerkTheta += interaction.jerkTheta
+        for i in range(self.interactionArraySize):
+            self.jerkX += self.interactionArray[i].jerkX
+            self.jerkY += self.interactionArray[i].jerkY
+            self.jerkTheta += self.interactionArray[i].jerkTheta
 
         self.addVelocity(
             (self.accelerationX + self.accelerationInteractionX - self.jerkX * deltaTime / 2),
             (self.accelerationY + self.accelerationInteractionY - self.jerkY * deltaTime / 2))
 
         self.accelerationTheta = 0
-        for interaction in self.interactionArray:
-            self.accelerationTheta += interaction.accelerationAngular
+        for i in range(self.interactionArraySize):
+            self.accelerationTheta += self.interactionArray[i].accelerationAngular
         self.addVelocityAngular(self.accelerationTheta - self.jerkTheta * deltaTime / 2)
 
     def expandForce(self, line, numberOfLine):
@@ -164,17 +167,28 @@ class BallForce(Ball):
             abs(dampeningTangent * 2 / self.momentInertial))
 
     def isCrossLineBefore(self, numberOfLine):
-        for interaction in self.interactionArray:
-            if (not interaction.isBall) and interaction.number == numberOfLine:
+        for i in range(self.interactionArraySize):
+            if (not self.interactionArray[i].isBall) and self.interactionArray[i].number == numberOfLine:
                 return True
         return False
 
     def deleteInteractionLine(self, numberOfLine):
-        for interaction in self.interactionArray:
+        for i, interaction in enumerate(self.interactionArray):
             if (not interaction.isBall) and interaction.number == numberOfLine:
-                wallInteraction.append(interaction.n)
-                self.interactionArray.remove(interaction)
+                # wallInteraction.append(interaction.n)
+                self.deleteInteraction(i)
                 break
+
+    def deleteInteraction(self, i):
+        self.interactionArray[i] = None
+        j = i
+        while j < 10:
+            j += 1
+            if self.interactionArray[j] is None:
+                break
+            self.interactionArray[j - 1] = self.interactionArray[j]
+        self.interactionArray[j] = None
+        self.interactionArraySize -= 1
 
     def saveAccelerationLength(self, alphaRadianLocal,
                                accelerationNormal,
@@ -193,9 +207,9 @@ class BallForce(Ball):
 
         jerkX = jerkNormal * cos(alphaRadianLocal) + jerkTangent * sin(alphaRadianLocal)
         jerkY = jerkNormal * sin(alphaRadianLocal) - jerkTangent * cos(alphaRadianLocal)
-        for interaction in self.interactionArray:
-            if interaction.number == number and interaction.isBall == isBall:
-                interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
+        for i in range(self.interactionArraySize):
+            if self.interactionArray[i].number == number and self.interactionArray[i].isBall == isBall:
+                self.interactionArray[i].changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
                                                jerkAngular,
                                                entryNormal, accelerationAngular, stiffness)
                 return
@@ -203,7 +217,8 @@ class BallForce(Ball):
                                         jerkX, jerkY, jerkAngular, entryNormal, accelerationAngular, stiffness))
 
     def addInteraction(self, interaction):
-        self.interactionArray.append(interaction)
+        self.interactionArray[self.interactionArraySize] = interaction
+        self.interactionArraySize += 1
 
     def rotationCS(self, velocityYLocal, dampeningTangentVelocity):
         self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(

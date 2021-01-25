@@ -8,14 +8,18 @@ from PIL import ImageTk
 from GlobalConstants import *
 
 # Энергия
-kineticPlot = []
-potentialPlot = []
-summaryPlot = []
+# realSteps = 0
+
+kineticPlot = np.zeros(numOfSteps, dtype=float)
+potentialPlot = np.zeros(numOfSteps, dtype=float)
+summaryPlot = np.zeros(numOfSteps, dtype=float)
+stepCount = np.zeros(numOfSteps, dtype=int)
+
+# wallInteraction = []
+# ballInteraction = []
+
 forcePlot = []
 velocityPlot = []
-wallInteraction = []
-ballInteraction = []
-stepCount = [0]
 stepCountForce = []
 
 
@@ -40,24 +44,25 @@ def Buttons():
 
 
 def saveInteraction():
-    linesEndFile = ['middle num of interaction = ' + str(midInteractionNum)]
-    if len(wallInteraction) > 0:
-        linesEndFile.append(
-            'wall\tmin = ' + str(min(wallInteraction)) + '\tmax = ' + str(max(wallInteraction)) + '\tmiddle = ' + str(
-                round(sum(wallInteraction) / len(wallInteraction), 1)) + '\tlen = ' + str(len(wallInteraction)))
-    if len(ballInteraction) > 0:
-        linesEndFile.append(
-            'ball\tmin = ' + str(min(ballInteraction)) + '\tmax = ' + str(max(ballInteraction)) + '\tmiddle = ' + str(
-                round(sum(ballInteraction) / len(ballInteraction), 1)) + '\tlen = ' + str(len(ballInteraction)))
-    if len(wallInteraction) > 0 and len(ballInteraction) > 0:
-        linesEndFile.append('all \tmin = ' + str(min(min(wallInteraction), min(ballInteraction))) + '\tmax = ' + str(
-            max(max(wallInteraction), max(ballInteraction))) + '\tmiddle = ' + str(
-            round((sum(ballInteraction) + sum(wallInteraction)) / (len(ballInteraction) + len(wallInteraction)),
-                  1)) + '\tlen = ' + str(len(ballInteraction) + len(wallInteraction)))
-    ballsInteractionFile = open('balls_end_interaction.txt', 'w')
-    for line in linesEndFile:
-        ballsInteractionFile.write(line + '\n')
-    ballsInteractionFile.close()
+    pass
+    # linesEndFile = ['middle num of interaction = ' + str(midInteractionNum)]
+    # if len(wallInteraction) > 0:
+    #     linesEndFile.append(
+    #         'wall\tmin = ' + str(min(wallInteraction)) + '\tmax = ' + str(max(wallInteraction)) + '\tmiddle = ' + str(
+    #             round(sum(wallInteraction) / len(wallInteraction), 1)) + '\tlen = ' + str(len(wallInteraction)))
+    # if len(ballInteraction) > 0:
+    #     linesEndFile.append(
+    #         'ball\tmin = ' + str(min(ballInteraction)) + '\tmax = ' + str(max(ballInteraction)) + '\tmiddle = ' + str(
+    #             round(sum(ballInteraction) / len(ballInteraction), 1)) + '\tlen = ' + str(len(ballInteraction)))
+    # if len(wallInteraction) > 0 and len(ballInteraction) > 0:
+    #     linesEndFile.append('all \tmin = ' + str(min(min(wallInteraction), min(ballInteraction))) + '\tmax = ' + str(
+    #         max(max(wallInteraction), max(ballInteraction))) + '\tmiddle = ' + str(
+    #         round((sum(ballInteraction) + sum(wallInteraction)) / (len(ballInteraction) + len(wallInteraction)),
+    #               1)) + '\tlen = ' + str(len(ballInteraction) + len(wallInteraction)))
+    # ballsInteractionFile = open('balls_end_interaction.txt', 'w')
+    # for line in linesEndFile:
+    #     ballsInteractionFile.write(line + '\n')
+    # ballsInteractionFile.close()
 
 
 def saveResults(elements):
@@ -79,17 +84,30 @@ def plotter():
     plt.style.use('fivethirtyeight')
     fig = plt.figure(figsize=(8, 8))
     ax = plt.subplot(111)
-    ax.plot(stepCount, kineticPlot, label='Кинетическая')
-    ax.plot(stepCount, potentialPlot, label='Потенциальная')
-    ax.plot(stepCount, summaryPlot, label='Суммарная')
+
+    stepCount1 = []
+    kineticPlot1 = []
+    potentialPlot1 = []
+    summaryPlot1 = []
+    for oneStep in stepCount:
+        if abs(potentialPlot[int(oneStep)]) < eps:
+            break
+        stepCount1.append(oneStep)
+        kineticPlot1.append(kineticPlot[oneStep])
+        potentialPlot1.append(potentialPlot[oneStep])
+        summaryPlot1.append(summaryPlot[oneStep])
+
+    ax.plot(stepCount1, kineticPlot1, label='Кинетическая')
+    ax.plot(stepCount1, potentialPlot1, label='Потенциальная')
+    ax.plot(stepCount1, summaryPlot1, label='Суммарная')
     ax.set_title('')
     chartBox = ax.get_position()
     ax.set_position([chartBox.x0, chartBox.y0, chartBox.width * 0.7, chartBox.height])
     ax.legend(loc='upper right', bbox_to_anchor=(0.9, 0.8))
-    ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 10))
-    ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount[-1] // 100) * 2))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot[-1]) * (stepCount[-1] // 10 * 10)))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot[-1]) * (stepCount[-1] // 10 * 20)))
+    # ax.xaxis.set_major_locator(ticker.MultipleLocator((stepCount1[-1] // 100) * 10))
+    # ax.xaxis.set_minor_locator(ticker.MultipleLocator((stepCount1[-1] // 100) * 2))
+    # ax.yaxis.set_major_locator(ticker.MultipleLocator((summaryPlot1[-1]) * (stepCount1[-1] // 10 * 10)))
+    # ax.yaxis.set_minor_locator(ticker.MultipleLocator((summaryPlot1[-1]) * (stepCount1[-1] // 10 * 20)))
     ax.tick_params(axis='both',
                    which='major',
                    direction='inout',
@@ -137,6 +155,8 @@ def plotter():
 
 
 def plotterForce():
+    # При необходимости использования этой функции
+    # провести все те же процедуры что и для plotter() по переводу списков в массивы
     plt.style.use('fivethirtyeight')
     fig = plt.figure(figsize=(8, 8))
     ax = plt.subplot(111)
@@ -194,6 +214,7 @@ def plotterForce():
     fig.tight_layout()
 
     plt.show()
+
 
 # --------------- Функции для численного рассчета --------------
 def dampeningVelocity(dampening, velocity):

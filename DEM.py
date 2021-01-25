@@ -150,7 +150,7 @@ tk.update()
 
 steps = 0
 elements.begin()
-while steps < numOfSeconds * int(1 / deltaTime):
+while steps < numOfSteps:
     # start_time = time.time()
     if elements.started:
         for i in range(step):

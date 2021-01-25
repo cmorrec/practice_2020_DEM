@@ -129,21 +129,21 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
-    for interaction in i.interactionArray:
-        if interaction.isBall and interaction.number == numberOfJ:
+    for k in range(i.interactionArraySize):
+        if i.interactionArray[k].isBall and i.interactionArray[k].number == numberOfJ:
             return True
     return False
 
 
-def deleteInteraction(i, numberOfJ):
-    for interaction in i.interactionArray:
+def deleteInteractionBall(i, numberOfJ):
+    for k, interaction in enumerate(i.interactionArray):
         if interaction.isBall and interaction.number == numberOfJ:
-            if len(ballInteraction) > 0:
-                if ballInteraction[len(ballInteraction) - 1] != interaction.n:
-                    ballInteraction.append(interaction.n)
-            else:
-                ballInteraction.append(interaction.n)
-            i.interactionArray.remove(interaction)
+            # if len(ballInteraction) > 0:
+            #     if ballInteraction[len(ballInteraction) - 1] != interaction.n:
+            #         ballInteraction.append(interaction.n)
+            # else:
+            #     ballInteraction.append(interaction.n)
+            i.deleteInteraction(k)
             break
 
 
@@ -159,5 +159,5 @@ class ElementsForce(Elements):
                 if isCrossForce(self.balls[i], self.balls[j]):
                     methodForce(self.balls[i], self.balls[j], i, j)
                 elif isCrossBefore(self.balls[i], j):
-                    deleteInteraction(self.balls[i], j)
-                    deleteInteraction(self.balls[j], i)
+                    deleteInteractionBall(self.balls[i], j)
+                    deleteInteractionBall(self.balls[j], i)
