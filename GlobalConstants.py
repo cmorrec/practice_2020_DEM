@@ -1,4 +1,4 @@
-displayRatio = 10000
+displayRatio = 5000
 midInteractionNum = 100
 
 
@@ -16,10 +16,11 @@ eps = 1e-9
 
 step = 100
 deltaTime = 1 * 1e-6
+numOfSeconds = 10
 # Шаг по времени
 cn_wall = 1
 cs_wall = 0.2
-Emod_wall = 2*1e11
+Emod_wall = 2 * 1e11
 nu_wall = 0.3
 Gmod_wall = Emod_wall / (2 * (1 + nu_wall))
 coefficientOfDampingTheta = 0
@@ -36,5 +37,3 @@ accelerationX = 0
 accelerationY = 9.81
 kn = 2 * 1e5
 # ks = 0
-
-

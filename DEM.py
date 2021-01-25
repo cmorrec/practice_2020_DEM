@@ -10,9 +10,9 @@ ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
 ballStartFileName4Plate = './ball_sets/4_plate.txt'
 ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
 ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
-ballStartFileNameBallMill = './ball_sets/ball_mill.txt'
-ballStartFileNameBallMillBig = './ball_sets/ball_mill_big.txt'
-ballStartFileNameVibro1 = './ball_sets/vibrotest_1.txt'
+ballStartFileNameBallMill = './ball_sets/mill/ball_mill_60.txt'
+ballStartFileNameBallMillBig = './ball_sets/mill/ball_mill_120.txt'
+ballStartFileNameVibro1 = './ball_sets/vibro/vibrotest_1.txt'
 
 ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
 ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
@@ -54,8 +54,8 @@ coordinatesFromFile = []
 
 isFirstLine = True
 
-velocityXWall = float(0)
-velocityYWall = float(0)
+freqXWall = float(0)
+freqYWall = float(0)
 absXWall = float(0)
 absYWall = float(0)
 velocityThetaWall = float(0)
@@ -64,8 +64,8 @@ for line in coordinatesFile:
     words = line.split()
     data = []
     if isFirstLine:
-        velocityXWall = float(words[0])
-        velocityYWall = float(words[1])
+        freqXWall = float(words[0])
+        freqYWall = float(words[1])
         absXWall = float(words[2])
         absYWall = float(words[3])
         velocityThetaWall = float(words[4])
@@ -104,8 +104,8 @@ canvas.grid(row=0, columnspan=3)
 buttons = Buttons()
 tk.update()
 
-wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, velocityXWall,
-                velocityYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY)
+wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, freqXWall,
+                freqYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY)
 
 ballsStartFile = open(ballStartFileName, 'r')
 ballsFromFile = []
@@ -124,11 +124,13 @@ for line in ballsStartFile:
     if len(data) > 0:
         if isForce:
             ballsFromFile.append(
-                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], color,
+                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9],
+                          data[10], color,
                           canvas))
         else:
             ballsFromFile.append(
-                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], color, canvas))
+                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10],
+                     color, canvas))
 
 ballsStartFile.close()
 
@@ -148,7 +150,7 @@ tk.update()
 
 steps = 0
 elements.begin()
-while len(stepCount) < 1 * 1e7:
+while steps < numOfSeconds * int(1 / deltaTime):
     # start_time = time.time()
     if elements.started:
         for i in range(step):
