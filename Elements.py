@@ -118,8 +118,11 @@ class Elements:
         return energyCount
 
     def energy(self):
+        global realSteps
         energyCount = self.energyKinetic() + self.energyPotential()
         summaryPlot[realSteps] = energyCount
+        stepCount[realSteps] = realSteps
+        realSteps += step
         return energyCount
 
     def energyKinetic(self):
@@ -146,17 +149,16 @@ class Elements:
         return energyCount
 
     def draw(self):
+        self.energy()
         for ball in self.balls:
             ball.draw()
         MoveWall.getInstance().draw()
 
     def move(self):
         self.calculation()
-        self.energy()
+        # self.energy()
         # self.step += 1
-        global realSteps
-        stepCount[realSteps] = realSteps
-        realSteps += 1
+
         MoveWall.getInstance().move()
         for ball in self.balls:
             ball.move()

@@ -10,10 +10,10 @@ from GlobalConstants import *
 # Энергия
 # realSteps = 0
 
-kineticPlot = np.zeros(numOfSteps, dtype=float)
-potentialPlot = np.zeros(numOfSteps, dtype=float)
-summaryPlot = np.zeros(numOfSteps, dtype=float)
-stepCount = np.zeros(numOfSteps, dtype=int)
+kineticPlot = np.zeros(numOfSteps // step, dtype=float)
+potentialPlot = np.zeros(numOfSteps // step, dtype=float)
+summaryPlot = np.zeros(numOfSteps // step, dtype=float)
+stepCount = np.zeros(numOfSteps // step, dtype=int)
 
 # wallInteraction = []
 # ballInteraction = []

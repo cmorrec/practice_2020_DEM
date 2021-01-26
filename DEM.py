@@ -150,6 +150,7 @@ tk.update()
 
 steps = 0
 elements.begin()
+start_time = time.time()
 while steps < numOfSteps:
     # start_time = time.time()
     if elements.started:
@@ -161,5 +162,6 @@ while steps < numOfSteps:
     tk.update_idletasks()
     tk.update()
     # print("+++ %s seconds +++" % (time.time() - start_time))
+print("+++ %s seconds +++" % (time.time() - start_time))
 elements.energyMonitoring()
 elements.exit(None)
