@@ -7,9 +7,11 @@ class MoveWall(Wall):
     __instance = None
 
     def __init__(self, canvas, color, coordinates=None, accelerationX=0, accelerationY=0, lines=None, freqX=0,
-                 freqY=0, velocityTheta=0, absX=0, absY=0, centerX=0, centerY=0):
+                 freqY=0, velocityTheta=0, absX=0, absY=0, centerX=0, centerY=0, width=0, height=0):
         Wall.__init__(self, canvas, color, coordinates, accelerationX, accelerationY, lines)
         self.velocityTheta = velocityTheta
+        self.width = width + absX
+        self.height = height + absY
         self.absX = absX
         self.absY = absY
         self.freqX = freqX * 2 * pi

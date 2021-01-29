@@ -1,5 +1,5 @@
 from Ball import *
-
+from HashTable import *
 
 # Класс Elements содержит в себе массив шаров и координирует их движение между собой,
 # в частности отслеживает и регулирует столкновение шаров
@@ -90,6 +90,15 @@ class Elements:
         self.canvas = canvas
         self.startEnergy = self.energy()
         self.step = 0
+        self.hashTable = HashTable(self.balls)
+        self.pairs = self.hashTable.getPairs(self.balls)
+        self.printPairs()
+        for i in range(self.hashTable.elementsOfX):
+            canvas.create_line(displayRatio * i * self.hashTable.delta, 0, displayRatio * i * self.hashTable.delta,
+                               displayRatio * self.hashTable.height)
+        for i in range(self.hashTable.elementsOfY):
+            canvas.create_line(0, displayRatio * i * self.hashTable.delta, displayRatio * self.hashTable.width,
+                               displayRatio * i * self.hashTable.delta)
 
     def energyMonitoring(self):
         print("Количество энергии", self.energyToSee(), "\n")
@@ -148,6 +157,11 @@ class Elements:
             ball.draw()
         MoveWall.getInstance().draw()
 
+    def printPairs(self):
+        for pair in self.pairs:
+            print(pair.i.number, pair.j.number)
+        print('==========================================')
+
     def move(self):
         self.calculation()
         self.energy()
@@ -156,6 +170,7 @@ class Elements:
         MoveWall.getInstance().move()
         for ball in self.balls:
             ball.move()
+        self.pairs = self.hashTable.getPairs(self.balls)
 
     def calculation(self):
         # В случае касания шара с шаром или шара со стенкой -- отключается для этого шара поле ускорений
@@ -165,10 +180,11 @@ class Elements:
         self.setAcceleration()
 
         # В случае столкновения шаров друг с другом решается задача о нецентральном неупругом ударе
-        for i in range(len(self.balls)):
-            for j in range(i + 1, len(self.balls)):
-                if isCross(self.balls[i], self.balls[j]):
-                    method(self.balls[i], self.balls[j])
+        for pair in self.pairs:
+            i = pair.i.number
+            j = pair.j.number
+            if isCross(self.balls[i], self.balls[j]):
+                method(self.balls[i], self.balls[j])
 
     def setAcceleration(self):
         for ball in self.balls:

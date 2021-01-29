@@ -154,10 +154,11 @@ class ElementsForce(Elements):
     def calculation(self):
         # Есть необходимость отключения не глобальных ускорений,
         # а ускорений взаимодействия, что проверяется отдельно
-        for i in range(len(self.balls)):
-            for j in range(i + 1, len(self.balls)):
-                if isCrossForce(self.balls[i], self.balls[j]):
-                    methodForce(self.balls[i], self.balls[j], i, j)
-                elif isCrossBefore(self.balls[i], j):
-                    deleteInteraction(self.balls[i], j)
-                    deleteInteraction(self.balls[j], i)
+        for pair in self.pairs:
+            i = pair.i.number
+            j = pair.j.number
+            if isCrossForce(self.balls[i], self.balls[j]):
+                methodForce(self.balls[i], self.balls[j], i, j)
+            elif isCrossBefore(self.balls[i], j):
+                deleteInteraction(self.balls[i], j)
+                deleteInteraction(self.balls[j], i)

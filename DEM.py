@@ -46,8 +46,9 @@ coordinatesFileNameSquareBig = './walls_dynamic/square_big.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
+coordinatesFileNameVibroBox = './walls_dynamic/vibro_box.txt'
 
-coordinatesFileName = coordinatesFileNameSquare
+coordinatesFileName = coordinatesFileNameVibroBox
 ballStartFileName = ballStartFileNameVibro1
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
@@ -105,7 +106,7 @@ buttons = Buttons()
 tk.update()
 
 wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, freqXWall,
-                freqYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY)
+                freqYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY, width, height)
 
 ballsStartFile = open(ballStartFileName, 'r')
 ballsFromFile = []
@@ -150,6 +151,7 @@ tk.update()
 
 steps = 0
 elements.begin()
+start_time = time.time()
 while steps < numOfSteps:
     # start_time = time.time()
     if elements.started:
@@ -161,5 +163,6 @@ while steps < numOfSteps:
     tk.update_idletasks()
     tk.update()
     # print("+++ %s seconds +++" % (time.time() - start_time))
+print("+++ %s seconds +++" % (time.time() - start_time))
 elements.energyMonitoring()
 elements.exit(None)

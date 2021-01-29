@@ -16,7 +16,7 @@ eps = 1e-9
 
 step = 100
 deltaTime = 1 * 1e-6
-numOfSeconds = 10
+numOfSeconds = 0.1
 numOfSteps = int(numOfSeconds * int(1 / deltaTime))
 # Шаг по времени
 cn_wall = 1

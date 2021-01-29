@@ -25,15 +25,13 @@ class BallForce(Ball):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
-        i = 0
         isCrossLine = False
-        for line in MoveWall.getInstance().lines:
+        for i, line in enumerate(MoveWall.getInstance().lines):
             if line.crossLine(self.x, self.y, self.radius):
                 self.expandForce(line, i)
                 isCrossLine = True
             elif self.isCrossLineBefore(i) and self.isInsidePolygon():
                 self.deleteInteractionLine(i)
-            i += 1
 
         if (not self.isInsidePolygon()) and (not isCrossLine):
             self.comeBack()
