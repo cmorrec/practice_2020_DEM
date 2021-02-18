@@ -60,19 +60,15 @@ class Ball:
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
-        self.addVelocityMethod()
-        self.x += self.velocityX * deltaTime - 0.5 * self.accelerationX * (deltaTime ** 2)
-        self.y += self.velocityY * deltaTime - 0.5 * self.accelerationY * (deltaTime ** 2)
-        self.theta = (self.theta + self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (deltaTime ** 2)) % (2 * pi)
+        self.addAccelerationInteractionMethod()
+        self.x += self.velocityX * deltaTime + 0.5 * self.accelerationX * (deltaTime ** 2)
+        self.y += self.velocityY * deltaTime + 0.5 * self.accelerationY * (deltaTime ** 2)
+        self.theta = (self.theta + self.velocityTheta * deltaTime + 0.5 * self.accelerationTheta * (deltaTime ** 2)) % (
+                    2 * pi)
+        self.addVelocity(self.accelerationX, self.accelerationY, self.accelerationTheta)
 
-    def addVelocityMethod(self):
-        self.addVelocity(self.accelerationX, self.accelerationY)
-
-    # def info(self):
-    #     print('velocityAlpha', self.alphaRadian)
-    #     print('velocityAbs', self.velocityAbsolute)
-    #     print('velocityX', self.velocityX)
-    #     print('velocityY', self.velocityY)
+    def addAccelerationInteractionMethod(self):
+        pass
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией
@@ -111,12 +107,6 @@ class Ball:
 
                     self.changeVelocity(atan2(velocityYLocal, velocityXLocalNew + eps) + line.alphaNorm,
                                         sqrt(velocityXLocalNew ** 2 + velocityYLocal ** 2))
-
-    def rotationHerzWall(self, velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall):
-        n = sqrt((16 * self.radius) / (9 * pi ** 2 * kn ** 2 * self.radius))
-        mu = 2000
-        force = mu * n * sqrt(abs(velocityXLocal - velocityXLocalWall)) ** 3
-        self.velocityTheta += force / (self.radius * self.mass) * (1 - self.cs) * (velocityYLocal - velocityYLocalWall)
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
@@ -209,13 +199,9 @@ class Ball:
         self.x += self.velocityX * deltaTime
         self.y += self.velocityY * deltaTime
 
-    def addVelocity(self, accelerationX, accelerationY):
+    def addVelocity(self, accelerationX, accelerationY, accelerationTheta):
         self.velocityX += accelerationX * deltaTime
         self.velocityY += accelerationY * deltaTime
         self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
                             sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
-
-    def addVelocityAngular(self, accelerationTheta):
         self.velocityTheta += accelerationTheta * deltaTime
-        # self.velocityTheta = dampeningVelocity(0.00001*self.velocityTheta, self.velocityTheta)
-        # print('self.velocityTheta, accelerationTheta', self.velocityTheta, accelerationTheta)

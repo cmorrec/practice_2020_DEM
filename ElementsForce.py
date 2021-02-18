@@ -2,16 +2,11 @@ from BallForce import *
 from Elements import *
 
 
-def isCrossForce(i, j):
+def isCrossForce(ball1: BallForce, ball2: BallForce):
     # проверяем столкнулись ли шары  и если да -- двигаются ли они навстречу друг другу
-    if distanceNow(i, j) < (i.radius + j.radius):
+    if distanceNow(ball1, ball2) < (ball1.radius + ball2.radius):
         return True
     return False
-
-
-def rotationCS(i, j, velocity1YLocal, velocity2YLocal, dampeningTangentI, dampeningTangentJ):
-    i.rotationCS(velocity1YLocal, dampeningTangentI)
-    j.rotationCS(velocity2YLocal, dampeningTangentJ)
 
 
 def findLocalVelocities(ball, gama):
@@ -61,7 +56,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     forceNormal1 = stiffness * entryNormal
     forceNormal2 = -1 * stiffness * entryNormal
 
-    forcePlot.append(abs(forceNormal1))
+    forcePlot.append(forceNormal1)
     velocityPlot.append(velocity1XLocal * 10000)
     if len(stepCountForce) == 0:
         stepCountForce.append(0)
@@ -71,7 +66,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     accelerationNormal1 = forceNormal1 / ball_1.mass
     accelerationNormal2 = forceNormal2 / ball_2.mass
 
-    velocity1YRelative = findRelativeVelocityY(velocity1YLocal - velocity2YLocal, ball_1, ball_2)
+    velocity1YRelative = zeroToZeroBig(findRelativeVelocityY(velocity1YLocal - velocity2YLocal, ball_1, ball_2))
     velocity2YRelative = -1 * velocity1YRelative
     signVelocityRelativeTangent1 = customSign(velocity1YRelative)
     signVelocityRelativeTangent2 = customSign(velocity2YRelative)
@@ -88,37 +83,56 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
                                                                                 abs(forceNormal2), -1, radiusEffective,
                                                                                 signVelocityRelativeAngular)
 
+    # print('\n1 before damping\naccelerationTangent1, accelerationAngular1', accelerationTangent1, accelerationAngular1)
+    # print('\n2 before damping\naccelerationTangent2, accelerationAngular2', accelerationTangent2, accelerationAngular2)
+
     # ----------------------------- Damping part -----------------------------
-    accelerationDampeningNormal1 = velocity1XRelative * getDampingNormal(radiusEffective, entryNormal,
-                                                                         ball_1.mass, ball_1.cn, E_eff) / ball_1.mass * (-1)
-    accelerationDampeningTangent1 = velocity1YRelative * getDampingTangent(radiusEffective, entryNormal,
-                                                                           ball_1.mass, ball_1.cs, G_eff) / ball_1.mass
+    accelerationDampeningNormal1 = velocity1XRelative * getDampingNormal(radiusEffective, entryNormal, ball_1.mass,
+                                                                         ball_1.cn, E_eff) / ball_1.mass * (-1)
+    accelerationDampeningTangent1 = velocity1YRelative * getDampingTangent(radiusEffective, entryNormal, ball_1.mass,
+                                                                           ball_1.cs, G_eff) / ball_1.mass
     accelerationNormal1 += accelerationDampeningNormal1
     accelerationTangent1 += accelerationDampeningTangent1
 
     accelerationDampeningNormal2 = velocity2XRelative * getDampingNormal(radiusEffective, entryNormal,
-                                                                         ball_2.mass, ball_2.cn, E_eff) / ball_2.mass * (-1)
+                                                                         ball_2.mass, ball_2.cn,
+                                                                         E_eff) / ball_2.mass * (-1)
     accelerationDampeningTangent2 = velocity2YRelative * getDampingTangent(radiusEffective, entryNormal,
                                                                            ball_2.mass, ball_2.cs, G_eff) / ball_2.mass
     accelerationNormal2 += accelerationDampeningNormal2
     accelerationTangent2 += accelerationDampeningTangent2
     # ----------------------------- End damping part -----------------------------
-    jerkNormal1, jerkTangent1, jerkAngular1 = ball_1.getJerk(entryNormal, velocity1XRelative,
-                                                             accelerationNormal1 + getAccelerationFieldNormal(gama),
+    # accelerationNormal1Relative = accelerationNormal1 - accelerationNormal2
+    # accelerationTangent1Relative = accelerationTangent1 - accelerationTangent2
+    # accelerationAngular1Relative = accelerationAngular1 - accelerationAngular2
+    # accelerationNormal2Relative = accelerationNormal2 - accelerationNormal1
+    # accelerationTangent2Relative = accelerationTangent2 - accelerationTangent1
+    # accelerationAngular2Relative = accelerationAngular2 - accelerationAngular1
+
+    # print('\n1 after damping before jerk\naccelerationTangent1, accelerationAngular1, accelerationDampeningTangent1',
+    #       accelerationTangent1, accelerationAngular1, accelerationDampeningTangent1)
+    # print('\n2 after damping before jerk\naccelerationTangent2, accelerationAngular2, accelerationDampeningTangent2',
+    #       accelerationTangent2, accelerationAngular2, accelerationDampeningTangent2)
+    jerkNormal1, jerkTangent1, jerkAngular1 = ball_1.getJerk(entryNormal, velocity1XLocal,
+                                                             accelerationNormal1,
                                                              signVelocityRelativeTangent1, 1, radiusEffective,
-                                                             signVelocityRelativeAngular, accelerationAngular1,
+                                                             signVelocityRelativeAngular,
+                                                             accelerationAngular1,
                                                              accelerationTangent1, E_eff)
-    accelerationNormal1 += jerkNormal1 * deltaTime
-    accelerationTangent1 += jerkTangent1 * deltaTime
-    accelerationAngular1 += jerkAngular1 * deltaTime
-    jerkNormal2, jerkTangent2, jerkAngular2 = ball_2.getJerk(entryNormal, velocity2XRelative,
-                                                             accelerationNormal2 + getAccelerationFieldNormal(gama),
-                                                             signVelocityRelativeTangent2,
-                                                             -1, radiusEffective, signVelocityRelativeAngular,
-                                                             accelerationAngular2, accelerationTangent2, E_eff)
-    accelerationNormal2 += jerkNormal2 * deltaTime
-    accelerationTangent2 += jerkTangent2 * deltaTime
-    accelerationAngular2 += jerkAngular2 * deltaTime
+    jerkPlot.append(jerkNormal1 * 1e-3)
+    jerkNormal2, jerkTangent2, jerkAngular2 = ball_2.getJerk(entryNormal, velocity2XLocal,
+                                                             accelerationNormal2,
+                                                             signVelocityRelativeTangent2, -1, radiusEffective,
+                                                             signVelocityRelativeAngular,
+                                                             accelerationAngular2,
+                                                             accelerationTangent2, E_eff)
+
+    # print('\naccelerationNormal1, accelerationTangent1, accelerationAngular1', accelerationNormal1,
+    #       accelerationTangent1, accelerationAngular1)
+    # print('jerkNormal1, jerkTangent1, jerkAngular1', jerkNormal1, jerkTangent1, jerkAngular1, '\n')
+    # print('accelerationNormal2, accelerationTangent2, accelerationAngular2', accelerationNormal2, accelerationTangent2,
+    #       accelerationAngular2)
+    # print('jerkNormal2, jerkTangent2, jerkAngular2', jerkNormal2, jerkTangent2, jerkAngular2, '\n')
 
     ball_1.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkNormal1, jerkTangent1,
                                   jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=numberOf2,

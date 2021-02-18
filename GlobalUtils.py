@@ -13,6 +13,7 @@ potentialPlot = []
 summaryPlot = []
 forcePlot = []
 velocityPlot = []
+jerkPlot = []
 wallInteraction = []
 ballInteraction = []
 stepCount = [0]
@@ -142,6 +143,7 @@ def plotterForce():
     ax = plt.subplot(111)
     ax.plot(stepCountForce, forcePlot, label='Сила')
     ax.plot(stepCountForce, velocityPlot, label='Скорость')
+    ax.plot(stepCountForce, jerkPlot, label='Рывок')
     ax.set_title('')
     chartBox = ax.get_position()
     ax.set_position([chartBox.x0, chartBox.y0, chartBox.width * 0.7, chartBox.height])
@@ -195,7 +197,10 @@ def plotterForce():
 
     plt.show()
 
+
 # --------------- Функции для численного рассчета --------------
+
+
 def dampeningVelocity(dampening, velocity):
     if abs(velocity) - abs(dampening) > 0 and abs(velocity) > eps:
         return velocity - dampening
@@ -210,6 +215,13 @@ def zeroToZero(number):
         return number
 
 
+def zeroToZeroBig(number):
+    if abs(number) < 1e-4:
+        return 0
+    else:
+        return number
+
+
 def customSign(number):
     if abs(number) < eps:
         return 0
@@ -217,6 +229,12 @@ def customSign(number):
         return 1
     else:
         return -1
+
+
+def isCoDirected(num1, num2):
+    if (customSign(num1) > 0 and customSign(num2) < 0) or (customSign(num2) > 0 and customSign(num1) < 0):
+        return False
+    return True
 
 
 def distanceNow(i, j):

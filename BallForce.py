@@ -37,34 +37,35 @@ class BallForce(Ball):
             self.comeBack()
 
         # Обновление направлений скоростей
-        self.addVelocityMethod()
-        self.x += self.velocityX * deltaTime - 0.5 * (self.accelerationX + self.accelerationInteractionX) * (
-                deltaTime ** 2) - self.jerkX * (deltaTime ** 3) / 3
-        self.y += self.velocityY * deltaTime - 0.5 * (self.accelerationY + self.accelerationInteractionY) * (
-                deltaTime ** 2) - self.jerkY * (deltaTime ** 3) / 3
-        self.theta += (self.velocityTheta * deltaTime - 0.5 * self.accelerationTheta * (
-                deltaTime ** 2) - self.jerkTheta * (deltaTime ** 3) / 3) % (2 * pi)
+        self.addAccelerationInteractionMethod()
 
-    def addVelocityMethod(self):
+        self.x += (self.velocityX * deltaTime) + (0.5 * (self.accelerationX + self.accelerationInteractionX) * (
+                deltaTime ** 2)) + (self.jerkX * (deltaTime ** 3) / 6)
+        self.y += (self.velocityY * deltaTime) + (0.5 * (self.accelerationY + self.accelerationInteractionY) * (
+                deltaTime ** 2)) + (self.jerkY * (deltaTime ** 3) / 6)
+        self.theta += ((self.velocityTheta * deltaTime) + (0.5 * self.accelerationTheta * (
+                deltaTime ** 2)) + (self.jerkTheta * (deltaTime ** 3) / 6)) % (2 * pi)
+
+        self.addVelocity(
+            ((self.accelerationX + self.accelerationInteractionX) + (self.jerkX * deltaTime / 2)),
+            ((self.accelerationY + self.accelerationInteractionY) + (self.jerkY * deltaTime / 2)),
+            (self.accelerationTheta + (self.jerkTheta * deltaTime / 2)))
+
+    def addAccelerationInteractionMethod(self):
         self.accelerationInteractionX = 0
         self.accelerationInteractionY = 0
+        self.accelerationTheta = 0
         self.jerkX = 0
         self.jerkY = 0
         self.jerkTheta = 0
-        self.accelerationTheta = 0
+
         for interaction in self.interactionArray:
             self.accelerationInteractionX += interaction.accelerationX
             self.accelerationInteractionY += interaction.accelerationY
+            self.accelerationTheta += interaction.accelerationAngular
             self.jerkX += interaction.jerkX
             self.jerkY += interaction.jerkY
             self.jerkTheta += interaction.jerkTheta
-            self.accelerationTheta += interaction.accelerationAngular
-
-        self.addVelocity(
-            (self.accelerationX + self.accelerationInteractionX - self.jerkX * deltaTime / 2),
-            (self.accelerationY + self.accelerationInteractionY - self.jerkY * deltaTime / 2))
-
-        self.addVelocityAngular(self.accelerationTheta - self.jerkTheta * deltaTime / 2)
 
     def expandForce(self, line, numberOfLine):
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
@@ -80,10 +81,10 @@ class BallForce(Ball):
             alphaRadianLocalWall)
         velocityYLocalWall = wall.getVelocityX() * cos(alphaRadianLocalWall) - wall.getVelocityY() * sin(
             alphaRadianLocalWall)
-        accelerationXLocalWall = wall.getAccelerationX() * cos(alphaRadianLocalWall) + wall.getAccelerationY() * sin(
-            alphaRadianLocalWall)
-        accelerationYLocalWall = wall.getAccelerationX() * cos(alphaRadianLocalWall) - wall.getAccelerationY() * sin(
-            alphaRadianLocalWall)
+        # accelerationXLocalWall = wall.getAccelerationX() * cos(alphaRadianLocalWall) + wall.getAccelerationY() * sin(
+        #     alphaRadianLocalWall)
+        # accelerationYLocalWall = wall.getAccelerationX() * cos(alphaRadianLocalWall) - wall.getAccelerationY() * sin(
+        #     alphaRadianLocalWall)
 
         velocityXLocal = self.velocityAbsolute * cos(alphaRadianLocal)
         velocityYLocal = self.velocityAbsolute * sin(alphaRadianLocal)
@@ -112,27 +113,21 @@ class BallForce(Ball):
                                                                                 radius, signVelocityAngular)
 
         # ----------------------------- Damping part -----------------------------
-        accelerationDampeningNormal = velocityRelativeNormal * getDampingNormal(radius, entryNormal,
-                                                                                mass, cn_wall,
+        accelerationDampeningNormal = velocityRelativeNormal * getDampingNormal(radius, entryNormal, mass, cn_wall,
                                                                                 E_eff) / mass * (-1)
-        accelerationDampeningTangent = velocityRelativeTangent * getDampingTangent(radius, entryNormal,
-                                                                                   mass, cs_wall,
+        accelerationDampeningTangent = velocityRelativeTangent * getDampingTangent(radius, entryNormal, mass, cs_wall,
                                                                                    G_eff) / mass
 
         accelerationNormal += accelerationDampeningNormal
         accelerationTangent += accelerationDampeningTangent
         # ----------------------------- End damping part -----------------------------
 
-        accelerationRelativeNormal = accelerationNormal - accelerationXLocalWall
-        accelerationRelativeTangent = accelerationTangent - accelerationYLocalWall
+        # accelerationRelativeNormal = accelerationNormal - accelerationXLocalWall
+        # accelerationRelativeTangent = accelerationTangent - accelerationYLocalWall
 
-        jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityRelativeNormal,
-                                                            accelerationRelativeNormal, signVelocityTangent, 1,
-                                                            radius, signVelocityAngular, accelerationAngular,
-                                                            accelerationRelativeTangent, E_eff)
-        accelerationNormal += jerkNormal * deltaTime
-        accelerationTangent += jerkTangent * deltaTime
-        accelerationAngular += jerkAngular * deltaTime
+        jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityXLocal, accelerationNormal,
+                                                            signVelocityTangent, 1, radius, signVelocityAngular,
+                                                            accelerationAngular, accelerationTangent, E_eff)
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerkNormal, jerkTangent,
                                     jerkAngular, entryNormal, accelerationAngular, isBall=False, number=numberOfLine,
@@ -154,10 +149,6 @@ class BallForce(Ball):
         accelerationTangent = forceSliding / self.mass
 
         return accelerationAngular, accelerationTangent
-
-    def rotationCSWall(self, velocityYLocal, dampeningTangent):
-        self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
-            abs(dampeningTangent * 2 / self.momentInertial))
 
     def isCrossLineBefore(self, numberOfLine):
         for interaction in self.interactionArray:
@@ -201,10 +192,6 @@ class BallForce(Ball):
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)
 
-    def rotationCS(self, velocityYLocal, dampeningTangentVelocity):
-        self.velocityTheta += - velocityYLocal / abs(velocityYLocal + eps) * sqrt(
-            self.mass * abs(dampeningTangentVelocity ** 2 / self.momentInertial))
-
     def iterJerk(self,
                  entryNormal,
                  velocityNormal,
@@ -219,9 +206,13 @@ class BallForce(Ball):
                  accelerationFirstTangent,
                  jerkTangent, E_eff):
         mass = self.mass
-        deltaEntryNormal = velocityNormal * deltaTime + (accelerationFirstNormal * (deltaTime ** 2)) / 2 + (
-                jerkNormal * (deltaTime ** 3)) / 6
-        entryNextNormal = entryNormal + deltaEntryNormal
+        L = velocityNormal * deltaTime + (accelerationFirstNormal * (deltaTime ** 2)) / 2
+        M = (jerkNormal * (deltaTime ** 3)) / 6
+        deltaEntryNormal = abs(L + M)
+        if isCoDirected(velocityNormal, accelerationFirstNormal):
+            entryNextNormal = entryNormal - deltaEntryNormal
+        else:
+            entryNextNormal = entryNormal + deltaEntryNormal
         stiffness = getStiffness(radiusEffective, abs(entryNextNormal), E_eff)
         forceNextNormal = stiffness * entryNextNormal * customSign(accelerationFirstNormal)
         deltaForceNormal = forceNextNormal - (accelerationFirstNormal * mass)
@@ -239,6 +230,8 @@ class BallForce(Ball):
 
         jerkAngular = (accelerationNextAngular - accelerationFirstAngular) / deltaTime
         jerkTangent = (accelerationNextTangent - accelerationFirstTangent) / deltaTime
+        # print("deltaEntryNormal, jerkNormal, jerkTangent, jerkAngular", deltaEntryNormal, jerkNormal, jerkTangent,
+        #       jerkAngular)
 
         #######################################################################
 
@@ -258,6 +251,7 @@ class BallForce(Ball):
         accelerationFirstNormal = accelerationNormal
         accelerationFirstAngular = accelerationAngular
         accelerationFirstTangent = accelerationTangent
+        # print("entry, velocityNormal, accelerationFirstNormal", entry, velocityNormal, accelerationFirstNormal)
         jerkNormal, accelerationNextNormal, \
         jerkTangent, accelerationNextTangent, \
         jerkAngular, accelerationNextAngular = self.iterJerk(entry, velocityNormal, accelerationFirstNormal, 0,
@@ -288,16 +282,19 @@ class BallForce(Ball):
             # i += 1
         # print(i)
         return jerkNormal, jerkTangent, jerkAngular
-
+    #
     # def info(self):
     #     print('velocityAlpha', self.alphaRadian, 'velocityAbs', self.velocityAbsolute)
-    #     print('velocityX', self.velocityX, 'velocityY', self.velocityY)
+    #     print('velocityX', self.velocityX, 'velocityY', self.velocityY, 'velocityTheta', self.velocityTheta)
     #     print('accelerationX =', self.accelerationX, 'accelerationY =', self.accelerationY)
     #     print('accelerationInteractionX =', self.accelerationInteractionX, '\taccelerationInteractionY =',
-    #     self.accelerationInteractionY)
-    #     print('jerkX =', self.jerkX, 'jerkY =', self.jerkY)
+    #           self.accelerationInteractionY, '\taccelerationTheta =',
+    #           self.accelerationTheta)
+    #     print('jerkX =', self.jerkX, 'jerkY =', self.jerkY, 'jerkTheta =', self.jerkTheta)
     #     for i, interaction in enumerate(self.interactionArray):
     #         print('interaction = ', i, '\tisBall =', interaction.isBall, '\tnumber =', interaction.number)
-    #         print('\taccelerationX =', interaction.accelerationX, '\taccelerationY =', interaction.accelerationY)
-    #         print('\tjerkX =', interaction.jerkX, '\tjerkY =', interaction.jerkY)
+    #         print('\taccelerationX =', interaction.accelerationX, '\taccelerationY =', interaction.accelerationY,
+    #               '\taccelerationTheta =', interaction.accelerationAngular)
+    #         print('\tjerkX =', interaction.jerkX, '\tjerkY =', interaction.jerkY, '\tjerkTheta =',
+    #               interaction.jerkTheta)
     #     print()

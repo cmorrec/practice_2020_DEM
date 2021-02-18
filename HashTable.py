@@ -24,16 +24,17 @@ class HashTable:
         for ball in balls:
             if ball.radius > radius:
                 radius = ball.radius
-        self.delta = 3 * radius  # elements.fastest_ball.velocity * deltaTime * 100
+        self.delta = self.height  # 3 * radius  # elements.fastest_ball.velocity * deltaTime * 100
         self.elementsOfX = int(ceil(self.width / self.delta))
         self.elementsOfY = int(ceil(self.height / self.delta))
         self.numOfElements = self.elementsOfX * self.elementsOfY
         self.table = [[] * 1 for i in range(self.numOfElements)]
 
     def hashBall(self, ball):
-        elementOfX = floor(ball.x / self.delta)
-        elementOfY = floor(ball.y / self.delta)
-        return self.elementsOfX * elementOfY + elementOfX
+        elementOfX = int(floor(ball.x / self.delta))
+        elementOfY = int(floor(ball.y / self.delta))
+        resultElement = (self.elementsOfX * elementOfY) + elementOfX
+        return resultElement
 
     # def hashLine(self, line):
     # int deltax := abs(x1 - x0)
@@ -64,7 +65,8 @@ class HashTable:
             self.table[i].clear()
 
         for i in range(len(balls)):
-            self.table[self.hashBall(balls[i])].append(HashObject(isBall=True, number=i))
+            index = self.hashBall(balls[i])
+            self.table[index].append(HashObject(isBall=True, number=i))
 
         # for i, line in enumerate(MoveWall.getInstance().lines):
         #     indexes = self.hashLine(line)
@@ -79,37 +81,39 @@ class HashTable:
             isDiagonalRight = True
             isDiagonalLeft = True
             elements1 = self.table[i]
+            # -------- Right block --------------
             for j in range(len(elements1)):
                 for k in range(j + 1, len(elements1)):
                     pairs.append(Pair(elements1[j], elements1[k]))
+            # -----------------------------------
 
-            if i % self.elementsOfX != self.elementsOfX - 1:
+            if (i % self.elementsOfX) != (self.elementsOfX - 1):
                 elements2 = self.table[i + 1]
-                for element1 in elements1:
-                    for element2 in elements2:
-                        pairs.append(Pair(element1, element2))
+                for j in range(len(elements1)):
+                    for k in range(len(elements2)):
+                        pairs.append(Pair(elements1[j], elements2[k]))
             else:
                 isDiagonalRight = False
 
-            if floor(i / self.elementsOfX) != self.elementsOfY - 1:
+            if floor(i / self.elementsOfX) != (self.elementsOfY - 1):
                 elements3 = self.table[i + self.elementsOfX]
-                for element1 in elements1:
-                    for element3 in elements3:
-                        pairs.append(Pair(element1, element3))
+                for j in range(len(elements1)):
+                    for k in range(len(elements3)):
+                        pairs.append(Pair(elements1[j], elements3[k]))
             else:
                 isDiagonalRight = False
                 isDiagonalLeft = False
 
             if isDiagonalRight:
                 elements4 = self.table[i + self.elementsOfX + 1]
-                for element1 in elements1:
-                    for element4 in elements4:
-                        pairs.append(Pair(element1, element4))
+                for j in range(len(elements1)):
+                    for k in range(len(elements4)):
+                        pairs.append(Pair(elements1[j], elements4[k]))
 
-            if isDiagonalLeft and i % self.elementsOfX != 0:
+            if isDiagonalLeft and ((i % self.elementsOfX) != 0):
                 elements5 = self.table[i + self.elementsOfX - 1]
-                for element1 in elements1:
-                    for element5 in elements5:
-                        pairs.append(Pair(element1, element5))
+                for j in range(len(elements1)):
+                    for k in range(len(elements5)):
+                        pairs.append(Pair(elements1[j], elements5[k]))
 
         return pairs

@@ -48,8 +48,8 @@ coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
 coordinatesFileNameVibroBox = './walls_dynamic/vibro_box.txt'
 
-coordinatesFileName = coordinatesFileNameVibroBox
-ballStartFileName = ballStartFileNameVibro1
+coordinatesFileName = coordinatesFileNameSquare
+ballStartFileName = ballStartFileName2Ball
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 
@@ -136,9 +136,9 @@ for line in ballsStartFile:
 ballsStartFile.close()
 
 if isForce:
-    elements = ElementsForce(np.array(ballsFromFile), canvas)
+    elements = ElementsForce(ballsFromFile, canvas)
 else:
-    elements = Elements(np.array(ballsFromFile), canvas)
+    elements = Elements(ballsFromFile, canvas)
 
 buttons[0].bind('<Button-1>', elements.start)  # Обработчик событий
 buttons[0].grid(row=1, column=0,
