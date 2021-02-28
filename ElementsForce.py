@@ -82,7 +82,19 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     accelerationAngular2, accelerationTangent2 = ball_2.findAccelerationAngular(signVelocityRelativeTangent2,
                                                                                 abs(forceNormal2), -1, radiusEffective,
                                                                                 signVelocityRelativeAngular)
-
+    jerkNormal1, jerkTangent1, jerkAngular1 = 0,0,0#ball_1.getJerk(entryNormal, velocity1XLocal,
+                                                             # accelerationNormal1,
+                                                             # signVelocityRelativeTangent1, 1, radiusEffective,
+                                                             # signVelocityRelativeAngular,
+                                                             # accelerationAngular1,
+                                                             # accelerationTangent1, E_eff)
+    jerkPlot.append(jerkNormal1 * 1e-3)
+    jerkNormal2, jerkTangent2, jerkAngular2 = 0,0,0 #ball_2.getJerk(entryNormal, velocity2XLocal,
+                                                             # accelerationNormal2,
+                                                             # signVelocityRelativeTangent2, -1, radiusEffective,
+                                                             # signVelocityRelativeAngular,
+                                                             # accelerationAngular2,
+                                                             # accelerationTangent2, E_eff)
     # print('\n1 before damping\naccelerationTangent1, accelerationAngular1', accelerationTangent1, accelerationAngular1)
     # print('\n2 before damping\naccelerationTangent2, accelerationAngular2', accelerationTangent2, accelerationAngular2)
 
@@ -113,19 +125,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     #       accelerationTangent1, accelerationAngular1, accelerationDampeningTangent1)
     # print('\n2 after damping before jerk\naccelerationTangent2, accelerationAngular2, accelerationDampeningTangent2',
     #       accelerationTangent2, accelerationAngular2, accelerationDampeningTangent2)
-    jerkNormal1, jerkTangent1, jerkAngular1 = ball_1.getJerk(entryNormal, velocity1XLocal,
-                                                             accelerationNormal1,
-                                                             signVelocityRelativeTangent1, 1, radiusEffective,
-                                                             signVelocityRelativeAngular,
-                                                             accelerationAngular1,
-                                                             accelerationTangent1, E_eff)
-    jerkPlot.append(jerkNormal1 * 1e-3)
-    jerkNormal2, jerkTangent2, jerkAngular2 = ball_2.getJerk(entryNormal, velocity2XLocal,
-                                                             accelerationNormal2,
-                                                             signVelocityRelativeTangent2, -1, radiusEffective,
-                                                             signVelocityRelativeAngular,
-                                                             accelerationAngular2,
-                                                             accelerationTangent2, E_eff)
+
 
     # print('\naccelerationNormal1, accelerationTangent1, accelerationAngular1', accelerationNormal1,
     #       accelerationTangent1, accelerationAngular1)

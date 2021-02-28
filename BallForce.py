@@ -111,7 +111,9 @@ class BallForce(Ball):
         # если вылетит из коробки могут быть проблемы со знаками forceNormal
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 radius, signVelocityAngular)
-
+        jerkNormal, jerkTangent, jerkAngular =0,0,0# self.getJerk(entryNormal, velocityXLocal, accelerationNormal,
+                                                            # signVelocityTangent, 1, radius, signVelocityAngular,
+                                                            # accelerationAngular, accelerationTangent, E_eff)
         # ----------------------------- Damping part -----------------------------
         accelerationDampeningNormal = velocityRelativeNormal * getDampingNormal(radius, entryNormal, mass, cn_wall,
                                                                                 E_eff) / mass * (-1)
@@ -122,12 +124,11 @@ class BallForce(Ball):
         accelerationTangent += accelerationDampeningTangent
         # ----------------------------- End damping part -----------------------------
 
+
         # accelerationRelativeNormal = accelerationNormal - accelerationXLocalWall
         # accelerationRelativeTangent = accelerationTangent - accelerationYLocalWall
 
-        jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityXLocal, accelerationNormal,
-                                                            signVelocityTangent, 1, radius, signVelocityAngular,
-                                                            accelerationAngular, accelerationTangent, E_eff)
+
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerkNormal, jerkTangent,
                                     jerkAngular, entryNormal, accelerationAngular, isBall=False, number=numberOfLine,
@@ -261,14 +262,15 @@ class BallForce(Ball):
                                                              signVelocityRelativeAngular,
                                                              accelerationFirstAngular, 0,
                                                              accelerationFirstTangent, 0, E_eff)
+        print(abs((accelerationNextNormal - accelerationNormal)),abs((accelerationNextAngular - accelerationAngular)),abs((accelerationNextTangent - accelerationTangent)))
         # i = 1
-        while abs((accelerationNextNormal - accelerationNormal) / (accelerationNormal + eps)) > epsAcceleration and \
-                abs((accelerationNextAngular - accelerationAngular) / (accelerationAngular + eps)) > epsAcceleration and \
-                abs((accelerationNextTangent - accelerationTangent) / (accelerationTangent + eps)) > epsAcceleration:
+        while abs((accelerationNextNormal - accelerationNormal))/abs(accelerationNormal + eps) > epsAcceleration or \
+            abs((accelerationNextAngular - accelerationAngular) / (accelerationAngular + eps)) > epsAcceleration2 or \
+            abs((accelerationNextTangent - accelerationTangent))/abs(accelerationTangent + eps) > epsAcceleration2:
+            print(1)
             accelerationNormal = accelerationNextNormal
             accelerationAngular = accelerationNextAngular
             accelerationTangent = accelerationNextTangent
-
             jerkNormal, accelerationNextNormal, \
             jerkTangent, accelerationNextTangent, \
             jerkAngular, accelerationNextAngular = self.iterJerk(entry, velocityNormal, accelerationFirstNormal,
