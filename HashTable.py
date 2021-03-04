@@ -24,7 +24,7 @@ class HashTable:
         for ball in balls:
             if ball.radius > radius:
                 radius = ball.radius
-        self.delta = self.height  # 3 * radius  # elements.fastest_ball.velocity * deltaTime * 100
+        self.delta = self.width  # 3 * radius  # elements.fastest_ball.velocity * deltaTime * 100
         self.elementsOfX = int(ceil(self.width / self.delta))
         self.elementsOfY = int(ceil(self.height / self.delta))
         self.numOfElements = self.elementsOfX * self.elementsOfY

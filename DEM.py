@@ -48,8 +48,8 @@ coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
 coordinatesFileNameVibroBox = './walls_dynamic/vibro_box.txt'
 
-coordinatesFileName = coordinatesFileNameSquare
-ballStartFileName = ballStartFileName2Ball
+coordinatesFileName = coordinatesFileNameVibroBox
+ballStartFileName = ballStartFileNameVibro1
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 

@@ -111,9 +111,9 @@ class BallForce(Ball):
         # если вылетит из коробки могут быть проблемы со знаками forceNormal
         accelerationAngular, accelerationTangent = self.findAccelerationAngular(signVelocityTangent, forceNormal, 1,
                                                                                 radius, signVelocityAngular)
-        jerkNormal, jerkTangent, jerkAngular =0,0,0# self.getJerk(entryNormal, velocityXLocal, accelerationNormal,
-                                                            # signVelocityTangent, 1, radius, signVelocityAngular,
-                                                            # accelerationAngular, accelerationTangent, E_eff)
+        jerkNormal, jerkTangent, jerkAngular = self.getJerk(entryNormal, velocityXLocal, accelerationNormal,
+                                                            signVelocityTangent, 1, radius, signVelocityAngular,
+                                                            accelerationAngular, accelerationTangent, E_eff)
         # ----------------------------- Damping part -----------------------------
         accelerationDampeningNormal = velocityRelativeNormal * getDampingNormal(radius, entryNormal, mass, cn_wall,
                                                                                 E_eff) / mass * (-1)
@@ -216,18 +216,18 @@ class BallForce(Ball):
             entryNextNormal = entryNormal + deltaEntryNormal
         stiffness = getStiffness(radiusEffective, abs(entryNextNormal), E_eff)
         forceNextNormal = stiffness * entryNextNormal * customSign(accelerationFirstNormal)
-        deltaForceNormal = forceNextNormal - (accelerationFirstNormal * mass)
         accelerationNextNormal = forceNextNormal / mass
+        deltaForceNormal = forceNextNormal - (accelerationFirstNormal * mass)
+
         jerkNormal = (accelerationNextNormal - accelerationFirstNormal) / deltaTime
 
         deltaForceSliding = coefficientOfFrictionSliding * deltaForceNormal * signVelocityRelativeTangent
         deltaMomentSliding = deltaForceSliding * radiusEffective * signVelocityTangentRelativeAngular
         deltaMomentRolling = coefficientOfFrictionRolling * deltaForceNormal * radiusEffective * (
                 signVelocityRelativeAngular * (-1))
-
         accelerationNextAngular = accelerationFirstAngular + (
-                deltaMomentSliding + deltaMomentRolling) / self.momentInertial + jerkAngular * deltaTime
-        accelerationNextTangent = accelerationFirstTangent + deltaForceSliding / mass + jerkTangent * deltaTime
+                deltaMomentSliding + deltaMomentRolling) / self.momentInertial
+        accelerationNextTangent = accelerationFirstTangent + deltaForceSliding / mass
 
         jerkAngular = (accelerationNextAngular - accelerationFirstAngular) / deltaTime
         jerkTangent = (accelerationNextTangent - accelerationFirstTangent) / deltaTime
@@ -262,12 +262,11 @@ class BallForce(Ball):
                                                              signVelocityRelativeAngular,
                                                              accelerationFirstAngular, 0,
                                                              accelerationFirstTangent, 0, E_eff)
-        print(abs((accelerationNextNormal - accelerationNormal)),abs((accelerationNextAngular - accelerationAngular)),abs((accelerationNextTangent - accelerationTangent)))
+        # print(abs((accelerationNextNormal - accelerationNormal)), abs((accelerationNextAngular - accelerationAngular)), abs((accelerationNextTangent - accelerationTangent)))
         # i = 1
-        while abs((accelerationNextNormal - accelerationNormal))/abs(accelerationNormal + eps) > epsAcceleration or \
-            abs((accelerationNextAngular - accelerationAngular) / (accelerationAngular + eps)) > epsAcceleration2 or \
-            abs((accelerationNextTangent - accelerationTangent))/abs(accelerationTangent + eps) > epsAcceleration2:
-            print(1)
+        while abs((accelerationNextNormal - accelerationNormal)) / abs(accelerationNormal + eps) > epsAcceleration or \
+            abs((accelerationNextAngular - accelerationAngular) / abs(accelerationAngular + eps)) > epsAcceleration or \
+            abs((accelerationNextTangent - accelerationTangent)) / abs(accelerationTangent + eps) > epsAcceleration:
             accelerationNormal = accelerationNextNormal
             accelerationAngular = accelerationNextAngular
             accelerationTangent = accelerationNextTangent

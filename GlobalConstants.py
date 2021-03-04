@@ -1,4 +1,4 @@
-displayRatio = 1000
+displayRatio = 10000
 midInteractionNum = 100
 
 
@@ -10,7 +10,6 @@ isForce = True
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 0.01
 epsAcceleration = 0.00001
-epsAcceleration2 = 1
 eps = 1e-9
 # inf = 1e11
 # Критически малая величина, необходимая для сравнения вещественных чисел
