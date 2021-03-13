@@ -1,5 +1,6 @@
-from Ball import *
+
 from HashTable import *
+
 
 # Класс Elements содержит в себе массив шаров и координирует их движение между собой,
 # в частности отслеживает и регулирует столкновение шаров
@@ -156,6 +157,30 @@ class Elements:
         for ball in self.balls:
             ball.draw()
         MoveWall.getInstance().draw()
+
+    def writeFileFirst(self, file: TextIO):
+        for i, ball in enumerate(self.balls):
+            # ballInit: i x y theta
+            file.write(
+                ballInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(ball.x) + inLineDelimiter + str(ball.y) + inLineDelimiter + str(ball.theta) + inLineDelimiter + str(ball.radius) + inLineDelimiter + ball.color + inLineDelimiter +'\n')
+        lines = MoveWall.getInstance().lines
+        for i, line in enumerate(lines):
+            # wallInit: i x1 y1 x2 y2
+            file.write(
+                wallInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter +'\n')
+        file.write(nextStepFlag + inLineDelimiter + '\n')
+
+    def writeFile(self, file: TextIO):
+        for i, ball in enumerate(self.balls):
+            # ball: i x y theta radius color
+            file.write(
+                ballFlag + inLineDelimiter + str(i) + inLineDelimiter + str(ball.x) + inLineDelimiter + str(ball.y) + inLineDelimiter + str(ball.theta) + inLineDelimiter +'\n')
+        lines = MoveWall.getInstance().lines
+        for i, line in enumerate(lines):
+            # wall: i x1 y1 x2 y2
+            file.write(
+                wallFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter +'\n')
+        file.write(nextStepFlag + inLineDelimiter + '\n')
 
     def printPairs(self):
         for pair in self.pairs:

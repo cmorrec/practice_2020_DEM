@@ -30,6 +30,7 @@ class Ball:
         self.velocityTheta = velocityTheta
         self.accelerationTheta = 0
         self.canvas = canvas
+        self.color = color
         self.id = canvas.create_oval(displayRatio * (x - radius), displayRatio * (y - radius),
                                      displayRatio * (x + radius), displayRatio * (y + radius), fill=color)
         self.id2 = canvas.create_line(displayRatio * x, displayRatio * y, displayRatio * (x + radius * cos(self.theta)),

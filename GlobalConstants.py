@@ -1,11 +1,20 @@
-displayRatio = 10000
+displayRatio = 5000
 midInteractionNum = 100
+inLineDelimiter = '\t'
+ballFlag = 'ball:'
+ballInitFlag = 'ballInit:'
+wallFlag = 'wall:'
+wallInitFlag = 'wallInit:'
+utilsFlag = 'utils:'
+nextStepFlag = 'next'
+endFileFlag = 'end\n'
 
 
 def getForceDamping(c):
     return 1 - (1 - c) ** (1 / midInteractionNum)
 
 
+isDraw = True
 isForce = True
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 0.01
@@ -15,8 +24,8 @@ eps = 1e-9
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
 step = 100
-deltaTime = 1 * 1e-5
-numOfSeconds = 1
+deltaTime = 1 * 1e-6
+numOfSeconds = 0.1
 numOfSteps = int(numOfSeconds * int(1 / deltaTime))
 # Шаг по времени
 cn_wall = 1
@@ -26,10 +35,6 @@ nu_wall = 0.3
 Gmod_wall = Emod_wall / (2 * (1 + nu_wall))
 coefficientOfDampingTheta = 0
 
-# if isForce:
-#     cn_wall = getForceDamping(cn_wall)
-#     cs_wall = getForceDamping(cs_wall)
-
 coefficientOfFrictionSliding = 0.1
 coefficientOfFrictionRolling = 0.05
 
@@ -37,4 +42,3 @@ coefficientOfFrictionRolling = 0.05
 accelerationX = 0
 accelerationY = 9.81
 kn = 2 * 1e5
-# ks = 0

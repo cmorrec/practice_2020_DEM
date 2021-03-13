@@ -1,4 +1,3 @@
-from BallForce import BallForce
 from ElementsForce import *
 
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
@@ -103,7 +102,6 @@ tk.rowconfigure(1)
 canvas = Canvas(tk, width=int(canvasWidth), height=int(canvasHeight), highlightthickness=0)
 canvas.grid(row=0, columnspan=3)
 buttons = Buttons()
-tk.update()
 
 wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, freqXWall,
                 freqYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY, width, height)
@@ -146,23 +144,31 @@ buttons[0].grid(row=1, column=0,
 buttons[1].grid(row=1, column=1)
 buttons[2].bind('<Button-1>', elements.exit)
 buttons[2].grid(row=1, column=2, padx=3)
-tk.update_idletasks()
-tk.update()
 
-steps = 0
+resultFile = open(getName(elements, coordinatesFileName, ballStartFileName, freqXWall, freqYWall, velocityThetaWall),
+                  'w')
+makeUtils(resultFile, canvasWidth, canvasHeight)
+
+elements.writeFileFirst(resultFile)
 elements.begin()
+
 start_time = time.time()
+steps = 0
 while steps < numOfSteps:
-    # start_time = time.time()
     if elements.started:
         for i in range(step):
             elements.move()
-        # print("--- %s seconds ---" % (time.time() - start_time))
     steps += step
-    elements.draw()
-    tk.update_idletasks()
-    tk.update()
-    # print("+++ %s seconds +++" % (time.time() - start_time))
+    if isDraw:
+        elements.draw()
+        tk.update_idletasks()
+        tk.update()
+    elements.writeFile(resultFile)
+
 print("+++ %s seconds +++" % (time.time() - start_time))
+
+resultFile.write(endFileFlag)
+resultFile.close()
+
 elements.energyMonitoring()
 elements.exit(None)

@@ -1,4 +1,3 @@
-from GlobalUtils import *
 from MoveWall import *
 
 
@@ -24,11 +23,11 @@ class HashTable:
         for ball in balls:
             if ball.radius > radius:
                 radius = ball.radius
-        self.delta = self.width  # 3 * radius  # elements.fastest_ball.velocity * deltaTime * 100
+        self.delta = 3 * radius
         self.elementsOfX = int(ceil(self.width / self.delta))
         self.elementsOfY = int(ceil(self.height / self.delta))
         self.numOfElements = self.elementsOfX * self.elementsOfY
-        self.table = [[] * 1 for i in range(self.numOfElements)]
+        self.table = [[] * 1 for _ in range(self.numOfElements)]
 
     def hashBall(self, ball):
         elementOfX = int(floor(ball.x / self.delta))

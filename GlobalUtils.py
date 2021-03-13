@@ -1,4 +1,6 @@
+import datetime
 from math import *
+from typing import TextIO
 import numpy as np
 import time
 from tkinter import *
@@ -21,6 +23,30 @@ stepCountForce = []
 
 
 # --------------- Функции для отображения и результатов --------------
+def getName(elements, coordinatesFileName: str, ballStartFileName: str, freqX: float, freqY: float, velTheta: float):
+    delimiter = '__'
+    directory = './results/'
+    date = datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+    coordinatesFileName = coordinatesFileName.split('/')[-1].split('.')[0] + delimiter + 'frX=' + str(freqX) + 'frY=' + str(
+        freqY) + 'vTh=' + str(velTheta)
+    ballStartFileName = ballStartFileName.split('/')[-1].split('.')[0]
+    numSec = 'sec=' + str(numOfSeconds)
+    end = '.txt'
+    name = directory + \
+           coordinatesFileName + delimiter + \
+           ballStartFileName + delimiter + \
+           numSec + delimiter + date + end
+    return name
+
+
+def makeUtils(file: TextIO, width: float, height: float):
+    width = str(width)
+    height = str(height)
+    deltaTimeStr = str(deltaTime)
+    #   width      height     deltaTime
+    file.write(utilsFlag + inLineDelimiter + width + inLineDelimiter + height + inLineDelimiter + deltaTimeStr + inLineDelimiter + '\n')
+
+
 def Buttons():
     but_1 = Button(text='Start',
                    width=17, height=2,
