@@ -5,56 +5,71 @@ from MoveWall import *
 
 
 class Ball:
-    def __init__(self, x, y, radius, alpha, velocity, cn, cs, density, color, canvas):
+    def __init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas):
         self.x = x
         self.y = y
+        self.Emod = Emod
+        self.nu = nu
+        self.xLastDraw = x
+        self.yLastDraw = y
         self.theta = 0
-        self.mass = density * pi * radius ** 2
+        self.radius = radius
+        self.mass = density * 4 / 3 * pi * radius ** 3
+        self.momentInertial = 0.4 * self.mass * (self.radius ** 2)
         # Коэффициент контактного демпфирования в нормальном направлении
         self.cn = cn
         # Коэффициент контактного демпфирования в тангенциальном направлении
         self.cs = cs
-        self.radius = radius
-        self.accelerationX = accelerationX
-        self.accelerationY = accelerationY
+        self.accelerationX = MoveWall.getInstance().accelerationX
+        self.accelerationY = MoveWall.getInstance().accelerationY
+        self.jerk = 0
         self.velocityAbsolute = velocity
         self.alphaRadian = alpha * pi / 180
         self.velocityX = velocity * cos(self.alphaRadian)
         self.velocityY = velocity * sin(self.alphaRadian)
-        self.velocityTheta = 0
+        self.velocityTheta = velocityTheta
+        self.accelerationTheta = 0
         self.canvas = canvas
-        self.id = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
-        self.id2 = canvas.create_line(x, y, x + radius * cos(self.theta), y + radius * sin(self.theta), width=2,
-                                      fill="black")
+        self.color = color
+        self.id = canvas.create_oval(displayRatio * (x - radius), displayRatio * (y - radius),
+                                     displayRatio * (x + radius), displayRatio * (y + radius), fill=color)
+        self.id2 = canvas.create_line(displayRatio * x, displayRatio * y, displayRatio * (x + radius * cos(self.theta)),
+                                      displayRatio * (y + radius * sin(self.theta)), width=2, fill="black")
         self.isCrossAnything = False
 
-    def drawPolygon(self):
-        self.movePolygon()  # фактическое движение
-        self.canvas.move(self.id, self.velocityX * deltaTime, self.velocityY * deltaTime)  # прорисовка движения
+    def canvasMove(self):
+        self.canvas.move(self.id, displayRatio * (self.x - self.xLastDraw), displayRatio * (self.y - self.yLastDraw))
 
     def rotationIndicator(self):
-        self.theta += (self.velocityTheta * deltaTime) % (2 * pi)
-        self.canvas.coords(self.id2, self.x, self.y, self.x + self.radius * cos(self.theta),
-                           self.y + self.radius * sin(self.theta))
-        self.canvas.move(self.id2, self.velocityX * deltaTime, self.velocityY * deltaTime)
+        self.canvas.coords(self.id2, displayRatio * self.x, displayRatio * self.y,
+                           displayRatio * (self.x + self.radius * cos(self.theta)),
+                           displayRatio * (self.y + self.radius * sin(self.theta)))
 
-    def movePolygon(self):
-        pos = self.canvas.coords(self.id)  # овал задается по 4-м коордиатам по которым
-        self.x = (pos[0] + pos[2]) / 2  # можно найти координаты центра
-        self.y = (pos[1] + pos[3]) / 2
+    def draw(self):
+        self.canvasMove()  # прорисовка движения
+        self.rotationIndicator()
+        self.xLastDraw = self.x
+        self.yLastDraw = self.y
 
+    def move(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
+
         if self.crossPolygon():
-            self.resetPolygon()
+            self.expand()
         elif not self.isInsidePolygon():
             self.comeBack()
         # Обновление направлений скоростей
-        self.velocityX = self.velocityAbsolute * cos(self.alphaRadian) + self.accelerationX * deltaTime
-        self.velocityY = self.velocityAbsolute * sin(self.alphaRadian) + self.accelerationY * deltaTime
-        self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
-                            sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
+        self.addAccelerationInteractionMethod()
+        self.x += self.velocityX * deltaTime + 0.5 * self.accelerationX * (deltaTime ** 2)
+        self.y += self.velocityY * deltaTime + 0.5 * self.accelerationY * (deltaTime ** 2)
+        self.theta = (self.theta + self.velocityTheta * deltaTime + 0.5 * self.accelerationTheta * (deltaTime ** 2)) % (
+                    2 * pi)
+        self.addVelocity(self.accelerationX, self.accelerationY, self.accelerationTheta)
+
+    def addAccelerationInteractionMethod(self):
+        pass
 
     def crossPolygon(self):
         # Проверяет пересечение как минимум с одной линией
@@ -63,7 +78,7 @@ class Ball:
                 return True
         return False
 
-    def resetPolygon(self):
+    def expand(self):
         # Находим линию, которую пересекает шарик и изменяем угол шарика по известной формуле:
         # alpha = 2 * beta - alpha
         wall = MoveWall.getInstance()
@@ -84,14 +99,15 @@ class Ball:
                         velocityYLocalWall = 0
                     velocityXLocal += velocityXLocalWall
                     dampeningNormal = velocityXLocal * cn_wall
-                    dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall
-                    self.velocityTheta += 1 / self.radius * (1 - cs_wall) * (
-                            velocityYLocal - velocityYLocalWall - (self.velocityTheta * self.radius)) * (
-                                   deltaTime ** 2)
+                    # dampeningTangent = (velocityYLocal - velocityYLocalWall) * cs_wall  # убрать скорость стенки
+
+                    # self.rotationHerzWall(velocityYLocal, velocityYLocalWall, velocityXLocal, velocityXLocalWall)
+
                     velocityXLocalNew = dampeningVelocity(dampeningNormal, velocityXLocal)
-                    velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
-                    self.changeVelocity(atan2(velocityYLocalNew, velocityXLocalNew + eps) + line.alphaNorm,
-                                        sqrt(velocityXLocalNew ** 2 + velocityYLocalNew ** 2))
+                    # velocityYLocalNew = dampeningVelocity(dampeningTangent, velocityYLocal)
+
+                    self.changeVelocity(atan2(velocityYLocal, velocityXLocalNew + eps) + line.alphaNorm,
+                                        sqrt(velocityXLocalNew ** 2 + velocityYLocal ** 2))
 
     def resetForLine(self, line):
         # Проверяем расстояние сейчас и в следующий момент времени
@@ -101,13 +117,15 @@ class Ball:
         if not self.isInsidePolygon():
             distNow *= -1
 
-        self.x += self.velocityX * deltaTime
-        self.y += self.velocityY * deltaTime
+        self.displace()
         distAfter = line.distanceToLine(self.x, self.y)
         if not self.isInsidePolygon():
             distAfter *= -1
-        self.x -= self.velocityX * deltaTime
-        self.y -= self.velocityY * deltaTime
+        self.velocityX *= -1
+        self.velocityY *= -1
+        self.displace()
+        self.velocityX *= -1
+        self.velocityY *= -1
 
         return distNow > distAfter
 
@@ -177,3 +195,14 @@ class Ball:
     def addAcceleration(self):
         self.accelerationX = MoveWall.getInstance().accelerationX
         self.accelerationY = MoveWall.getInstance().accelerationY
+
+    def displace(self):
+        self.x += self.velocityX * deltaTime
+        self.y += self.velocityY * deltaTime
+
+    def addVelocity(self, accelerationX, accelerationY, accelerationTheta):
+        self.velocityX += accelerationX * deltaTime
+        self.velocityY += accelerationY * deltaTime
+        self.changeVelocity(atan2(self.velocityY, self.velocityX + eps),
+                            sqrt((self.velocityX ** 2) + (self.velocityY ** 2)))
+        self.velocityTheta += accelerationTheta * deltaTime

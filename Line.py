@@ -11,13 +11,9 @@ class Line:
         self.x2 = coordinate2.x
         self.y1 = coordinate1.y
         self.y2 = coordinate2.y
-        self.abs = sqrt((self.x2 - self.x1) ** 2 + (self.y2 - self.y1) ** 2)
-        # Следующие три строки исключают возможность деления на ноль
-        distY = abs(self.y2 - self.y1)
-        if distY < eps:
-            distY = eps
+        self.abs = self.findAbs()
         # Угол направления линии
-        self.alphaTau = acos((self.x2 - self.x1) / self.abs) * (self.y2 - self.y1) / distY
+        self.alphaTau = self.findTau()
         # Угол нормали к линии
         self.alphaNorm = self.alphaTau + (pi / 2)
 
@@ -27,7 +23,9 @@ class Line:
         # Координаты точки на прямой этой линии до которой от центра шарика расстояние h
         xH = x0 + h * cos(pi - self.alphaNorm)
         yH = y0 - h * sin(pi - self.alphaNorm)
-        if (h < radius) and (self.isLine(xH, yH) or abs(self.x1 - self.x2) < eps or abs(
+        xH2 = x0 + h * cos(pi - (-1) * self.alphaNorm)
+        yH2 = y0 - h * sin(pi - (-1) * self.alphaNorm)
+        if (h < radius) and (self.isLine(xH, yH) or self.isLine(xH2, yH2) or abs(self.x1 - self.x2) < eps or abs(
                 self.y1 - self.y2) < eps):
             return True
         else:
@@ -46,13 +44,19 @@ class Line:
         b = sqrt((self.x1 - x0) ** 2 + (self.y1 - y0) ** 2)
         c = self.abs
         p = (a + b + c) / 2
-        if (p * (p - a) * (p - b) * (p - c)) > 0:
-            h = 2 * sqrt(p * (p - a) * (p - b) * (p - c)) / c
-        else:
-            h = 2 * sqrt(p * (p - a) * (p - b) * (p - c) * (-1)) / c
+        h = 2 * sqrt(abs(p * (p - a) * (p - b) * (p - c))) / c
         return h
 
     def crossVerticalUp(self, x0, y0):
         # Проверка на пересечение линии и луча проведенного из этой точки вертикально вверх
         yH = self.y1 + (x0 - self.x1) * tan(self.alphaTau)
         return y0 < yH and ((self.x1 <= x0 < self.x2) or (self.x2 <= x0 < self.x1))
+
+    def findAbs(self):
+        return sqrt((self.x2 - self.x1) ** 2 + (self.y2 - self.y1) ** 2)
+
+    def findTau(self):
+        return atan2(self.y2 - self.y1, self.x2 - self.x1 + eps)
+
+    def findNorm(self):
+        return atan2(self.y2 - self.y1, self.x2 - self.x1 + eps) + (pi / 2)
