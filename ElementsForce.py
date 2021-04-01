@@ -95,8 +95,6 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
                                                              signVelocityRelativeAngular,
                                                              accelerationAngular2,
                                                              accelerationTangent2, E_eff)
-    # print('\n1 before damping\naccelerationTangent1, accelerationAngular1', accelerationTangent1, accelerationAngular1)
-    # print('\n2 before damping\naccelerationTangent2, accelerationAngular2', accelerationTangent2, accelerationAngular2)
 
     # ----------------------------- Damping part -----------------------------
     accelerationDampeningNormal1 = velocity1XRelative * getDampingNormal(radiusEffective, entryNormal, ball_1.mass,
@@ -114,25 +112,6 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     accelerationNormal2 += accelerationDampeningNormal2
     accelerationTangent2 += accelerationDampeningTangent2
     # ----------------------------- End damping part -----------------------------
-    # accelerationNormal1Relative = accelerationNormal1 - accelerationNormal2
-    # accelerationTangent1Relative = accelerationTangent1 - accelerationTangent2
-    # accelerationAngular1Relative = accelerationAngular1 - accelerationAngular2
-    # accelerationNormal2Relative = accelerationNormal2 - accelerationNormal1
-    # accelerationTangent2Relative = accelerationTangent2 - accelerationTangent1
-    # accelerationAngular2Relative = accelerationAngular2 - accelerationAngular1
-
-    # print('\n1 after damping before jerk\naccelerationTangent1, accelerationAngular1, accelerationDampeningTangent1',
-    #       accelerationTangent1, accelerationAngular1, accelerationDampeningTangent1)
-    # print('\n2 after damping before jerk\naccelerationTangent2, accelerationAngular2, accelerationDampeningTangent2',
-    #       accelerationTangent2, accelerationAngular2, accelerationDampeningTangent2)
-
-
-    # print('\naccelerationNormal1, accelerationTangent1, accelerationAngular1', accelerationNormal1,
-    #       accelerationTangent1, accelerationAngular1)
-    # print('jerkNormal1, jerkTangent1, jerkAngular1', jerkNormal1, jerkTangent1, jerkAngular1, '\n')
-    # print('accelerationNormal2, accelerationTangent2, accelerationAngular2', accelerationNormal2, accelerationTangent2,
-    #       accelerationAngular2)
-    # print('jerkNormal2, jerkTangent2, jerkAngular2', jerkNormal2, jerkTangent2, jerkAngular2, '\n')
 
     ball_1.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkNormal1, jerkTangent1,
                                   jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=numberOf2,

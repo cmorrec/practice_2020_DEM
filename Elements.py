@@ -93,13 +93,13 @@ class Elements:
         self.step = 0
         self.hashTable = HashTable(self.balls)
         self.pairs = self.hashTable.getPairs(self.balls)
-        self.printPairs()
         for i in range(self.hashTable.elementsOfX):
             canvas.create_line(displayRatio * i * self.hashTable.delta, 0, displayRatio * i * self.hashTable.delta,
                                displayRatio * self.hashTable.height)
         for i in range(self.hashTable.elementsOfY):
             canvas.create_line(0, displayRatio * i * self.hashTable.delta, displayRatio * self.hashTable.width,
                                displayRatio * i * self.hashTable.delta)
+        self.pairs = self.hashTable.getPairs(self.balls)
 
     def energyMonitoring(self):
         print("Количество энергии", self.energyToSee(), "\n")
@@ -157,6 +157,7 @@ class Elements:
         for ball in self.balls:
             ball.draw()
         MoveWall.getInstance().draw()
+        self.pairs = self.hashTable.getPairs(self.balls)
 
     def writeFileFirst(self, file: TextIO):
         for i, ball in enumerate(self.balls):
@@ -195,7 +196,6 @@ class Elements:
         MoveWall.getInstance().move()
         for ball in self.balls:
             ball.move()
-        self.pairs = self.hashTable.getPairs(self.balls)
 
     def calculation(self):
         # В случае касания шара с шаром или шара со стенкой -- отключается для этого шара поле ускорений

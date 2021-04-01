@@ -1,4 +1,5 @@
 import sys
+import time
 from math import sin, cos
 from tkinter import Tk, Canvas
 from GlobalConstants import *
@@ -101,6 +102,9 @@ def draw(_balls: list, _lines: list):
     tk.update()
 
 
+input()
+
+start_time = time.time()
 while True:
     newLine = file.readline().split(inLineDelimiter)
     if newLine[0] == ballFlag:
@@ -126,5 +130,5 @@ while True:
     elif newLine[0] == endFileFlag or newLine[0] == '':
         break
 
-print('I`m draw this!!!!')
+print("+++ %s seconds +++" % (time.time() - start_time))
 input()

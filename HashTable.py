@@ -35,42 +35,13 @@ class HashTable:
         resultElement = (self.elementsOfX * elementOfY) + elementOfX
         return resultElement
 
-    # def hashLine(self, line):
-    # int deltax := abs(x1 - x0)
-    # int deltay := abs(y1 - y0)
-    # real error := 0
-    # real deltaerr := (deltay + 1) / (deltax + 1)
-    # int y := y0
-    # int diry := y1 - y0
-    # if diry > 0
-    #     diry = 1
-    # if diry < 0
-    #     diry = -1
-    # for x from x0 to x1
-    #     plot(x, y)
-    #     error := error + deltaerr
-    #     if error >= 1.0
-    #         y := y + diry
-    #         error := error - 1.0
-    #
-    # deltaX = abs(line.x1 - line.x2)
-    # deltaY = abs(line.y1 - line.y2)
-    # error = float(0)
-    # deltaError = (deltay + 1) / (deltax + 1)
-
     def update(self, balls):
-        # print(self.table.shape)
         for i in range(self.numOfElements):
             self.table[i].clear()
 
         for i in range(len(balls)):
             index = self.hashBall(balls[i])
             self.table[index].append(HashObject(isBall=True, number=i))
-
-        # for i, line in enumerate(MoveWall.getInstance().lines):
-        #     indexes = self.hashLine(line)
-        #     for j in indexes:
-        #         self.table[j].append(HashObject(isBall=False, number=i))
 
     def getPairs(self, balls):
         self.update(balls)

@@ -26,7 +26,7 @@ stepCountForce = []
 def getName(elements, coordinatesFileName: str, ballStartFileName: str, freqX: float, freqY: float, velTheta: float):
     delimiter = '__'
     directory = './results/'
-    date = datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+    date = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     coordinatesFileName = coordinatesFileName.split('/')[-1].split('.')[0] + delimiter + 'frX=' + str(freqX) + 'frY=' + str(
         freqY) + 'vTh=' + str(velTheta)
     ballStartFileName = ballStartFileName.split('/')[-1].split('.')[0]
