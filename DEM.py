@@ -1,9 +1,10 @@
+import BreakBall
 from ElementsForce import *
 
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
 ballStartFileName2Ball = './ball_sets/2_ball.txt'
 ballStartFileName4Ball = './ball_sets/4_ball.txt'
-ballStartFileName4BallBig = './ball_sets/4_ball_big.txt'
+ballStartFileName4BallAnother = './ball_sets/4_ball_another.txt'
 ballStartFileName2PlateVol = './ball_sets/2_plate_volume.txt'
 ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
 ballStartFileName4Plate = './ball_sets/4_plate.txt'
@@ -47,8 +48,9 @@ coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
 coordinatesFileNameVibroBox = './walls_dynamic/vibro_box.txt'
 
-coordinatesFileName = coordinatesFileNameVibroBox
-ballStartFileName = ballStartFileNameVibro1
+coordinatesFileName = coordinatesFileNamePolygon
+ballStartFileName = ballStartFileName4Ball
+oreBallStartFileName = ballStartFileName4BallAnother
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 
@@ -106,35 +108,50 @@ buttons = Buttons()
 wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, freqXWall,
                 freqYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY, width, height)
 
+oreBallStartFile = open(oreBallStartFileName, 'r')
 ballsStartFile = open(ballStartFileName, 'r')
 ballsFromFile = []
 
-for line in ballsStartFile:
-    words = line.split()
-    data = []
-    j = 0
-    color = ''
-    for word in words:
-        if j != len(words) - 1:
-            data.append(float(word))
-        else:
-            color = word
-        j += 1
-    if len(data) > 0:
-        if isForce:
-            ballsFromFile.append(
-                BallForce(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9],
-                          data[10], color,
-                          canvas))
-        else:
-            ballsFromFile.append(
-                Ball(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10],
-                     color, canvas))
+eventBus = EventBus()
 
-ballsStartFile.close()
+
+def readBalls(ballsStartFile_: TextIO, isBreakage: bool):
+    for line_ in ballsStartFile_:
+        words_ = line_.split()
+        data_ = []
+        j = 0
+        color = ''
+        for word_ in words_:
+            if j != len(words_) - 1:
+                data_.append(float(word_))
+            else:
+                color = word_
+            j += 1
+        if len(data_) > 0:
+            if isBreakage:
+                ballsFromFile.append(
+                    BreakBall.BreakBall(data_[0], data_[1], data_[2], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7],
+                                        data_[8], data_[9], data_[10], color, canvas, eventBus))
+            else:
+                if isForce:
+                    ballsFromFile.append(
+                        BallForce(data_[0], data_[1], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7],
+                                  data_[8], data_[9],
+                                  data_[10], color,
+                                  canvas))
+                else:
+                    ballsFromFile.append(
+                        Ball(data_[0], data_[1], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7], data_[8],
+                             data_[9], data_[10],
+                             color, canvas))
+    ballsStartFile_.close()
+
+
+readBalls(ballsStartFile, False)
+readBalls(oreBallStartFile, True)
 
 if isForce:
-    elements = ElementsForce(ballsFromFile, canvas)
+    elements = ElementsForce(ballsFromFile, canvas, eventBus)
 else:
     elements = Elements(ballsFromFile, canvas)
 
@@ -149,7 +166,7 @@ resultFile = open(getName(elements, coordinatesFileName, ballStartFileName, freq
                   'w')
 makeUtils(resultFile, canvasWidth, canvasHeight)
 
-elements.writeFileFirst(resultFile)
+elements.writeFile(resultFile)
 elements.begin()
 
 start_time = time.time()

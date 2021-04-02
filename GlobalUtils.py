@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from PIL import ImageTk
 from GlobalConstants import *
+import numpy.random as rand
 
 # Энергия
 kineticPlot = []

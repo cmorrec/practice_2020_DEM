@@ -14,6 +14,7 @@ class Ball:
         self.yLastDraw = y
         self.theta = 0
         self.radius = radius
+        self.density = density
         self.mass = density * 4 / 3 * pi * radius ** 3
         self.momentInertial = 0.4 * self.mass * (self.radius ** 2)
         # Коэффициент контактного демпфирования в нормальном направлении
@@ -52,14 +53,19 @@ class Ball:
         self.yLastDraw = self.y
 
     def move(self):
+        self.wallInteract()
+        self.transfer()
+
+    def wallInteract(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
-
         if self.crossPolygon():
             self.expand()
         elif not self.isInsidePolygon():
             self.comeBack()
+
+    def transfer(self):
         # Обновление направлений скоростей
         self.addAccelerationInteractionMethod()
         self.x += self.velocityX * deltaTime + 0.5 * self.accelerationX * (deltaTime ** 2)

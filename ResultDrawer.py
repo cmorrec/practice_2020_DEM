@@ -55,13 +55,9 @@ class CustomBall:
         self.y = y
         self.theta = theta
 
-    def draw(self):
-        self.canvas.move(self.id, displayRatio * (self.x - self.xLastDraw), displayRatio * (self.y - self.yLastDraw))
-        self.canvas.coords(self.id2, displayRatio * self.x, displayRatio * self.y,
-                           displayRatio * (self.x + self.radius * cos(self.theta)),
-                           displayRatio * (self.y + self.radius * sin(self.theta)))
-        self.xLastDraw = self.x
-        self.yLastDraw = self.y
+    def remove(self):
+        self.canvas.delete(self.id)
+        self.canvas.delete(self.id2)
 
 
 class CustomLine:
@@ -81,25 +77,21 @@ class CustomLine:
         self.y1 = y1
         self.y2 = y2
 
-    def draw(self):
-        self.canvas.coords(self.id,
-                           displayRatio * self.x1,
-                           displayRatio * self.y1,
-                           displayRatio * self.x2,
-                           displayRatio * self.y2)
+    def remove(self):
+        self.canvas.delete(self.id)
 
 
 balls = []
 lines = []
 
 
-def draw(_balls: list, _lines: list):
-    for ball in _balls:
-        ball.draw()
-    for line in _lines:
-        line.draw()
+def remove(_balls: list, _lines: list):
     tk.update_idletasks()
     tk.update()
+    for ball in _balls:
+        ball.remove()
+    for line in _lines:
+        line.remove()
 
 
 input()
@@ -107,24 +99,21 @@ input()
 start_time = time.time()
 while True:
     newLine = file.readline().split(inLineDelimiter)
-    if newLine[0] == ballFlag:
-        # ball: i x y theta
-        balls[int(newLine[1])].setCoordinate(float(newLine[2]), float(newLine[3]), float(newLine[4]))
-    elif newLine[0] == wallFlag:
-        # wall: i x1 y1 x2 y2
-        lines[int(newLine[1])].setCoordinate(float(newLine[2]), float(newLine[3]), float(newLine[4]), float(newLine[5]))
-    elif newLine[0] == nextStepFlag:
-        draw(balls, lines)
-    elif newLine[0] == ballInitFlag:
-        # ballInit: i x y theta radius color
+    if newLine[0] == ballInitFlag:
+        # ball: i x y theta radius color
         balls.append(
             CustomBall(int(newLine[1]), float(newLine[2]), float(newLine[3]), float(newLine[4]), float(newLine[5]),
                        newLine[6], canvas))
     elif newLine[0] == wallInitFlag:
-        # wallInit: i x1 y1 x2 y2
+        # wall: i x1 y1 x2 y2
         lines.append(
             CustomLine(int(newLine[1]), float(newLine[2]), float(newLine[3]), float(newLine[4]), float(newLine[5]),
                        canvas))
+    elif newLine[0] == nextStepFlag:
+        remove(balls, lines)
+        balls.clear()
+        lines.clear()
+        time.sleep(1)
     elif newLine[0] == utilsFlag:
         pass
     elif newLine[0] == endFileFlag or newLine[0] == '':

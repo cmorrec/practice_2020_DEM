@@ -5,18 +5,36 @@ class Interaction:
                  jerkX, jerkY, jerkTheta,
                  entryNormal,
                  accelerationAngular,
-                 stiffness):
+                 stiffness,
+                 isCount):
         self.isBall = isBall
         self.number = number
-        self.entryNormal = entryNormal
-        self.accelerationX = accelerationX
-        self.accelerationY = accelerationY
-        self.jerkX = jerkX
-        self.jerkY = jerkY
-        self.jerkTheta = jerkTheta
-        self.accelerationAngular = accelerationAngular
-        self.stiffness = stiffness
-        self.n = 1
+        self.isCount = isCount
+        if isCount:
+            self.entryNormal = entryNormal
+            self.accelerationX = accelerationX
+            self.accelerationY = accelerationY
+            self.jerkX = jerkX
+            self.jerkY = jerkY
+            self.jerkTheta = jerkTheta
+            self.accelerationAngular = accelerationAngular
+            self.stiffness = stiffness
+            self.n = 1
+            self.maxEnergy = (stiffness * (entryNormal ** 2)) / 2
+        else:
+            self.entryNormal = 0
+            self.accelerationX = 0
+            self.accelerationY = 0
+            self.jerkX = 0
+            self.jerkY = 0
+            self.jerkTheta = 0
+            self.accelerationAngular = 0
+            self.stiffness = 0
+            self.n = 0
+            self.maxEnergy = 0
+        print('interaction -> ', isCount)
+        if not isCount:
+            print('here')
 
     def changeAcceleration(self,
                            accelerationX,
@@ -25,12 +43,16 @@ class Interaction:
                            entryNormal,
                            accelerationAngular,
                            stiffness):
-        self.accelerationX = accelerationX
-        self.accelerationY = accelerationY
-        self.jerkX = jerkX
-        self.jerkY = jerkY
-        self.jerkTheta = jerkTheta
-        self.entryNormal = entryNormal
-        self.accelerationAngular = accelerationAngular
-        self.stiffness = stiffness
-        self.n += 1
+        if self.isCount:
+            self.accelerationX = accelerationX
+            self.accelerationY = accelerationY
+            self.jerkX = jerkX
+            self.jerkY = jerkY
+            self.jerkTheta = jerkTheta
+            self.entryNormal = entryNormal
+            self.accelerationAngular = accelerationAngular
+            self.stiffness = stiffness
+            self.n += 1
+            energy = (stiffness * (entryNormal ** 2)) / 2
+            if energy > self.maxEnergy:
+                self.maxEnergy = energy

@@ -20,8 +20,10 @@ class BallForce(Ball):
         self.jerkY = 0
         self.jerkTheta = 0
         self.interactionArray = []
+        self.interactionNum = 0
+        self.interactionCountFlag = True
 
-    def move(self):
+    def wallInteract(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки
         #   - Выхода за границы стенки(скорость больше радиуса * 2)
@@ -36,6 +38,7 @@ class BallForce(Ball):
         if (not self.isInsidePolygon()) and (not isCrossLine):
             self.comeBack()
 
+    def transfer(self):
         # Обновление направлений скоростей
         self.addAccelerationInteractionMethod()
 
@@ -66,6 +69,22 @@ class BallForce(Ball):
             self.jerkX += interaction.jerkX
             self.jerkY += interaction.jerkY
             self.jerkTheta += interaction.jerkTheta
+
+        # if not self.interactionCountFlag:
+        #     print(self.accelerationInteractionX,
+        #           self.accelerationInteractionY,
+        #           self.accelerationTheta,
+        #           self.jerkX,
+        #           self.jerkY,
+        #           self.jerkTheta)
+        # if self.interactionNum <= 1:
+        # if len(self.interactionArray) > 0:
+        #     self.interactionNum += 1
+        # if self.interactionNum > 1:
+
+        if len(self.interactionArray) > 0 and not self.interactionCountFlag:
+            self.info()
+        self.interactionCountFlag = True
 
     def expandForce(self, line, numberOfLine):
         alphaRadianLocal = self.alphaRadian - line.alphaNorm
@@ -181,11 +200,11 @@ class BallForce(Ball):
         for interaction in self.interactionArray:
             if interaction.number == number and interaction.isBall == isBall:
                 interaction.changeAcceleration(accelerationInteractionX, accelerationInteractionY, jerkX, jerkY,
-                                               jerkAngular,
-                                               entryNormal, accelerationAngular, stiffness)
+                                               jerkAngular, entryNormal, accelerationAngular, stiffness)
                 return
         self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY,
-                                        jerkX, jerkY, jerkAngular, entryNormal, accelerationAngular, stiffness))
+                                        jerkX, jerkY, jerkAngular, entryNormal, accelerationAngular, stiffness,
+                                        self.interactionCountFlag))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)
@@ -258,8 +277,9 @@ class BallForce(Ball):
                                                              accelerationFirstTangent, 0, E_eff)
         # i = 1
         while abs((accelerationNextNormal - accelerationNormal)) / abs(accelerationNormal + eps) > epsAcceleration or \
-            abs((accelerationNextAngular - accelerationAngular) / abs(accelerationAngular + eps)) > epsAcceleration or \
-            abs((accelerationNextTangent - accelerationTangent)) / abs(accelerationTangent + eps) > epsAcceleration:
+                abs((accelerationNextAngular - accelerationAngular) / abs(
+                    accelerationAngular + eps)) > epsAcceleration or \
+                abs((accelerationNextTangent - accelerationTangent)) / abs(accelerationTangent + eps) > epsAcceleration:
             accelerationNormal = accelerationNextNormal
             accelerationAngular = accelerationNextAngular
             accelerationTangent = accelerationNextTangent
@@ -275,3 +295,19 @@ class BallForce(Ball):
                                                                  accelerationFirstTangent, jerkTangent, E_eff)
             # i += 1
         return jerkNormal, jerkTangent, jerkAngular
+
+    def info(self):
+        print('velocityAlpha', self.alphaRadian, 'velocityAbs', self.velocityAbsolute)
+        print('velocityX', self.velocityX, 'velocityY', self.velocityY, 'velocityTheta', self.velocityTheta)
+        print('accelerationX =', self.accelerationX, 'accelerationY =', self.accelerationY)
+        print('accelerationInteractionX =', self.accelerationInteractionX, '\taccelerationInteractionY =',
+              self.accelerationInteractionY, '\taccelerationTheta =',
+              self.accelerationTheta)
+        print('jerkX =', self.jerkX, 'jerkY =', self.jerkY, 'jerkTheta =', self.jerkTheta)
+        for i, interaction in enumerate(self.interactionArray):
+            print('interaction = ', i, '\tisBall =', interaction.isBall, '\tnumber =', interaction.number)
+            print('\taccelerationX =', interaction.accelerationX, '\taccelerationY =', interaction.accelerationY,
+                  '\taccelerationTheta =', interaction.accelerationAngular)
+            print('\tjerkX =', interaction.jerkX, '\tjerkY =', interaction.jerkY, '\tjerkTheta =',
+                  interaction.jerkTheta)
+        print('\n\n')

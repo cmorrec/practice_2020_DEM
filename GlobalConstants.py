@@ -1,4 +1,4 @@
-displayRatio = 5000
+displayRatio = 1000
 midInteractionNum = 100
 inLineDelimiter = '\t'
 ballFlag = 'ball:'
@@ -24,8 +24,8 @@ eps = 1e-9
 # Критически малая величина, необходимая для сравнения вещественных чисел
 
 step = 100
-deltaTime = 1 * 1e-6
-numOfSeconds = 0.1
+deltaTime = 1 * 1e-5
+numOfSeconds = 3
 numOfSteps = int(numOfSeconds * int(1 / deltaTime))
 # Шаг по времени
 cn_wall = 1

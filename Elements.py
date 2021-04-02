@@ -1,4 +1,3 @@
-
 from HashTable import *
 
 
@@ -93,13 +92,12 @@ class Elements:
         self.step = 0
         self.hashTable = HashTable(self.balls)
         self.pairs = self.hashTable.getPairs(self.balls)
-        for i in range(self.hashTable.elementsOfX):
-            canvas.create_line(displayRatio * i * self.hashTable.delta, 0, displayRatio * i * self.hashTable.delta,
-                               displayRatio * self.hashTable.height)
-        for i in range(self.hashTable.elementsOfY):
-            canvas.create_line(0, displayRatio * i * self.hashTable.delta, displayRatio * self.hashTable.width,
-                               displayRatio * i * self.hashTable.delta)
-        self.pairs = self.hashTable.getPairs(self.balls)
+        # for i in range(self.hashTable.elementsOfX):
+        #     canvas.create_line(displayRatio * i * self.hashTable.delta, 0, displayRatio * i * self.hashTable.delta,
+        #                        displayRatio * self.hashTable.height)
+        # for i in range(self.hashTable.elementsOfY):
+        #     canvas.create_line(0, displayRatio * i * self.hashTable.delta, displayRatio * self.hashTable.width,
+        #                        displayRatio * i * self.hashTable.delta)
 
     def energyMonitoring(self):
         print("Количество энергии", self.energyToSee(), "\n")
@@ -159,29 +157,32 @@ class Elements:
         MoveWall.getInstance().draw()
         self.pairs = self.hashTable.getPairs(self.balls)
 
-    def writeFileFirst(self, file: TextIO):
+    def writeFile(self, file: TextIO):
         for i, ball in enumerate(self.balls):
-            # ballInit: i x y theta
+            # ballInit: i x y theta radius color
             file.write(
-                ballInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(ball.x) + inLineDelimiter + str(ball.y) + inLineDelimiter + str(ball.theta) + inLineDelimiter + str(ball.radius) + inLineDelimiter + ball.color + inLineDelimiter +'\n')
+                ballInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(ball.x) + inLineDelimiter + str(
+                    ball.y) + inLineDelimiter + str(ball.theta) + inLineDelimiter + str(
+                    ball.radius) + inLineDelimiter + ball.color + inLineDelimiter + '\n')
         lines = MoveWall.getInstance().lines
         for i, line in enumerate(lines):
             # wallInit: i x1 y1 x2 y2
             file.write(
-                wallInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter +'\n')
+                wallInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(
+                    line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter + '\n')
         file.write(nextStepFlag + inLineDelimiter + '\n')
 
-    def writeFile(self, file: TextIO):
-        for i, ball in enumerate(self.balls):
-            # ball: i x y theta radius color
-            file.write(
-                ballFlag + inLineDelimiter + str(i) + inLineDelimiter + str(ball.x) + inLineDelimiter + str(ball.y) + inLineDelimiter + str(ball.theta) + inLineDelimiter +'\n')
-        lines = MoveWall.getInstance().lines
-        for i, line in enumerate(lines):
-            # wall: i x1 y1 x2 y2
-            file.write(
-                wallFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter +'\n')
-        file.write(nextStepFlag + inLineDelimiter + '\n')
+    # def writeFile(self, file: TextIO):
+    #     for i, ball in enumerate(self.balls):
+    #         # ball: i x y theta radius color
+    #         file.write(
+    #             ballFlag + inLineDelimiter + str(i) + inLineDelimiter + str(ball.x) + inLineDelimiter + str(ball.y) + inLineDelimiter + str(ball.theta) + inLineDelimiter +'\n')
+    #     lines = MoveWall.getInstance().lines
+    #     for i, line in enumerate(lines):
+    #         # wall: i x1 y1 x2 y2
+    #         file.write(
+    #             wallFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter +'\n')
+    #     file.write(nextStepFlag + inLineDelimiter + '\n')
 
     def printPairs(self):
         for pair in self.pairs:

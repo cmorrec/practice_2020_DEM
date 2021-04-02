@@ -14,7 +14,6 @@ class Pair:
 
 
 class HashTable:
-
     def __init__(self, balls):
         wall = MoveWall.getInstance()
         self.width = wall.width
@@ -87,3 +86,19 @@ class HashTable:
                         pairs.append(Pair(elements1[j], elements5[k]))
 
         return pairs
+
+    # def updateDelta(self, balls):
+    #     radius = 0
+    #     for ball in balls:
+    #         if ball.radius > radius:
+    #             radius = ball.radius
+    #     self.delta = 3 * radius
+    #     self.elementsOfX = int(ceil(self.width / self.delta))
+    #     self.elementsOfY = int(ceil(self.height / self.delta))
+    #     self.numOfElements = self.elementsOfX * self.elementsOfY
+    #     self.table = [[] * 1 for _ in range(self.numOfElements)]
+    #     print('new delta ', self.delta, '\n',
+    #           'new elements of x', self.elementsOfX, '\n',
+    #           'new elements of y', self.elementsOfY, '\n',
+    #           'new elements num', self.numOfElements, '\n\n')
+    #

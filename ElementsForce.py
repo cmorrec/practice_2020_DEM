@@ -1,3 +1,5 @@
+import BreakBall
+from EventBus import EventBus, destroyBall
 from BallForce import *
 from Elements import *
 
@@ -136,17 +138,29 @@ def deleteInteraction(i, numberOfJ):
                     ballInteraction.append(interaction.n)
             else:
                 ballInteraction.append(interaction.n)
+            if isinstance(i, BreakBall.BreakBall):
+                i.addBreakInteraction(number=interaction.number, isBall=interaction.isBall)
             i.interactionArray.remove(interaction)
             break
 
 
 class ElementsForce(Elements):
-    def __init__(self, balls, canvas):
+    def __init__(self, balls, canvas, eventBus: EventBus):
         Elements.__init__(self, balls, canvas)
+        self.newBalls = []
+        self.eventBus = eventBus
+        self.eventBus.on(destroyBall, self.destruct)
 
     def calculation(self):
         # Есть необходимость отключения не глобальных ускорений,
         # а ускорений взаимодействия, что проверяется отдельно
+        if len(self.newBalls):
+            self.balls.extend(self.newBalls)
+            self.newBalls.clear()
+            # TODO проводим перерасчет сетки
+            # self.hashTable.updateDelta(self.balls)
+            self.pairs = self.hashTable.getPairs(self.balls)
+
         for pair in self.pairs:
             i = pair.i.number
             j = pair.j.number
@@ -155,3 +169,10 @@ class ElementsForce(Elements):
             elif isCrossBefore(self.balls[i], j):
                 deleteInteraction(self.balls[i], j)
                 deleteInteraction(self.balls[j], i)
+
+    def destruct(self, data):
+        ball = data['destroyingBall']
+        newBalls = data['newBalls']
+        self.balls.remove(ball)
+        for ball_ in newBalls:
+            self.newBalls.append(ball_)
