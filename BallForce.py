@@ -32,8 +32,8 @@ class BallForce(Ball):
             if line.crossLine(self.x, self.y, self.radius):
                 self.expandForce(line, i)
                 isCrossLine = True
-            elif self.isCrossLineBefore(i) and self.isInsidePolygon():
-                self.deleteInteractionLine(i)
+            elif self.isCrossLineBefore(line) and self.isInsidePolygon():
+                self.deleteInteractionLine(line)
 
         if (not self.isInsidePolygon()) and (not isCrossLine):
             self.comeBack()
@@ -70,20 +70,6 @@ class BallForce(Ball):
             self.jerkY += interaction.jerkY
             self.jerkTheta += interaction.jerkTheta
 
-        # if not self.interactionCountFlag:
-        #     print(self.accelerationInteractionX,
-        #           self.accelerationInteractionY,
-        #           self.accelerationTheta,
-        #           self.jerkX,
-        #           self.jerkY,
-        #           self.jerkTheta)
-        # if self.interactionNum <= 1:
-        # if len(self.interactionArray) > 0:
-        #     self.interactionNum += 1
-        # if self.interactionNum > 1:
-
-        if len(self.interactionArray) > 0 and not self.interactionCountFlag:
-            self.info()
         self.interactionCountFlag = True
 
     def expandForce(self, line, numberOfLine):
@@ -147,7 +133,7 @@ class BallForce(Ball):
         # accelerationRelativeTangent = accelerationTangent - accelerationYLocalWall
 
         self.saveAccelerationLength(line.alphaNorm, accelerationNormal, accelerationTangent, jerkNormal, jerkTangent,
-                                    jerkAngular, entryNormal, accelerationAngular, isBall=False, number=numberOfLine,
+                                    jerkAngular, entryNormal, accelerationAngular, isBall=False, number=line,
                                     stiffness=stiffness)
 
     def findAccelerationAngular(self,

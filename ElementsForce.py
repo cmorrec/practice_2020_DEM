@@ -116,17 +116,16 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     # ----------------------------- End damping part -----------------------------
 
     ball_1.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkNormal1, jerkTangent1,
-                                  jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=numberOf2,
+                                  jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=ball_2,
                                   stiffness=stiffness)
     ball_2.saveAccelerationLength(gama, accelerationNormal2, accelerationTangent2, jerkNormal2, jerkTangent2,
-                                  jerkAngular2, entryNormal, accelerationAngular2, isBall=True, number=numberOf1,
+                                  jerkAngular2, entryNormal, accelerationAngular2, isBall=True, number=ball_1,
                                   stiffness=stiffness)
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
     for interaction in i.interactionArray:
         if interaction.isBall and interaction.number == numberOfJ:
-            print('isCrossBefore -> ', numberOfJ)
             return True
     return False
 
@@ -141,8 +140,6 @@ def deleteInteraction(i, numberOfJ):
                 ballInteraction.append(interaction.n)
             if isinstance(i, BreakBall.BreakBall):
                 i.addBreakInteraction(number=interaction.number, isBall=interaction.isBall)
-            if not interaction.isCount:
-                print('delete -> ', interaction.accelerationX)
             i.interactionArray.remove(interaction)
             break
 
@@ -167,9 +164,9 @@ class ElementsForce(Elements):
             j = pair.j.number
             if isCrossForce(self.balls[i], self.balls[j]):
                 methodForce(self.balls[i], self.balls[j], i, j)
-            elif isCrossBefore(self.balls[i], j):
-                deleteInteraction(self.balls[i], j)
-                deleteInteraction(self.balls[j], i)
+            elif isCrossBefore(self.balls[i], self.balls[j]):
+                deleteInteraction(self.balls[i], self.balls[j])
+                deleteInteraction(self.balls[j], self.balls[i])
 
     def destruct(self, data):
         ball = data['destroyingBall']
@@ -181,8 +178,6 @@ class ElementsForce(Elements):
         if index == -1:
             print('elemForce -> destruct -> i try to remove ball that does not exist')
             exit(1)
-        # for ball_ in self.balls:
-        #     for interaction
         for pair in self.pairs:
             i = pair.i.number
             j = pair.j.number
@@ -190,11 +185,7 @@ class ElementsForce(Elements):
                 continue
             elif j == index:
                 i, j = j, i
-            # for interaction in self.balls[j].interactionArray:
-                # if interaction.isBall and interaction.number == index:
-            deleteInteraction(self.balls[j], index)
+            deleteInteraction(self.balls[j], self.balls[index])
 
         self.balls.remove(ball)
-
-        # for ball_ in newBalls:
         self.newBalls.extend(newBalls)

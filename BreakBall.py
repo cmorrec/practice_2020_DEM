@@ -3,11 +3,11 @@ from EventBus import EventBus, destroyBall
 
 
 class BreakBall(BallForce):
-    def __init__(self, x, y, radius, radiusBegin, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas,
-                 eventBus: EventBus):
+    def __init__(self, x, y, radius, radiusBegin, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color,
+                 canvas, eventBus: EventBus):
         BallForce.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas)
-        self.strength = 10     # correct this
-        self.minEnergy = 0.1      # correct this
+        self.strength = 10      # correct this
+        self.minEnergy = 0.1    # correct this
         self.breakInteractions = []
         self.breakEnergy = 0
         self.probability = 0
@@ -28,8 +28,6 @@ class BreakBall(BallForce):
                 self.canvas.delete(self.id)
                 self.canvas.delete(self.id2)
                 self.eventBus.emit(destroyBall, data)
-        # if len(self.interactionArray) > 0:
-        #     self.info()
 
     def updateProps(self):
         if len(self.breakInteractions) > 0:
@@ -53,7 +51,7 @@ class BreakBall(BallForce):
         ball1 = BreakBall(self.x, self.y + self.radius * 0.4, self.radius * 0.4, self.radiusBegin,
                           self.alphaRadian / pi * 180, self.velocityAbsolute, self.velocityTheta, self.cn, self.cs,
                           self.density, self.Emod, self.nu, self.color, self.canvas, self.eventBus)
-        ball2 = BreakBall(self.x, self.y - self.radius * 0.4, self.radius * 0.4, self.radiusBegin,
+        ball2 = BreakBall(self.x, self.y - self.radius * 0.3, self.radius * 0.4, self.radiusBegin,
                           self.alphaRadian / pi * 180, self.velocityAbsolute, self.velocityTheta, self.cn, self.cs,
                           self.density, self.Emod, self.nu, self.color, self.canvas, self.eventBus)
         ball1.addVelocity(0, ball1.velocityY / deltaTime, 0)

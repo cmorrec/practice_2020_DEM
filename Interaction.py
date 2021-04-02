@@ -32,9 +32,6 @@ class Interaction:
             self.stiffness = 0
             self.n = 0
             self.maxEnergy = 0
-        print('interaction -> ', isCount)
-        if not isCount:
-            print('here')
 
     def changeAcceleration(self,
                            accelerationX,
