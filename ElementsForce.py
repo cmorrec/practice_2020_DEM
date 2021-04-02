@@ -126,6 +126,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
     for interaction in i.interactionArray:
         if interaction.isBall and interaction.number == numberOfJ:
+            print('isCrossBefore -> ', numberOfJ)
             return True
     return False
 
@@ -140,6 +141,8 @@ def deleteInteraction(i, numberOfJ):
                 ballInteraction.append(interaction.n)
             if isinstance(i, BreakBall.BreakBall):
                 i.addBreakInteraction(number=interaction.number, isBall=interaction.isBall)
+            if not interaction.isCount:
+                print('delete -> ', interaction.accelerationX)
             i.interactionArray.remove(interaction)
             break
 
@@ -154,11 +157,9 @@ class ElementsForce(Elements):
     def calculation(self):
         # Есть необходимость отключения не глобальных ускорений,
         # а ускорений взаимодействия, что проверяется отдельно
-        if len(self.newBalls):
+        if len(self.newBalls) > 0:
             self.balls.extend(self.newBalls)
             self.newBalls.clear()
-            # TODO проводим перерасчет сетки
-            # self.hashTable.updateDelta(self.balls)
             self.pairs = self.hashTable.getPairs(self.balls)
 
         for pair in self.pairs:
@@ -173,6 +174,27 @@ class ElementsForce(Elements):
     def destruct(self, data):
         ball = data['destroyingBall']
         newBalls = data['newBalls']
+        index = -1
+        for i, ball_ in enumerate(self.balls):
+            if ball_ == ball:
+                index = i
+        if index == -1:
+            print('elemForce -> destruct -> i try to remove ball that does not exist')
+            exit(1)
+        # for ball_ in self.balls:
+        #     for interaction
+        for pair in self.pairs:
+            i = pair.i.number
+            j = pair.j.number
+            if i != index and j != index:
+                continue
+            elif j == index:
+                i, j = j, i
+            # for interaction in self.balls[j].interactionArray:
+                # if interaction.isBall and interaction.number == index:
+            deleteInteraction(self.balls[j], index)
+
         self.balls.remove(ball)
-        for ball_ in newBalls:
-            self.newBalls.append(ball_)
+
+        # for ball_ in newBalls:
+        self.newBalls.extend(newBalls)
