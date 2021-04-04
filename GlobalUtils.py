@@ -279,3 +279,8 @@ def getDampingNormal(radius, entry, mass, c, E_eff):
 
 def getDampingTangent(radius, entry, mass, c, G_eff):
     return 4 * sqrt(mass * 2 * G_eff * entry * sqrt(radius)) * c
+
+
+def getBallsNum():
+    return 3
+    # return int(rand.normal())

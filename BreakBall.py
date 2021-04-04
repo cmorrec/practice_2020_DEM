@@ -6,7 +6,7 @@ class BreakBall(BallForce):
     def __init__(self, x, y, radius, radiusBegin, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color,
                  canvas, eventBus: EventBus):
         BallForce.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas)
-        self.strength = 10      # correct this
+        self.strength = 0.1      # correct this
         self.minEnergy = 0.1    # correct this
         self.breakInteractions = []
         self.breakEnergy = 0
@@ -41,22 +41,33 @@ class BreakBall(BallForce):
         return False
 
     def isDestruct(self) -> bool:
-        if self.radius < self.radiusBegin / 2:
+        if self.radius < self.radiusBegin:
             return False
         choice = [True, False]
         probability = [self.probability, 1 - self.probability]
         return rand.choice(choice, size=1, p=probability)
 
+    def getNewBall(self, beta, newRadius):
+        delta = self.radius - newRadius
+        newBall = BreakBall(self.x + delta * cos(beta), self.y + delta * sin(beta), newRadius, self.radiusBegin,
+                            self.alphaRadian / pi * 180, self.velocityAbsolute, self.velocityTheta, self.cn, self.cs,
+                            self.density, self.Emod, self.nu, self.color, self.canvas, self.eventBus)
+        newBall.addVelocity(self.velocityAbsolute * cos(beta) / deltaTime,
+                            self.velocityAbsolute * sin(beta) / deltaTime, 0)
+
+        return newBall
+
     def getNewBalls(self):
-        ball1 = BreakBall(self.x, self.y + self.radius * 0.4, self.radius * 0.4, self.radiusBegin,
-                          self.alphaRadian / pi * 180, self.velocityAbsolute, self.velocityTheta, self.cn, self.cs,
-                          self.density, self.Emod, self.nu, self.color, self.canvas, self.eventBus)
-        ball2 = BreakBall(self.x, self.y - self.radius * 0.3, self.radius * 0.4, self.radiusBegin,
-                          self.alphaRadian / pi * 180, self.velocityAbsolute, self.velocityTheta, self.cn, self.cs,
-                          self.density, self.Emod, self.nu, self.color, self.canvas, self.eventBus)
-        ball1.addVelocity(0, ball1.velocityY / deltaTime, 0)
-        ball2.addVelocity(0, - ball2.velocityY / deltaTime, 0)
-        balls = [ball1, ball2]
+        numOfBalls = getBallsNum()
+        newRadius = self.radius / (numOfBalls ** (1 / 3))
+        deltaBeta = 2 * pi / numOfBalls
+        beta = 0
+        balls = []
+        while numOfBalls > 0:
+            balls.append(self.getNewBall(beta, newRadius))
+            beta += deltaBeta
+            numOfBalls -= 1
+
         return balls
 
     # использовать в момент удаления этого взаимодействия
