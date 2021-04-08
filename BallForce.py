@@ -174,7 +174,8 @@ class BallForce(Ball):
                                jerkAngular,
                                entryNormal,
                                accelerationAngular,
-                               isBall, number, stiffness):
+                               isBall, number, stiffness,
+                               interactionCountFlag=True):
         accelerationInteractionX = accelerationNormal * cos(alphaRadianLocal) + accelerationTangent * sin(
             alphaRadianLocal)
 
@@ -190,7 +191,7 @@ class BallForce(Ball):
                 return
         self.addInteraction(Interaction(isBall, number, accelerationInteractionX, accelerationInteractionY,
                                         jerkX, jerkY, jerkAngular, entryNormal, accelerationAngular, stiffness,
-                                        self.interactionCountFlag))
+                                        interactionCountFlag))
 
     def addInteraction(self, interaction):
         self.interactionArray.append(interaction)

@@ -1,4 +1,4 @@
-import BreakBall
+from BreakBall import BreakBall
 from EventBus import EventBus, destroyBall
 from BallForce import *
 from Elements import *
@@ -115,12 +115,16 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     accelerationTangent2 += accelerationDampeningTangent2
     # ----------------------------- End damping part -----------------------------
 
+    interactionCountFlag = False
+    if ball_1.interactionCountFlag and ball_2.interactionCountFlag:
+        interactionCountFlag = True
+
     ball_1.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkNormal1, jerkTangent1,
                                   jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=ball_2,
-                                  stiffness=stiffness)
+                                  stiffness=stiffness, interactionCountFlag=interactionCountFlag)
     ball_2.saveAccelerationLength(gama, accelerationNormal2, accelerationTangent2, jerkNormal2, jerkTangent2,
                                   jerkAngular2, entryNormal, accelerationAngular2, isBall=True, number=ball_1,
-                                  stiffness=stiffness)
+                                  stiffness=stiffness, interactionCountFlag=interactionCountFlag)
 
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
@@ -138,7 +142,7 @@ def deleteInteraction(i, numberOfJ):
                     ballInteraction.append(interaction.n)
             else:
                 ballInteraction.append(interaction.n)
-            if isinstance(i, BreakBall.BreakBall):
+            if isinstance(i, BreakBall):
                 i.addBreakInteraction(number=interaction.number, isBall=interaction.isBall)
             i.interactionArray.remove(interaction)
             break
@@ -189,3 +193,15 @@ class ElementsForce(Elements):
 
         self.balls.remove(ball)
         self.newBalls.extend(newBalls)
+
+    def makeNewBall(self):
+        lastBall = self.balls[-1]
+        radius = lastBall.radiusBegin
+        wall = MoveWall.getInstance()
+        self.newBalls.append(BreakBall(x=wall.centerX, y=wall.centerX,
+                                       radius=radius, radiusBegin=radius,
+                                       alpha=0, velocity=0, velocityTheta=0,
+                                       cn=lastBall.cn, cs=lastBall.cs, nu=lastBall.nu,
+                                       density=lastBall.density, Emod=lastBall.Emod,
+                                       color=lastBall.color, canvas=self.canvas,
+                                       eventBus=self.eventBus))

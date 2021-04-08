@@ -113,6 +113,7 @@ while True:
         remove(balls, lines)
         balls.clear()
         lines.clear()
+        time.sleep(0.01)
     elif newLine[0] == utilsFlag:
         pass
     elif newLine[0] == endFileFlag or newLine[0] == '':

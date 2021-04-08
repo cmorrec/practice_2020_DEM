@@ -1,4 +1,3 @@
-import BreakBall
 from ElementsForce import *
 
 ballStartFileName1Ball = './ball_sets/1_ball.txt'
@@ -130,8 +129,8 @@ def readBalls(ballsStartFile_: TextIO, isBreakage: bool):
         if len(data_) > 0:
             if isBreakage:
                 ballsFromFile.append(
-                    BreakBall.BreakBall(data_[0], data_[1], data_[2], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7],
-                                        data_[8], data_[9], data_[10], color, canvas, eventBus))
+                    BreakBall(data_[0], data_[1], data_[2], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7],
+                              data_[8], data_[9], data_[10], color, canvas, eventBus))
             else:
                 if isForce:
                     ballsFromFile.append(
@@ -181,6 +180,10 @@ while steps < numOfSteps:
         tk.update_idletasks()
         tk.update()
     elements.writeFile(resultFile)
+    if addNewBalls:
+        if steps >= newBallSteps[0]:
+            elements.makeNewBall()
+            newBallSteps.remove(newBallSteps[0])
 
 print("+++ %s seconds +++" % (time.time() - start_time))
 

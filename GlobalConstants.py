@@ -27,6 +27,13 @@ step = 100
 deltaTime = 1 * 1e-5
 numOfSeconds = 3
 numOfSteps = int(numOfSeconds * int(1 / deltaTime))
+addNewBalls = True
+newBallPeriod = 0.1
+newBallPeriodSteps = round(newBallPeriod * int(1 / deltaTime))
+newBallCount = round(numOfSeconds / newBallPeriod)
+newBallSteps = [i * newBallPeriodSteps for i in range(1, newBallCount)]
+print(newBallPeriod, newBallPeriodSteps, newBallCount, newBallSteps)
+
 # Шаг по времени
 cn_wall = 1
 cs_wall = 0.2
