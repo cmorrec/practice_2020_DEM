@@ -154,14 +154,16 @@ class ElementsForce(Elements):
         self.newBalls = []
         self.eventBus = eventBus
         self.eventBus.on(destroyBall, self.destruct)
+        self.recalculateGrid = True
 
     def calculation(self):
         # Есть необходимость отключения не глобальных ускорений,
         # а ускорений взаимодействия, что проверяется отдельно
-        if len(self.newBalls) > 0:
+        if len(self.newBalls) > 0 or self.recalculateGrid:
             self.balls.extend(self.newBalls)
             self.newBalls.clear()
             self.pairs = self.hashTable.getPairs(self.balls)
+            self.recalculateGrid = False
 
         for pair in self.pairs:
             i = pair.i.number
@@ -193,6 +195,7 @@ class ElementsForce(Elements):
 
         self.balls.remove(ball)
         self.newBalls.extend(newBalls)
+        self.recalculateGrid = True
 
     def makeNewBall(self):
         lastBall = self.balls[-1]

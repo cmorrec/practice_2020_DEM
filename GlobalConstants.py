@@ -32,7 +32,6 @@ newBallPeriod = 0.1
 newBallPeriodSteps = round(newBallPeriod * int(1 / deltaTime))
 newBallCount = round(numOfSeconds / newBallPeriod)
 newBallSteps = [i * newBallPeriodSteps for i in range(1, newBallCount)]
-print(newBallPeriod, newBallPeriodSteps, newBallCount, newBallSteps)
 
 # Шаг по времени
 cn_wall = 1

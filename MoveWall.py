@@ -34,6 +34,12 @@ class MoveWall(Wall):
         self.centerY = centerY
         self.canvas.bind_all('<KeyPress-s>', self.changeFlag)
 
+        self.deleteCellWidth = 0.1
+        self.deleteCellXBegin = centerX - self.deleteCellWidth / 2
+        self.deleteCellXEnd = centerX + self.deleteCellWidth / 2
+        self.deleteCellYBegin = centerY - self.deleteCellWidth / 2
+        self.deleteCellYEnd = centerY + self.deleteCellWidth / 2
+
     @staticmethod
     def getInstance():
         return MoveWall.__instance
@@ -126,3 +132,8 @@ class MoveWall(Wall):
             self.flagMove = False
         else:
             self.flagMove = True
+
+    def inDeleteCell(self, ball):
+        if self.deleteCellXBegin < ball.x < self.deleteCellXEnd and self.deleteCellYBegin < ball.y < self.deleteCellYEnd:
+            return True
+        return False

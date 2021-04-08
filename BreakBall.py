@@ -21,13 +21,23 @@ class BreakBall(BallForce):
 
         if self.updateProps():
             if self.isDestruct():
-                data = {
-                    'newBalls': self.getNewBalls(),
-                    'destroyingBall': self
-                }
-                self.canvas.delete(self.id)
-                self.canvas.delete(self.id2)
-                self.eventBus.emit(destroyBall, data)
+                self.destruct()
+        wall = MoveWall.getInstance()
+        if self.radius <= wall.deleteCellWidth:
+            if wall.inDeleteCell(self):
+                self.destruct(isNewBalls=False)
+
+    def destruct(self, isNewBalls=True):
+        newBalls = []
+        if isNewBalls:
+            newBalls = self.getNewBalls()
+        data = {
+            'newBalls': newBalls,
+            'destroyingBall': self
+        }
+        self.canvas.delete(self.id)
+        self.canvas.delete(self.id2)
+        self.eventBus.emit(destroyBall, data)
 
     def updateProps(self):
         if len(self.breakInteractions) > 0:
