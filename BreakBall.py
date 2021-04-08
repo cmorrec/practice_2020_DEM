@@ -23,7 +23,7 @@ class BreakBall(BallForce):
             if self.isDestruct():
                 self.destruct()
         wall = MoveWall.getInstance()
-        if self.radius <= wall.deleteCellWidth:
+        if self.radius <= wall.throughput:
             if wall.inDeleteCell(self):
                 self.destruct(isNewBalls=False)
 

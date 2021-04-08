@@ -35,6 +35,7 @@ class MoveWall(Wall):
         self.canvas.bind_all('<KeyPress-s>', self.changeFlag)
 
         self.deleteCellWidth = 0.1
+        self.throughput = 0.04
         self.deleteCellXBegin = centerX - self.deleteCellWidth / 2
         self.deleteCellXEnd = centerX + self.deleteCellWidth / 2
         self.deleteCellYBegin = centerY - self.deleteCellWidth / 2
