@@ -20,8 +20,7 @@ class BallForce(Ball):
         self.jerkY = 0
         self.jerkTheta = 0
         self.interactionArray = []
-        self.interactionNum = 0
-        self.interactionCountFlag = True
+        self.interactionCountFlag = False
 
     def wallInteract(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
