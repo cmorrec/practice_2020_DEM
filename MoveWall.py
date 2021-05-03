@@ -1,5 +1,5 @@
 from Wall import *
-
+from CoordinateWall import *
 deltaVelocityWall = 1
 
 
@@ -121,7 +121,7 @@ class MoveWall(Wall):
             y_2 = line.y2 + littleY
 
             # Сохраняем
-            line.setCoordinates(CoordinateWall(x_1, y_1))
+            line.setCoordinates(CoordinateWall(x_1, y_1, x_2, y_2))
 
     def move(self):
         if self.flagMove:

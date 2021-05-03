@@ -28,12 +28,12 @@ class Line:
         yH2 = y0 - h * sin(pi - (-1) * self.alphaNorm)
         if (h < radius) and (self.isLine(xH, yH) or self.isLine(xH2, yH2) or abs(self.x1 - self.x2) < eps or abs(
                 self.y1 - self.y2) < eps):
-            if self.x1 == .2:
-                print("1")
-            return True
+            if (not (self.x2 < x0 < self.x1) and 2*radius > zazor) or (self.y2 < y0 < self.y1) or (self.y1 < y0 < self.y2):
+                return True
+            elif (self.x2 < x0 < self.x1) or (self.x1 < x0 < self.x2) or (self.y2 < y0 < self.y1) or (self.y1 < y0 < self.y2):
+                return True
         else:
             return False
-
     def isLine(self, x0, y0):
         # Проверка точки на принадлежность линии прямоугольнику, в котором линия - диагональ
         return (((x0 - self.x2 < eps) and (self.x1 - x0 < eps)) or

@@ -34,7 +34,7 @@ newBallCount = round(numOfSeconds / newBallPeriod)
 newBallSteps = [i * newBallPeriodSteps for i in range(1, newBallCount)]
 
 # Шаг по времени
-cn_wall = 1
+cn_wall = 3
 cs_wall = 0.2
 Emod_wall = 2 * 1e11
 nu_wall = 0.3
@@ -48,3 +48,4 @@ coefficientOfFrictionRolling = 0.05
 accelerationX = 0
 accelerationY = 9.81
 kn = 2 * 1e5
+zazor = 0.1
