@@ -19,6 +19,7 @@ class BallForce(Ball):
         self.jerkX = 0
         self.jerkY = 0
         self.jerkTheta = 0
+        self.radius = radius
         self.interactionArray = []
         self.interactionCountFlag = False
 
@@ -34,8 +35,8 @@ class BallForce(Ball):
             elif self.isCrossLineBefore(line) and self.isInsidePolygon():
                 self.deleteInteractionLine(line)
 
-        if (not self.isInsidePolygon()) and (not isCrossLine):
-            self.comeBack()
+        # if (not self.isInsidePolygon()) and (not isCrossLine):
+        #     self.comeBack()
 
     def transfer(self):
         # Обновление направлений скоростей

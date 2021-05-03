@@ -147,33 +147,33 @@ class Ball:
         else:
             return False
 
-    def comeBack(self):
-        # Возвращаем мяч в стенки в случае его выброса:
-        # Находим линию к которой мячу будет логичнее всего стремиться
-        # (меньше всего расстояние и перпендекуляр попадает в линию(в отрезок линии))
-        # и меняем направление в соответсвии с этой линией
-        distances = []
-        for line in MoveWall.getInstance().lines:
-            distances.append(line.distanceToLine(self.x, self.y))
-        minDistance = min(distances)
-        key = True
-
-        while key:
-            for line in MoveWall.getInstance().lines:
-                if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
-                    h = line.distanceToLine(self.x, self.y)
-                    xH = self.x + h * cos(pi - line.alphaNorm)
-                    yH = self.y - h * sin(pi - line.alphaNorm)
-                    if line.isLine(xH, yH) or len(distances) == 1:
-                        key = False
-                    else:
-                        distances.remove(minDistance)
-                        minDistance = min(distances)
-
-        for line in MoveWall.getInstance().lines:
-            if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
-                self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
-                return
+    # def comeBack(self):
+    #     # Возвращаем мяч в стенки в случае его выброса:
+    #     # Находим линию к которой мячу будет логичнее всего стремиться
+    #     # (меньше всего расстояние и перпендекуляр попадает в линию(в отрезок линии))
+    #     # и меняем направление в соответсвии с этой линией
+    #     distances = []
+    #     for line in MoveWall.getInstance().lines:
+    #         distances.append(line.distanceToLine(self.x, self.y))
+    #     minDistance = min(distances)
+    #     key = True
+    #
+    #     while key:
+    #         for line in MoveWall.getInstance().lines:
+    #             if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
+    #                 h = line.distanceToLine(self.x, self.y)
+    #                 xH = self.x + h * cos(pi - line.alphaNorm)
+    #                 yH = self.y - h * sin(pi - line.alphaNorm)
+    #                 if line.isLine(xH, yH) or len(distances) == 1:
+    #                     key = False
+    #                 else:
+    #                     distances.remove(minDistance)
+    #                     minDistance = min(distances)
+    #
+    #     for line in MoveWall.getInstance().lines:
+    #         if abs(line.distanceToLine(self.x, self.y) - minDistance) < eps:
+    #             self.alphaRadian = 2 * line.alphaTau - self.alphaRadian
+    #             return
 
     def changeVelocity(self, newAlpha, newVelocityAbsolute):
         # Изменение вектора скорости

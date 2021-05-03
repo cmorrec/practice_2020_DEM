@@ -1,6 +1,6 @@
 from MoveLine import *
+from CoordinateWall import *
 from Coordinate import *
-
 
 # Класс Wall принимает в себя координаты и может принимать линии
 #

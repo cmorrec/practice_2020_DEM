@@ -36,6 +36,7 @@ ballStartFileNameTest4_4 = './ball_sets/tests/ball-wall/tests4/test4_4.txt'
 ballStartFileNameTest4_5 = './ball_sets/tests/ball-wall/tests4/test4_5.txt'
 
 coordinatesFileNameCircle = './walls_dynamic/circle.txt'
+coordinatesFileNameGrohot = './walls_dynamic/grohot.txt'
 coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
 coordinatesFileNameCylinderCone = './walls_dynamic/cylinder_cone.txt'
 coordinatesFileNamePolygon = './walls_dynamic/polygon.txt'
@@ -47,9 +48,9 @@ coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
 coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
 coordinatesFileNameVibroBox = './walls_dynamic/vibro_box.txt'
 
-coordinatesFileName = coordinatesFileNamePolygon
+coordinatesFileName = coordinatesFileNameGrohot
 ballStartFileName = ballStartFileName4Ball
-oreBallStartFileName = ballStartFileName4BallAnother
+
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 
@@ -75,19 +76,24 @@ for line in coordinatesFile:
         for word in words:
             data.append(float(word))
     if len(data) > 0:
-        coordinatesFromFile.append(Coordinate(data[0], data[1]))
+        coordinatesFromFile.append(CoordinateWall(data[0], data[1], data[2], data[3]))
 
 coordinatesFile.close()
 
-xCoordinates = []
-yCoordinates = []
+x1Coordinates = []
+y1Coordinates = []
+x2Coordinates = []
+y2Coordinates = []
+
 for coordinate in coordinatesFromFile:
-    xCoordinates.append(coordinate.x)
-    yCoordinates.append(coordinate.y)
-width = max(xCoordinates) - min(xCoordinates)
-height = max(yCoordinates) - min(yCoordinates)
-centerX = width / 2 + min(xCoordinates)
-centerY = height / 2 + min(yCoordinates)
+    x1Coordinates.append(coordinate.x1)
+    y1Coordinates.append(coordinate.y1)
+    x2Coordinates.append(coordinate.x2)
+    y2Coordinates.append(coordinate.y2)
+width = max(x1Coordinates) - min(x1Coordinates)
+height = max(y1Coordinates) - min(y1Coordinates)
+centerX = width / 2 + min(x1Coordinates)
+centerY = height / 2 + min(y1Coordinates)
 canvasWidth = displayRatio * (width + absXWall)
 canvasHeight = displayRatio * (height + absYWall)
 
@@ -107,7 +113,7 @@ buttons = Buttons()
 wall = MoveWall(canvas, 'black', np.array(coordinatesFromFile), accelerationX, accelerationY, None, freqXWall,
                 freqYWall, velocityThetaWall, absXWall, absYWall, centerX, centerY, width, height)
 
-oreBallStartFile = open(oreBallStartFileName, 'r')
+
 ballsStartFile = open(ballStartFileName, 'r')
 ballsFromFile = []
 
@@ -147,7 +153,6 @@ def readBalls(ballsStartFile_: TextIO, isBreakage: bool):
 
 
 readBalls(ballsStartFile, False)
-readBalls(oreBallStartFile, True)
 
 if isForce:
     elements = ElementsForce(ballsFromFile, canvas, eventBus)

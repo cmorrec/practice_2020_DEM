@@ -121,7 +121,7 @@ class MoveWall(Wall):
             y_2 = line.y2 + littleY
 
             # Сохраняем
-            line.setCoordinates(Coordinate(x_1, y_1), Coordinate(x_2, y_2))
+            line.setCoordinates(CoordinateWall(x_1, y_1))
 
     def move(self):
         if self.flagMove:

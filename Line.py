@@ -6,11 +6,12 @@ from GlobalUtils import *
 
 
 class Line:
-    def __init__(self, coordinate1, coordinate2):
-        self.x1 = coordinate1.x
-        self.x2 = coordinate2.x
-        self.y1 = coordinate1.y
-        self.y2 = coordinate2.y
+    def __init__(self, coordinate):
+        self.x1 = coordinate.x1
+        self.x2 = coordinate.x2
+        self.y1 = coordinate.y1
+        self.y2 = coordinate.y2
+        print(self.x1, self.y1, self.x2, self.y2,)
         self.abs = self.findAbs()
         # Угол направления линии
         self.alphaTau = self.findTau()
@@ -27,6 +28,8 @@ class Line:
         yH2 = y0 - h * sin(pi - (-1) * self.alphaNorm)
         if (h < radius) and (self.isLine(xH, yH) or self.isLine(xH2, yH2) or abs(self.x1 - self.x2) < eps or abs(
                 self.y1 - self.y2) < eps):
+            if self.x1 == .2:
+                print("1")
             return True
         else:
             return False
