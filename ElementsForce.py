@@ -134,7 +134,7 @@ def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить �
     return False
 
 
-def deleteInteraction(i, numberOfJ):
+def deleteInteraction(i, numberOfJ, recursion = True):
     for interaction in i.interactionArray:
         if interaction.isBall and interaction.number == numberOfJ:
             if len(ballInteraction) > 0:
@@ -142,9 +142,11 @@ def deleteInteraction(i, numberOfJ):
                     ballInteraction.append(interaction.n)
             else:
                 ballInteraction.append(interaction.n)
-            if isinstance(i, BreakBall):
+            if isinstance(i, BreakBall) and recursion:
                 i.addBreakInteraction(number=interaction.number, isBall=interaction.isBall)
-            i.interactionArray.remove(interaction)
+                i.reactForEndInteraction(interaction.maxEnergy)
+            if interaction in i.interactionArray:
+                i.interactionArray.remove(interaction)
             break
 
 
@@ -152,6 +154,7 @@ class ElementsForce(Elements):
     def __init__(self, balls, canvas, eventBus: EventBus):
         Elements.__init__(self, balls, canvas)
         self.newBalls = []
+        self.removingBalls = []
         self.eventBus = eventBus
         self.eventBus.on(destroyBall, self.destruct)
         self.recalculateGrid = True
@@ -160,8 +163,12 @@ class ElementsForce(Elements):
         # Есть необходимость отключения не глобальных ускорений,
         # а ускорений взаимодействия, что проверяется отдельно
         if len(self.newBalls) > 0 or self.recalculateGrid:
+            for ball in self.removingBalls:
+                if ball in self.balls:
+                    self.balls.remove(ball)
             self.balls.extend(self.newBalls)
             self.newBalls.clear()
+            self.removingBalls.clear()
             self.pairs = self.hashTable.getPairs(self.balls)
             self.recalculateGrid = False
 
@@ -191,9 +198,9 @@ class ElementsForce(Elements):
                 continue
             elif j == index:
                 i, j = j, i
-            deleteInteraction(self.balls[j], self.balls[index])
+            deleteInteraction(self.balls[j], self.balls[index], False)
 
-        self.balls.remove(ball)
+        self.removingBalls.append(ball)
         self.newBalls.extend(newBalls)
         self.recalculateGrid = True
 
@@ -201,7 +208,8 @@ class ElementsForce(Elements):
         lastBall = self.balls[-1]
         radius = lastBall.radiusBegin
         wall = MoveWall.getInstance()
-        self.newBalls.append(BreakBall(x=wall.centerX, y=wall.centerX,
+        self.newBalls.append(BreakBall(x=3.5,#wall.centerX,#
+                                       y=1.0,#wall.centerX,#
                                        radius=radius, radiusBegin=radius,
                                        alpha=0, velocity=0, velocityTheta=0,
                                        cn=lastBall.cn, cs=lastBall.cs, nu=lastBall.nu,

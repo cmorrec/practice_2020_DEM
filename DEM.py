@@ -1,55 +1,11 @@
 from ElementsForce import *
 
-ballStartFileName1Ball = './ball_sets/1_ball.txt'
-ballStartFileName2Ball = './ball_sets/2_ball.txt'
-ballStartFileName4Ball = './ball_sets/4_ball.txt'
-ballStartFileName4BallAnother = './ball_sets/4_ball_another.txt'
-ballStartFileName2PlateVol = './ball_sets/2_plate_volume.txt'
-ballStartFileName2PlateDen = './ball_sets/2_plate_density.txt'
-ballStartFileName4Plate = './ball_sets/4_plate.txt'
-ballStartFileName4PlateCustom = './ball_sets/4_plate_custom.txt'
-ballStartFileNameSimple = './ball_sets/balls_start_simple.txt'
-ballStartFileNameBallMill = './ball_sets/mill/ball_mill_60.txt'
-ballStartFileNameBallMillBig = './ball_sets/mill/ball_mill_120.txt'
-ballStartFileNameVibro1 = './ball_sets/vibro/vibrotest_1.txt'
-
-ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
-ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
-ballStartFileNameTest1_3 = './ball_sets/tests/ball-ball/tests1/test1_3.txt'
-ballStartFileNameTest1_4 = './ball_sets/tests/ball-ball/tests1/test1_4.txt'
-
-ballStartFileNameTest2_1 = './ball_sets/tests/ball-ball/tests2/test2_1.txt'
-ballStartFileNameTest2_2 = './ball_sets/tests/ball-ball/tests2/test2_2.txt'
-ballStartFileNameTest2_3 = './ball_sets/tests/ball-ball/tests2/test2_3.txt'
-ballStartFileNameTest2_4 = './ball_sets/tests/ball-ball/tests2/test2_4.txt'
-
-ballStartFileNameTest3_1 = './ball_sets/tests/ball-wall/tests3/test3_1.txt'
-ballStartFileNameTest3_2 = './ball_sets/tests/ball-wall/tests3/test3_2.txt'
-ballStartFileNameTest3_3 = './ball_sets/tests/ball-wall/tests3/test3_3.txt'
-ballStartFileNameTest3_4 = './ball_sets/tests/ball-wall/tests3/test3_4.txt'
-ballStartFileNameTest3_5 = './ball_sets/tests/ball-wall/tests3/test3_5.txt'
-
-ballStartFileNameTest4_1 = './ball_sets/tests/ball-wall/tests4/test4_1.txt'
-ballStartFileNameTest4_2 = './ball_sets/tests/ball-wall/tests4/test4_2.txt'
-ballStartFileNameTest4_3 = './ball_sets/tests/ball-wall/tests4/test4_3.txt'
-ballStartFileNameTest4_4 = './ball_sets/tests/ball-wall/tests4/test4_4.txt'
-ballStartFileNameTest4_5 = './ball_sets/tests/ball-wall/tests4/test4_5.txt'
-
-coordinatesFileNameCircle = './walls_dynamic/circle.txt'
-coordinatesFileNameCylinderBall = './walls_dynamic/cylinder_ball.txt'
-coordinatesFileNameCylinderCone = './walls_dynamic/cylinder_cone.txt'
-coordinatesFileNamePolygon = './walls_dynamic/polygon.txt'
-coordinatesFileNameRhombus = './walls_dynamic/rhombus.txt'
-coordinatesFileNameSquare = './walls_dynamic/square.txt'
-coordinatesFileNameSquareBig = './walls_dynamic/square_big.txt'
-coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
-coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
-coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
-coordinatesFileNameVibroBox = './walls_dynamic/vibro_box.txt'
-
-coordinatesFileName = coordinatesFileNamePolygon
-ballStartFileName = ballStartFileName4Ball
-oreBallStartFileName = ballStartFileName4BallAnother
+# coordinatesFileName = coordinatesFileNamePolygon
+# ballStartFileName = ballStartFileName4Ball
+# oreBallStartFileName = ballStartFileName4BallAnother
+coordinatesFileName = coordinatesFileNameMill
+ballStartFileName = ballStartFileNameFraction120
+oreBallStartFileName = ballStartFileNameOre120
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 
@@ -180,7 +136,7 @@ while steps < numOfSteps:
         tk.update_idletasks()
         tk.update()
     elements.writeFile(resultFile)
-    if addNewBalls:
+    if addNewBalls and len(newBallSteps):
         if steps >= newBallSteps[0]:
             elements.makeNewBall()
             newBallSteps.remove(newBallSteps[0])

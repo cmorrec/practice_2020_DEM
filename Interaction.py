@@ -10,7 +10,7 @@ class Interaction:
         self.isBall = isBall
         self.number = number
         self.isCount = isCount
-        if isCount:
+        if isCount or not isBall:
             self.entryNormal = entryNormal
             self.accelerationX = accelerationX
             self.accelerationY = accelerationY
@@ -40,7 +40,7 @@ class Interaction:
                            entryNormal,
                            accelerationAngular,
                            stiffness):
-        if self.isCount:
+        if self.isCount or not self.isBall:
             self.accelerationX = accelerationX
             self.accelerationY = accelerationY
             self.jerkX = jerkX

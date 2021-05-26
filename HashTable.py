@@ -40,7 +40,10 @@ class HashTable:
 
         for i in range(len(balls)):
             index = self.hashBall(balls[i])
-            self.table[index].append(HashObject(isBall=True, number=i))
+            if index >= len(self.table):
+                print('Out of range', 'number', i, balls[i].x, balls[i].y, balls[i].color, balls[i].radius)
+            else:
+                self.table[index].append(HashObject(isBall=True, number=i))
 
     def getPairs(self, balls):
         self.update(balls)

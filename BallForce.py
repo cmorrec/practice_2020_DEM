@@ -22,6 +22,9 @@ class BallForce(Ball):
         self.interactionArray = []
         self.interactionCountFlag = False
 
+    def reactForEndInteraction(self, maxEnergy):
+        pass
+
     def wallInteract(self):
         # Смена направления происходит в двух случаях(для обоих разные последствия):
         #   - Пересечения мячом линии стенки

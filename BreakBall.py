@@ -6,8 +6,10 @@ class BreakBall(BallForce):
     def __init__(self, x, y, radius, radiusBegin, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color,
                  canvas, eventBus: EventBus):
         BallForce.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas)
-        self.strength = 0.1      # correct this
-        self.minEnergy = 0.1    # correct this
+        # self.strength = 0.01  # correct this
+        # self.minEnergy = 0.3  # correct this
+        self.strength = 100     # correct this
+        self.minEnergy = 300   # correct this
         self.breakInteractions = []
         self.breakEnergy = 0
         self.probability = 0
@@ -19,13 +21,28 @@ class BreakBall(BallForce):
         self.wallInteract()
         self.transfer()
 
-        if self.updateProps():
-            if self.isDestruct():
-                self.destruct()
         wall = MoveWall.getInstance()
         if self.radius <= wall.throughput:
             if wall.inDeleteCell(self):
                 self.destruct(isNewBalls=False)
+
+    def reactForEndInteraction(self, maxEnergy):
+        if maxEnergy > self.minEnergy:
+            print('maxEnergy',maxEnergy)
+        if maxEnergy > self.minEnergy:
+            self.breakEnergy += maxEnergy - self.minEnergy
+        self.probability = 1 - exp(-1 * self.strength * self.breakEnergy)
+        if self.isDestruct():
+            self.destruct()
+
+    def isDestruct(self) -> bool:
+        if self.radius < self.radiusBegin:
+            return False
+        choice = [True, False]
+        probability = [self.probability, 1 - self.probability]
+        if self.probability > eps:
+            print('probability', self.probability)
+        return rand.choice(choice, size=1, p=probability)
 
     def destruct(self, isNewBalls=True):
         newBalls = []
@@ -39,31 +56,13 @@ class BreakBall(BallForce):
         self.canvas.delete(self.id2)
         self.eventBus.emit(destroyBall, data)
 
-    def updateProps(self):
-        if len(self.breakInteractions) > 0:
-            for interaction in self.breakInteractions:
-                energy = interaction.maxEnergy
-                if energy > self.minEnergy:
-                    self.breakEnergy += energy - self.minEnergy
-            self.probability = 1 - exp(-1 * self.strength * self.breakEnergy)
-            self.breakInteractions.clear()
-            return True
-        return False
-
-    def isDestruct(self) -> bool:
-        if self.radius < self.radiusBegin:
-            return False
-        choice = [True, False]
-        probability = [self.probability, 1 - self.probability]
-        return rand.choice(choice, size=1, p=probability)
-
     def getNewBall(self, beta, newRadius):
         delta = self.radius - newRadius
         newBall = BreakBall(self.x + delta * cos(beta), self.y + delta * sin(beta), newRadius, self.radiusBegin,
                             self.alphaRadian / pi * 180, self.velocityAbsolute, self.velocityTheta, self.cn, self.cs,
                             self.density, self.Emod, self.nu, self.color, self.canvas, self.eventBus)
-        newBall.addVelocity(self.velocityAbsolute * cos(beta) / deltaTime,
-                            self.velocityAbsolute * sin(beta) / deltaTime, 0)
+        newBall.addVelocity(self.velocityAbsolute * cos(beta) / deltaTime / 5,
+                            self.velocityAbsolute * sin(beta) / deltaTime / 5, 0)
 
         return newBall
 
