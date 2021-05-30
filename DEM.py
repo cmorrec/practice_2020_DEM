@@ -3,9 +3,9 @@ from ElementsForce import *
 # coordinatesFileName = coordinatesFileNamePolygon
 # ballStartFileName = ballStartFileName4Ball
 # oreBallStartFileName = ballStartFileName4BallAnother
-coordinatesFileName = coordinatesFileNameMill
-ballStartFileName = ballStartFileNameFraction120
-oreBallStartFileName = ballStartFileNameOre120
+coordinatesFileName = coordinatesFileNameMill1m
+ballStartFileName = ballStartFileNameFraction240
+oreBallStartFileName = ballStartFileNameOre240
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 

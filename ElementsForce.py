@@ -206,10 +206,10 @@ class ElementsForce(Elements):
 
     def makeNewBall(self):
         lastBall = self.balls[-1]
-        radius = lastBall.radiusBegin
+        radius = lastBall.radiusBegin if isinstance(lastBall, BreakBall) else lastBall.radius
         wall = MoveWall.getInstance()
-        self.newBalls.append(BreakBall(x=3.5,#wall.centerX,#
-                                       y=1.0,#wall.centerX,#
+        self.newBalls.append(BreakBall(x=2 * wall.centerX - radius * 1.5,#
+                                       y=wall.centerX,#
                                        radius=radius, radiusBegin=radius,
                                        alpha=0, velocity=0, velocityTheta=0,
                                        cn=lastBall.cn, cs=lastBall.cs, nu=lastBall.nu,

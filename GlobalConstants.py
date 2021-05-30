@@ -1,4 +1,4 @@
-displayRatio = 120
+displayRatio = 300
 midInteractionNum = 100
 inLineDelimiter = '\t'
 ballFlag = 'ball:'
@@ -64,6 +64,8 @@ ballStartFileNameVibro1 = './ball_sets/vibro/vibrotest_1.txt'
 
 ballStartFileNameFraction120 = './ball_sets/mill/fraction/120.txt'
 ballStartFileNameOre120 = './ball_sets/mill/ore/120.txt'
+ballStartFileNameFraction240 = './ball_sets/mill/fraction/240.txt'
+ballStartFileNameOre240 = './ball_sets/mill/ore/240.txt'
 
 ballStartFileNameTest1_1 = './ball_sets/tests/ball-ball/tests1/test1_1.txt'
 ballStartFileNameTest1_2 = './ball_sets/tests/ball-ball/tests1/test1_2.txt'
@@ -96,5 +98,6 @@ coordinatesFileNameSquare = './walls_dynamic/square.txt'
 coordinatesFileNameSquareBig = './walls_dynamic/square_big.txt'
 coordinatesFileNameTrapezoid = './walls_dynamic/trapezoid.txt'
 coordinatesFileNameTriangle = './walls_dynamic/triangle.txt'
-coordinatesFileNameMill = './walls_dynamic/wall_mill.txt'
+coordinatesFileNameMill2Dot5m = './walls_dynamic/wall_mill_2dot5m.txt'
+coordinatesFileNameMill1m = './walls_dynamic/wall_mill_1m.txt'
 coordinatesFileNameVibroBox = './walls_dynamic/vibro_box.txt'
