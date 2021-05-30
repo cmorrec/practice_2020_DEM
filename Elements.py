@@ -172,18 +172,6 @@ class Elements:
                     line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter + '\n')
         file.write(nextStepFlag + inLineDelimiter + '\n')
 
-    # def writeFile(self, file: TextIO):
-    #     for i, ball in enumerate(self.balls):
-    #         # ball: i x y theta radius color
-    #         file.write(
-    #             ballFlag + inLineDelimiter + str(i) + inLineDelimiter + str(ball.x) + inLineDelimiter + str(ball.y) + inLineDelimiter + str(ball.theta) + inLineDelimiter +'\n')
-    #     lines = MoveWall.getInstance().lines
-    #     for i, line in enumerate(lines):
-    #         # wall: i x1 y1 x2 y2
-    #         file.write(
-    #             wallFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter +'\n')
-    #     file.write(nextStepFlag + inLineDelimiter + '\n')
-
     def printPairs(self):
         for pair in self.pairs:
             print(pair.i.number, pair.j.number)

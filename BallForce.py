@@ -157,13 +157,13 @@ class BallForce(Ball):
 
     def isCrossLineBefore(self, numberOfLine):
         for interaction in self.interactionArray:
-            if (not interaction.isBall) and interaction.number == numberOfLine:
+            if (not interaction.isBall) and interaction.number is numberOfLine:
                 return True
         return False
 
     def deleteInteractionLine(self, numberOfLine):
         for interaction in self.interactionArray:
-            if (not interaction.isBall) and interaction.number == numberOfLine:
+            if (not interaction.isBall) and interaction.number is numberOfLine:
                 wallInteraction.append(interaction.n)
                 self.interactionArray.remove(interaction)
                 break

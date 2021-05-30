@@ -36,8 +36,8 @@ class MoveWall(Wall):
 
         # self.deleteCellWidth = 0.1
         # self.throughput = 0.04
-        self.deleteCellWidth = 0.4
-        self.throughput = 0.099
+        self.deleteCellWidth = 0.8
+        self.throughput = 0.049
         self.deleteCellXBegin = centerX - self.deleteCellWidth / 2
         self.deleteCellXEnd = centerX + self.deleteCellWidth / 2
         self.deleteCellYBegin = centerY - self.deleteCellWidth / 2
@@ -137,6 +137,4 @@ class MoveWall(Wall):
             self.flagMove = True
 
     def inDeleteCell(self, ball):
-        if self.deleteCellXBegin < ball.x < self.deleteCellXEnd and self.deleteCellYBegin < ball.y < self.deleteCellYEnd:
-            return True
-        return False
+        return self.deleteCellXBegin < ball.x < self.deleteCellXEnd and self.deleteCellYBegin < ball.y < self.deleteCellYEnd

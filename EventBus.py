@@ -1,5 +1,5 @@
 destroyBall = 'destroyBall'
-
+draw = 'draw'
 
 class EventBus:
     def __init__(self):

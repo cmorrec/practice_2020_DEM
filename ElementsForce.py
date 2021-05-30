@@ -33,7 +33,7 @@ def dampingLocalVelocity(velocity, velocityRelative, c):
     return velocity
 
 
-def methodForce(ball_1, ball_2, numberOf1, numberOf2):
+def methodForce(ball_1, ball_2):
     # Решение задачи о нецентральном упругом ударе двух дисков, путём приведения к задаче о
     # столкновении шаров по оси Х(линия столкновения становится горизонтальной, происходит
     # переход в локальную систему координат)
@@ -115,9 +115,7 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
     accelerationTangent2 += accelerationDampeningTangent2
     # ----------------------------- End damping part -----------------------------
 
-    interactionCountFlag = False
-    if ball_1.interactionCountFlag and ball_2.interactionCountFlag:
-        interactionCountFlag = True
+    interactionCountFlag = ball_1.interactionCountFlag and ball_2.interactionCountFlag
 
     ball_1.saveAccelerationLength(gama, accelerationNormal1, accelerationTangent1, jerkNormal1, jerkTangent1,
                                   jerkAngular1, entryNormal, accelerationAngular1, isBall=True, number=ball_2,
@@ -129,21 +127,20 @@ def methodForce(ball_1, ball_2, numberOf1, numberOf2):
 
 def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить две неиспользуемых переменных
     for interaction in i.interactionArray:
-        if interaction.isBall and interaction.number == numberOfJ:
+        if interaction.isBall and interaction.number is numberOfJ:
             return True
     return False
 
 
 def deleteInteraction(i, numberOfJ, recursion = True):
     for interaction in i.interactionArray:
-        if interaction.isBall and interaction.number == numberOfJ:
+        if interaction.isBall and interaction.number is numberOfJ:
             if len(ballInteraction) > 0:
                 if ballInteraction[len(ballInteraction) - 1] != interaction.n:
                     ballInteraction.append(interaction.n)
             else:
                 ballInteraction.append(interaction.n)
             if isinstance(i, BreakBall) and recursion:
-                i.addBreakInteraction(number=interaction.number, isBall=interaction.isBall)
                 i.reactForEndInteraction(interaction.maxEnergy)
             if interaction in i.interactionArray:
                 i.interactionArray.remove(interaction)
@@ -164,6 +161,24 @@ class ElementsForce(Elements):
         # а ускорений взаимодействия, что проверяется отдельно
         if len(self.newBalls) > 0 or self.recalculateGrid:
             for ball in self.removingBalls:
+                index = -1
+                for i, ball_ in enumerate(self.balls):
+                    if ball_ == ball:
+                        index = i
+                        break
+                if index == -1:
+                    print('elemForce -> destruct -> i try to remove ball that does not exist')
+                    exit(1)
+                for pair in self.pairs:
+                    i = pair.i.number
+                    j = pair.j.number
+                    if i != index and j != index:
+                        continue
+                    elif j == index:
+                        i, j = j, i
+                    deleteInteraction(self.balls[j], self.balls[index], False)
+
+            for ball in self.removingBalls:
                 if ball in self.balls:
                     self.balls.remove(ball)
             self.balls.extend(self.newBalls)
@@ -175,36 +190,26 @@ class ElementsForce(Elements):
         for pair in self.pairs:
             i = pair.i.number
             j = pair.j.number
-            if isCrossForce(self.balls[i], self.balls[j]):
-                methodForce(self.balls[i], self.balls[j], i, j)
-            elif isCrossBefore(self.balls[i], self.balls[j]):
-                deleteInteraction(self.balls[i], self.balls[j])
-                deleteInteraction(self.balls[j], self.balls[i])
+            ball_i = self.balls[i]
+            ball_j = self.balls[j]
+            if isCrossForce(ball_i, ball_j):
+                methodForce(ball_i, ball_j)
+            elif isCrossBefore(ball_i, ball_j):
+                deleteInteraction(ball_i, ball_j)
+                deleteInteraction(ball_j, ball_i)
 
     def destruct(self, data):
         ball = data['destroyingBall']
+        for ball_ in self.removingBalls:
+            if ball_ is ball:
+                return
         newBalls = data['newBalls']
-        index = -1
-        for i, ball_ in enumerate(self.balls):
-            if ball_ == ball:
-                index = i
-        if index == -1:
-            print('elemForce -> destruct -> i try to remove ball that does not exist')
-            exit(1)
-        for pair in self.pairs:
-            i = pair.i.number
-            j = pair.j.number
-            if i != index and j != index:
-                continue
-            elif j == index:
-                i, j = j, i
-            deleteInteraction(self.balls[j], self.balls[index], False)
-
         self.removingBalls.append(ball)
         self.newBalls.extend(newBalls)
         self.recalculateGrid = True
 
     def makeNewBall(self):
+        print('It`s new ball')
         lastBall = self.balls[-1]
         radius = lastBall.radiusBegin if isinstance(lastBall, BreakBall) else lastBall.radius
         wall = MoveWall.getInstance()

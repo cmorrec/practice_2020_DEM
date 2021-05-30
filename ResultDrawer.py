@@ -43,10 +43,10 @@ class CustomBall:
         self.yLastDraw = y
         self.theta = theta
         self.radius = radius
-        self.color = color
+        self.color = color.rstrip()
         self.canvas = canvas_
         self.id = canvas.create_oval(displayRatio * (x - radius), displayRatio * (y - radius),
-                                     displayRatio * (x + radius), displayRatio * (y + radius), fill=color)
+                                     displayRatio * (x + radius), displayRatio * (y + radius), fill=color.rstrip())
         self.id2 = canvas.create_line(displayRatio * x, displayRatio * y, displayRatio * (x + radius * cos(self.theta)),
                                       displayRatio * (y + radius * sin(self.theta)), width=2, fill="black")
 
@@ -113,7 +113,7 @@ while True:
         remove(balls, lines)
         balls.clear()
         lines.clear()
-        # time.sleep(0.01)
+        time.sleep(0.1)
     elif newLine[0] == utilsFlag:
         pass
     elif newLine[0] == endFileFlag or newLine[0] == '':

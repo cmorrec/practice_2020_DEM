@@ -6,6 +6,8 @@ from ElementsForce import *
 coordinatesFileName = coordinatesFileNameMill1m
 ballStartFileName = ballStartFileNameFraction240
 oreBallStartFileName = ballStartFileNameOre240
+ballStartFileName = ballStartFileName1Ball
+oreBallStartFileName = ballStartFileNameSimple
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 

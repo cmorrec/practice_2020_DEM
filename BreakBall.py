@@ -1,5 +1,5 @@
 from BallForce import *
-from EventBus import EventBus, destroyBall
+from EventBus import EventBus, destroyBall, draw
 
 
 class BreakBall(BallForce):
@@ -8,9 +8,8 @@ class BreakBall(BallForce):
         BallForce.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas)
         # self.strength = 0.01  # correct this
         # self.minEnergy = 0.3  # correct this
-        self.strength = 100     # correct this
-        self.minEnergy = 300   # correct this
-        self.breakInteractions = []
+        self.strength = 0.01     # correct this
+        self.minEnergy = 35 * radius / radiusBegin   # correct this
         self.breakEnergy = 0
         self.probability = 0
         self.eventBus = eventBus
@@ -31,17 +30,20 @@ class BreakBall(BallForce):
             print('maxEnergy',maxEnergy)
         if maxEnergy > self.minEnergy:
             self.breakEnergy += maxEnergy - self.minEnergy
-        self.probability = 1 - exp(-1 * self.strength * self.breakEnergy)
-        if self.isDestruct():
-            self.destruct()
+            self.probability = 1 - exp(-1 * self.strength * self.breakEnergy)
+            if self.probability > eps:
+                print('probability', self.probability)
+            if self.isDestruct():
+                self.destruct()
 
     def isDestruct(self) -> bool:
-        if self.radius < self.radiusBegin:
+        if self.radius < 0.5 * self.radiusBegin:
             return False
+        for interaction in self.interactionArray:
+            if not interaction.isBall:
+                return False
         choice = [True, False]
         probability = [self.probability, 1 - self.probability]
-        if self.probability > eps:
-            print('probability', self.probability)
         return rand.choice(choice, size=1, p=probability)
 
     def destruct(self, isNewBalls=True):
@@ -78,9 +80,3 @@ class BreakBall(BallForce):
             numOfBalls -= 1
 
         return balls
-
-    # использовать в момент удаления этого взаимодействия
-    def addBreakInteraction(self, number, isBall):
-        for interaction in self.interactionArray:
-            if number == interaction.number and isBall == interaction.isBall:
-                self.breakInteractions.append(interaction)
