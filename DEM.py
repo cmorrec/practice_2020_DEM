@@ -4,10 +4,10 @@ from ElementsForce import *
 # ballStartFileName = ballStartFileName4Ball
 # oreBallStartFileName = ballStartFileName4BallAnother
 coordinatesFileName = coordinatesFileNameMill1m
-ballStartFileName = ballStartFileNameFraction240
-oreBallStartFileName = ballStartFileNameOre240
-ballStartFileName = ballStartFileName1Ball
-oreBallStartFileName = ballStartFileNameSimple
+ballStartFileName = ballStartFileNameFractionDiploma1
+oreBallStartFileName = ballStartFileNameOreDiploma1
+# ballStartFileName = ballStartFileName1Ball
+# oreBallStartFileName = ballStartFileNameSimple
 coordinatesFile = open(coordinatesFileName, 'r')
 coordinatesFromFile = []
 
