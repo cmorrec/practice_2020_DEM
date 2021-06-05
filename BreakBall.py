@@ -19,6 +19,7 @@ class BreakBall(BallForce):
     def move(self):
         self.wallInteract()
         self.transfer()
+        self.interactionCountFlag = True
 
         wall = MoveWall.getInstance()
         if self.radius <= wall.throughput:

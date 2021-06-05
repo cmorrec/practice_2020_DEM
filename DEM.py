@@ -4,7 +4,7 @@ from ElementsForce import *
 # ballStartFileName = ballStartFileName4Ball
 # oreBallStartFileName = ballStartFileName4BallAnother
 coordinatesFileName = coordinatesFileNameMill1m
-ballStartFileName = ballStartFileNameFractionDiploma1
+ballStartFileName = ballStartFileNameFractionDiploma2
 oreBallStartFileName = ballStartFileNameOreDiploma1
 # ballStartFileName = ballStartFileName1Ball
 # oreBallStartFileName = ballStartFileNameSimple

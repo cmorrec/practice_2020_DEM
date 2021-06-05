@@ -43,6 +43,7 @@ class BallForce(Ball):
     def transfer(self):
         # Обновление направлений скоростей
         self.addAccelerationInteractionMethod()
+        self.interactionCountFlag = True
 
         self.x += (self.velocityX * deltaTime) + (0.5 * (self.accelerationX + self.accelerationInteractionX) * (
                 deltaTime ** 2)) + (self.jerkX * (deltaTime ** 3) / 6)
@@ -71,8 +72,6 @@ class BallForce(Ball):
             self.jerkX += interaction.jerkX
             self.jerkY += interaction.jerkY
             self.jerkTheta += interaction.jerkTheta
-
-        self.interactionCountFlag = True
 
     def expandForce(self, line, numberOfLine):
         alphaRadianLocal = self.alphaRadian - line.alphaNorm

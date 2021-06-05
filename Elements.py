@@ -155,7 +155,6 @@ class Elements:
         for ball in self.balls:
             ball.draw()
         MoveWall.getInstance().draw()
-        self.pairs = self.hashTable.getPairs(self.balls)
 
     def writeFile(self, file: TextIO):
         for i, ball in enumerate(self.balls):
@@ -171,6 +170,7 @@ class Elements:
                 wallInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(
                     line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter + '\n')
         file.write(nextStepFlag + inLineDelimiter + '\n')
+        self.pairs = self.hashTable.getPairs(self.balls)
 
     def printPairs(self):
         for pair in self.pairs:
