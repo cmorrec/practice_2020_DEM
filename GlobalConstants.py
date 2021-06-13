@@ -25,10 +25,10 @@ eps = 1e-9
 
 step = 100
 deltaTime = 1 * 1e-5
-numOfSeconds = 60
+numOfSeconds = 15
 numOfSteps = int(numOfSeconds * int(1 / deltaTime))
 addNewBalls = True
-newBallPeriod = 6
+newBallPeriod = 5
 newBallPeriodSteps = round(newBallPeriod * int(1 / deltaTime))
 newBallCount = round(numOfSeconds / newBallPeriod)
 newBallSteps = [i * newBallPeriodSteps for i in range(1, newBallCount)]

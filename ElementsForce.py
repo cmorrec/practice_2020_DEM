@@ -207,6 +207,8 @@ class ElementsForce(Elements):
         self.removingBalls.append(ball)
         self.newBalls.extend(newBalls)
         self.recalculateGrid = True
+        if len(newBalls) == 0:
+            self.deadBalls.append(ball.radius)
 
     def makeNewBall(self):
         print('It`s new ball')
