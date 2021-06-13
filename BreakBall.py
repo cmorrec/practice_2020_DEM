@@ -8,8 +8,8 @@ class BreakBall(BallForce):
         BallForce.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas)
         # self.strength = 0.01  # correct this
         # self.minEnergy = 0.3  # correct this
-        self.strength = 0.01     # correct this
-        self.minEnergy = 35 * radius / radiusBegin   # correct this
+        self.strength = 0.002     # correct this
+        self.minEnergy = 20 * radius / radiusBegin   # correct this
         self.breakEnergy = 0
         self.probability = 0
         self.eventBus = eventBus
@@ -27,15 +27,15 @@ class BreakBall(BallForce):
                 self.destruct(isNewBalls=False)
 
     def reactForEndInteraction(self, maxEnergy):
-        if maxEnergy > self.minEnergy:
-            print('maxEnergy',maxEnergy)
+        # if maxEnergy > self.minEnergy:
+        #     print('maxEnergy',maxEnergy)
         if maxEnergy > self.minEnergy:
             self.breakEnergy += maxEnergy - self.minEnergy
             self.probability = 1 - exp(-1 * self.strength * self.breakEnergy)
-            if self.probability > eps:
-                print('probability', self.probability)
-            if self.isDestruct():
-                self.destruct()
+            # if self.probability > eps:
+            #     print('probability', self.probability)
+        if self.isDestruct():
+            self.destruct()
 
     def isDestruct(self) -> bool:
         if self.radius < 0.5 * self.radiusBegin:

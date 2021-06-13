@@ -11,16 +11,16 @@ from GlobalConstants import *
 import numpy.random as rand
 
 # Энергия
-kineticPlot = []
-potentialPlot = []
-summaryPlot = []
-forcePlot = []
-velocityPlot = []
-jerkPlot = []
-wallInteraction = []
-ballInteraction = []
-stepCount = [0]
-stepCountForce = []
+#kineticPlot = []
+#potentialPlot = []
+#summaryPlot = []
+#forcePlot = []
+#velocityPlot = []
+#jerkPlot = []
+#wallInteraction = []
+#ballInteraction = []
+#stepCount = [0]
+#stepCountForce = []
 
 
 # --------------- Функции для отображения и результатов --------------

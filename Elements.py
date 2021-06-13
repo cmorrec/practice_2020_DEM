@@ -88,8 +88,9 @@ class Elements:
         self.balls = balls
         self.started = False
         self.canvas = canvas
-        self.startEnergy = self.energy()
-        self.step = 0
+        # self.startEnergy = self.energy()
+        # self.step = 0
+        print('start')
         self.hashTable = HashTable(self.balls)
         self.pairs = self.hashTable.getPairs(self.balls)
         # for i in range(self.hashTable.elementsOfX):
@@ -99,57 +100,57 @@ class Elements:
         #     canvas.create_line(0, displayRatio * i * self.hashTable.delta, displayRatio * self.hashTable.width,
         #                        displayRatio * i * self.hashTable.delta)
 
-    def energyMonitoring(self):
-        print("Количество энергии", self.energyToSee(), "\n")
+    # def energyMonitoring(self):
+    #     print("Количество энергии", self.energyToSee(), "\n")
 
     def start(self, event):
         self.started = True
-        self.energyMonitoring()
+        # self.energyMonitoring()
 
     def begin(self):
         self.started = True
-        self.energyMonitoring()
+        # self.energyMonitoring()
 
     def exit(self, event):
         self.started = False
         saveResults(self)
-        self.energyMonitoring()
-        plotter()
+        # self.energyMonitoring()
+        # plotter()
 
-    def energyToSee(self):
-        energyCount = 0
-        for ball in self.balls:
-            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
-                    ball.velocityTheta ** 2) + ball.mass * MoveWall.getInstance().accelerationY * (
-                                   MoveWall.getInstance().maxY - ball.y)
-        return energyCount
+    # def energyToSee(self):
+    #     energyCount = 0
+    #     for ball in self.balls:
+    #         energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
+    #                 ball.velocityTheta ** 2) + ball.mass * MoveWall.getInstance().accelerationY * (
+    #                                MoveWall.getInstance().maxY - ball.y)
+    #     return energyCount
+    #
+    # def energy(self):
+    #     energyCount = self.energyKinetic() + self.energyPotential()
+    #     # summaryPlot.append(energyCount)
+    #     return energyCount
 
-    def energy(self):
-        energyCount = self.energyKinetic() + self.energyPotential()
-        summaryPlot.append(energyCount)
-        return energyCount
+    # def energyKinetic(self):
+    #     energyCount = 0
+    #     for ball in self.balls:
+    #         energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
+    #                 ball.velocityTheta ** 2)
+    #     kineticPlot.append(energyCount)
+    #     return energyCount
 
-    def energyKinetic(self):
-        energyCount = 0
-        for ball in self.balls:
-            energyCount += 0.5 * ball.mass * (ball.velocityAbsolute ** 2) + 0.5 * ball.momentInertial * (
-                    ball.velocityTheta ** 2)
-        kineticPlot.append(energyCount)
-        return energyCount
-
-    def energyPotential(self):
-        energyCount = 0
-        for ball in self.balls:
-            energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
-            if isForce:
-                for interaction in ball.interactionArray:
-                    if interaction.isBall:
-                        energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 4
-                    else:
-                        energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 2
-
-        potentialPlot.append(energyCount)
-        return energyCount
+    # def energyPotential(self):
+    #     energyCount = 0
+    #     for ball in self.balls:
+    #         energyCount += ball.mass * MoveWall.getInstance().accelerationY * (MoveWall.getInstance().maxY - ball.y)
+    #         if isForce:
+    #             for interaction in ball.interactionArray:
+    #                 if interaction.isBall:
+    #                     energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 4
+    #                 else:
+    #                     energyCount += (interaction.stiffness * interaction.entryNormal ** 2) / 2
+    #
+    #     potentialPlot.append(energyCount)
+    #     return energyCount
 
     def draw(self):
         for ball in self.balls:
@@ -179,9 +180,9 @@ class Elements:
 
     def move(self):
         self.calculation()
-        self.energy()
-        self.step += 1
-        stepCount.append(self.step)
+        # self.energy()
+        # self.step += 1
+        # stepCount.append(self.step)
         MoveWall.getInstance().move()
         for ball in self.balls:
             ball.move()

@@ -58,12 +58,12 @@ def methodForce(ball_1, ball_2):
     forceNormal1 = stiffness * entryNormal
     forceNormal2 = -1 * stiffness * entryNormal
 
-    forcePlot.append(forceNormal1)
-    velocityPlot.append(velocity1XLocal * 10000)
-    if len(stepCountForce) == 0:
-        stepCountForce.append(0)
-    else:
-        stepCountForce.append(stepCountForce[len(stepCountForce) - 1] + 1)
+    # forcePlot.append(forceNormal1)
+    # velocityPlot.append(velocity1XLocal * 10000)
+    # if len(stepCountForce) == 0:
+    #     stepCountForce.append(0)
+    # else:
+    #     stepCountForce.append(stepCountForce[len(stepCountForce) - 1] + 1)
 
     accelerationNormal1 = forceNormal1 / ball_1.mass
     accelerationNormal2 = forceNormal2 / ball_2.mass
@@ -90,7 +90,7 @@ def methodForce(ball_1, ball_2):
                                                              signVelocityRelativeAngular,
                                                              accelerationAngular1,
                                                              accelerationTangent1, E_eff)
-    jerkPlot.append(jerkNormal1 * 1e-3)
+    # jerkPlot.append(jerkNormal1 * 1e-3)
     jerkNormal2, jerkTangent2, jerkAngular2 = ball_2.getJerk(entryNormal, velocity2XLocal,
                                                              accelerationNormal2,
                                                              signVelocityRelativeTangent2, -1, radiusEffective,
@@ -135,11 +135,11 @@ def isCrossBefore(i, numberOfJ):  # Возможно стоит удалить �
 def deleteInteraction(i, numberOfJ, recursion = True):
     for interaction in i.interactionArray:
         if interaction.isBall and interaction.number is numberOfJ:
-            if len(ballInteraction) > 0:
-                if ballInteraction[len(ballInteraction) - 1] != interaction.n:
-                    ballInteraction.append(interaction.n)
-            else:
-                ballInteraction.append(interaction.n)
+            # if len(ballInteraction) > 0:
+            #     if ballInteraction[len(ballInteraction) - 1] != interaction.n:
+            #         ballInteraction.append(interaction.n)
+            # else:
+            #     ballInteraction.append(interaction.n)
             if isinstance(i, BreakBall) and recursion:
                 i.reactForEndInteraction(interaction.maxEnergy)
             if interaction in i.interactionArray:

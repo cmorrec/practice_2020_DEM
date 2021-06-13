@@ -14,7 +14,7 @@ def getForceDamping(c):
     return 1 - (1 - c) ** (1 / midInteractionNum)
 
 
-isDraw = True
+isDraw = False
 isForce = True
 # Класс GlobalUtils будет хранить в себе все сторонние библиотеки и константы
 epsVelocity = 0.01
@@ -25,10 +25,10 @@ eps = 1e-9
 
 step = 100
 deltaTime = 1 * 1e-5
-numOfSeconds = 5
+numOfSeconds = 60
 numOfSteps = int(numOfSeconds * int(1 / deltaTime))
 addNewBalls = True
-newBallPeriod = 0.2
+newBallPeriod = 6
 newBallPeriodSteps = round(newBallPeriod * int(1 / deltaTime))
 newBallCount = round(numOfSeconds / newBallPeriod)
 newBallSteps = [i * newBallPeriodSteps for i in range(1, newBallCount)]
