@@ -172,7 +172,7 @@ class Elements:
                 wallInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(
                     line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter + '\n')
         for ball in self.deadBalls:
-            file.write(utilsFlag + inLineDelimiter + ball)
+            file.write(utilsFlag + inLineDelimiter + ball + '\n')
         file.write(nextStepFlag + inLineDelimiter + '\n')
         self.deadBalls.clear()
         self.pairs = self.hashTable.getPairs(self.balls)
