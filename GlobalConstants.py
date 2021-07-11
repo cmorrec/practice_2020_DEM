@@ -6,6 +6,7 @@ ballInitFlag = 'ballInit:'
 wallFlag = 'wall:'
 wallInitFlag = 'wallInit:'
 utilsFlag = 'utils:'
+strangeFlag = 'strange:'
 nextStepFlag = 'next'
 endFileFlag = 'end\n'
 
@@ -28,7 +29,7 @@ deltaTime = 1 * 1e-5
 numOfSeconds = 15
 numOfSteps = int(numOfSeconds * int(1 / deltaTime))
 addNewBalls = True
-newBallPeriod = 5
+newBallPeriod = 0.4
 newBallPeriodSteps = round(newBallPeriod * int(1 / deltaTime))
 newBallCount = round(numOfSeconds / newBallPeriod)
 newBallSteps = [i * newBallPeriodSteps for i in range(1, newBallCount)]

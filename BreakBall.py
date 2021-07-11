@@ -8,8 +8,8 @@ class BreakBall(BallForce):
         BallForce.__init__(self, x, y, radius, alpha, velocity, velocityTheta, cn, cs, density, Emod, nu, color, canvas)
         # self.strength = 0.01  # correct this
         # self.minEnergy = 0.3  # correct this
-        self.strength = 0.002     # correct this
-        self.minEnergy = 20 * radius / radiusBegin   # correct this
+        self.strength = 0.01     # correct this
+        self.minEnergy = 25 * radius / radiusBegin   # correct this
         self.breakEnergy = 0
         self.probability = 0
         self.eventBus = eventBus

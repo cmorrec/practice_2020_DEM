@@ -123,7 +123,7 @@ resultFile = open(getName(elements, coordinatesFileName, ballStartFileName, freq
                   'w')
 makeUtils(resultFile, canvasWidth, canvasHeight)
 
-elements.writeFile(resultFile)
+elements.writeFile(resultFile, 0)
 elements.begin()
 
 start_time = time.time()
@@ -137,7 +137,7 @@ while steps < numOfSteps:
         elements.draw()
         tk.update_idletasks()
         tk.update()
-    elements.writeFile(resultFile)
+    elements.writeFile(resultFile, steps * deltaTime)
     if addNewBalls and len(newBallSteps):
         if steps >= newBallSteps[0]:
             elements.makeNewBall()
@@ -148,5 +148,5 @@ print("+++ %s seconds +++" % (time.time() - start_time))
 resultFile.write(endFileFlag)
 resultFile.close()
 
-elements.energyMonitoring()
+# elements.energyMonitoring()
 elements.exit(None)

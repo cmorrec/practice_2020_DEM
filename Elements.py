@@ -86,6 +86,10 @@ def method(i, j):
 class Elements:
     def __init__(self, balls, canvas):
         self.balls = balls
+        self.deadMass = 0
+        self.saveMass = 0
+        for ball in balls:
+            self.saveMass += 4 / 3 * pi * (ball.radius ** 3)
         self.started = False
         self.canvas = canvas
         self.deadBalls = []
@@ -158,7 +162,7 @@ class Elements:
             ball.draw()
         MoveWall.getInstance().draw()
 
-    def writeFile(self, file: TextIO):
+    def writeFile(self, file: TextIO, time: float):
         for i, ball in enumerate(self.balls):
             # ballInit: i x y theta radius color
             file.write(
@@ -172,7 +176,13 @@ class Elements:
                 wallInitFlag + inLineDelimiter + str(i) + inLineDelimiter + str(line.x1) + inLineDelimiter + str(
                     line.y1) + inLineDelimiter + str(line.x2) + inLineDelimiter + str(line.y2) + inLineDelimiter + '\n')
         for ball in self.deadBalls:
-            file.write(utilsFlag + inLineDelimiter + ball + '\n')
+            file.write(utilsFlag + inLineDelimiter + str(ball) + '\n')
+            mass = 4 / 3 * pi * (ball ** 3)
+            self.deadMass += mass
+            self.saveMass -= mass
+        if len(self.deadBalls) > 0:
+            file.write(strangeFlag + inLineDelimiter + str(self.deadMass) + inLineDelimiter + str(self.saveMass) +
+                       inLineDelimiter + str(time) + '\n')
         file.write(nextStepFlag + inLineDelimiter + '\n')
         self.deadBalls.clear()
         self.pairs = self.hashTable.getPairs(self.balls)

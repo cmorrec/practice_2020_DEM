@@ -223,3 +223,4 @@ class ElementsForce(Elements):
                                        density=lastBall.density, Emod=lastBall.Emod,
                                        color=lastBall.color, canvas=self.canvas,
                                        eventBus=self.eventBus))
+        self.saveMass += 4 / 3 * pi * (radius ** 3)
